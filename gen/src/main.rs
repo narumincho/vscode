@@ -1,3 +1,5 @@
+use std::vec;
+
 #[tokio::main]
 pub async fn main() -> anyhow::Result<()> {
     let result = reqwest::get(
@@ -43,40 +45,7 @@ pub async fn main() -> anyhow::Result<()> {
     let filtered = first_module_block
         .body
         .into_iter()
-        .filter_map(|b| {
-            if let Some(module_declaration) = b.as_module_decl() {
-                if let Some(export_declaration) = module_declaration.as_export_decl() {
-                    if let Some(type_alias) = export_declaration.decl.as_ts_type_alias() {
-                        match format!("{}", type_alias.id.to_id().0).as_str() {
-                            "DocumentFieldValue" => Some(swc_ecma_ast::ModuleItem::ModuleDecl(
-                                swc_ecma_ast::ModuleDecl::ExportDecl(swc_ecma_ast::ExportDecl {
-                                    span: swc_common::Span::default(),
-                                    decl: swc_ecma_ast::Decl::TsTypeAlias(Box::new(
-                                        swc_ecma_ast::TsTypeAliasDecl {
-                                            span: swc_common::Span::default(),
-                                            declare: false,
-                                            id: type_alias.id.clone(),
-                                            type_ann: Box::new(swc_ecma_ast::TsType::TsKeywordType(swc_ecma_ast::TsKeywordType {
-                                                span: swc_common::Span::default(),
-                                                kind: swc_ecma_ast::TsKeywordTypeKind::TsBooleanKeyword,
-                                            })),
-                                            type_params: None,
-                                        },
-                                    )),
-                                }),
-                            )),
-                            _ => Some(b),
-                        }
-                    } else {
-                        None
-                    }
-                } else {
-                    None
-                }
-            } else {
-                None
-            }
-        })
+        .filter_map(|b| module_item_transform(&b))
         .collect::<Vec<_>>();
 
     let result = swc_ecma_ast::TsModuleBlock {
@@ -114,4 +83,46 @@ pub enum Error {
 
     #[error("first module body not found")]
     FirstModuleBodyNotFound,
+}
+
+fn module_item_transform(
+    module_item: &swc_ecma_ast::ModuleItem,
+) -> Option<swc_ecma_ast::ModuleItem> {
+    let module_declaration = module_item.as_module_decl()?;
+    let export_declaration = module_declaration.as_export_decl()?;
+    match &export_declaration.decl {
+        swc_ecma_ast::Decl::Class(class) => Some(swc_ecma_ast::ModuleItem::ModuleDecl(
+            swc_ecma_ast::ModuleDecl::ExportDecl(swc_ecma_ast::ExportDecl {
+                span: export_declaration.span,
+                decl: swc_ecma_ast::Decl::TsTypeAlias(Box::new(swc_ecma_ast::TsTypeAliasDecl {
+                    span: swc_common::Span::default(),
+                    declare: false,
+                    id: class.ident.clone(),
+                    type_ann: Box::new(swc_ecma_ast::TsType::TsTypeLit(swc_ecma_ast::TsTypeLit {
+                        span: swc_common::Span::default(),
+                        members: class
+                            .class
+                            .body
+                            .iter()
+                            .filter_map(|class_member| match class_member {
+                                swc_ecma_ast::ClassMember::Constructor(constructor) => {
+                                    Some(swc_ecma_ast::TsTypeElement::TsConstructSignatureDecl(
+                                        swc_ecma_ast::TsConstructSignatureDecl {
+                                            span: constructor.span,
+                                            params: vec![],
+                                            type_ann: None,
+                                            type_params: None,
+                                        },
+                                    ))
+                                }
+                                _ => None,
+                            })
+                            .collect(),
+                    })),
+                    type_params: None,
+                })),
+            }),
+        )),
+        _ => None,
+    }
 }

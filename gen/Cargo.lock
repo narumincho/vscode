@@ -573,6 +573,7 @@ dependencies = [
  "anyhow",
  "once_cell",
  "reqwest",
+ "string_cache",
  "swc",
  "swc_common",
  "swc_ecma_ast",
