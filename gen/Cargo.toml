@@ -1,0 +1,18 @@
+[package]
+name = "gen"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tokio = { version = "1.25.0", features = ["macros", "rt-multi-thread"] }
+anyhow = "1.0.69"
+reqwest = "0.11.14"
+thiserror = "1.0.38"
+swc = "0.245.25"
+swc_common = "0.29.31"
+swc_ecma_parser = "0.124.9"
+swc_ecma_ast = "0.96.5"
+swc_ecma_codegen = "0.129.12"
+once_cell = "1.17.0"
