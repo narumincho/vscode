@@ -1,4 +1,8 @@
 /*サンプルコメント*/ export function requireVsCode() {}
+/*import VS Code API
+```ts
+ require("vscode")
+```*/ export type requireVsCode = "aa";
 /**
 	 * Represents a reference to a command. Provides a title which
 	 * will be used to represent a command in the UI and, optionally,

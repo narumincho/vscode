@@ -44,15 +44,11 @@ pub async fn main() -> anyhow::Result<()> {
 
     let mut module_map = Vec::<swc_ecma_ast::ModuleItem>::new();
 
-    let require_vs_code_span = swc_common::Span::new(
-        swc_common::source_map::BytePos::SYNTHESIZED,
-        swc_common::source_map::BytePos::SYNTHESIZED,
-        swc_common::hygiene::SyntaxContext::empty(),
-    );
-    println!("{:?}", require_vs_code_span);
+    let require_vs_code_byte_pos = swc_common::source_map::Pos::from_u32(1);
+
     swc_common::comments::Comments::add_leading(
         &comments,
-        require_vs_code_span.lo(),
+        require_vs_code_byte_pos,
         swc_common::comments::Comment {
             span: swc_common::DUMMY_SP,
             kind: swc_common::comments::CommentKind::Block,
@@ -62,7 +58,7 @@ pub async fn main() -> anyhow::Result<()> {
 
     module_map.push(swc_ecma_ast::ModuleItem::ModuleDecl(
         swc_ecma_ast::ModuleDecl::ExportDecl(swc_ecma_ast::ExportDecl {
-            span: require_vs_code_span,
+            span: swc_common::Spanned::span(&require_vs_code_byte_pos),
             decl: swc_ecma_ast::Decl::Fn(swc_ecma_ast::FnDecl {
                 ident: swc_ecma_ast::Ident::new(
                     string_cache::Atom::from("requireVsCode"),
@@ -83,6 +79,40 @@ pub async fn main() -> anyhow::Result<()> {
                     return_type: None,
                 }),
             }),
+        }),
+    ));
+
+    let type_vscode_api_byte_pos = swc_common::source_map::Pos::from_u32(2);
+    swc_common::comments::Comments::add_leading(
+        &comments,
+        type_vscode_api_byte_pos,
+        swc_common::comments::Comment {
+            span: swc_common::DUMMY_SP,
+            kind: swc_common::comments::CommentKind::Block,
+            text: swc::atoms::Atom::from(
+                "import VS Code API
+```ts
+ require(\"vscode\")
+```",
+            ),
+        },
+    );
+    module_map.push(swc_ecma_ast::ModuleItem::ModuleDecl(
+        swc_ecma_ast::ModuleDecl::ExportDecl(swc_ecma_ast::ExportDecl {
+            span: swc_common::Spanned::span(&type_vscode_api_byte_pos),
+            decl: swc_ecma_ast::Decl::TsTypeAlias(Box::new(swc_ecma_ast::TsTypeAliasDecl {
+                id: swc_ecma_ast::Ident::new(
+                    string_cache::Atom::from("requireVsCode"),
+                    swc_common::Span::default(),
+                ),
+                declare: false,
+                span: swc_common::Span::default(),
+                type_ann: Box::new(swc_ecma_ast::TsType::TsLitType(swc_ecma_ast::TsLitType {
+                    span: swc_common::Span::default(),
+                    lit: swc_ecma_ast::TsLit::Str(swc_ecma_ast::Str::from("aa")),
+                })),
+                type_params: None,
+            })),
         }),
     ));
 
