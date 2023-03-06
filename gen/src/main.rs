@@ -44,7 +44,22 @@ pub async fn main() -> anyhow::Result<()> {
 
     let mut module_map = Vec::<swc_ecma_ast::ModuleItem>::new();
 
-    let require_vs_code_span = swc_common::Span::default();
+    let require_vs_code_span = swc_common::Span::new(
+        swc_common::source_map::BytePos(1),
+        swc_common::source_map::BytePos(1),
+        swc_common::hygiene::SyntaxContext::empty(),
+    );
+    println!("{:?}", require_vs_code_span);
+    swc_common::comments::Comments::add_leading(
+        &comments,
+        require_vs_code_span.lo(),
+        swc_common::comments::Comment {
+            span: swc_common::DUMMY_SP,
+            kind: swc_common::comments::CommentKind::Block,
+            text: swc::atoms::atom!("サンプルコメント"),
+        },
+    );
+
     module_map.push(swc_ecma_ast::ModuleItem::ModuleDecl(
         swc_ecma_ast::ModuleDecl::ExportDecl(swc_ecma_ast::ExportDecl {
             span: require_vs_code_span,
