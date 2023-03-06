@@ -189,15 +189,15 @@ fn class_member_to_ts_type_element(
                 },
             ))
         }
-        swc_ecma_ast::ClassMember::ClassProp(classProp) => {
-            if classProp.is_static {
+        swc_ecma_ast::ClassMember::ClassProp(class_prop) => {
+            if class_prop.is_static {
                 None
             } else {
                 Some(swc_ecma_ast::TsTypeElement::TsPropertySignature(
                     swc_ecma_ast::TsPropertySignature {
-                        span: classProp.span,
-                        readonly: classProp.readonly,
-                        key: Box::new(match &classProp.key {
+                        span: class_prop.span,
+                        readonly: class_prop.readonly,
+                        key: Box::new(match &class_prop.key {
                             swc_ecma_ast::PropName::BigInt(big_int) => {
                                 swc_ecma_ast::Expr::Lit(swc_ecma_ast::Lit::BigInt(big_int.clone()))
                             }
@@ -213,10 +213,10 @@ fn class_member_to_ts_type_element(
                             swc_ecma_ast::PropName::Computed(computed) => *computed.expr.clone(),
                         }),
                         computed: false,
-                        optional: classProp.is_optional,
+                        optional: false,
                         init: None,
                         params: vec![],
-                        type_ann: classProp.type_ann.clone(),
+                        type_ann: class_prop.type_ann.clone(),
                         type_params: None,
                     },
                 ))

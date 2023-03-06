@@ -105,7 +105,7 @@
 		 */ readonly id: string;
     /**
 		 * The optional ThemeColor of the icon. The color is currently only used in {@link TreeItem}.
-		 */ readonly color??: ThemeColor | undefined;
+		 */ readonly color?: ThemeColor | undefined;
     /**
 		 * Creates a reference to a theme icon.
 		 * @param id id of the icon. The available icons are listed in https://code.visualstudio.com/api/references/icons-in-labels#icon-listing.
@@ -275,28 +275,28 @@
 		 */ title: string;
     /**
 		 * A {@link WorkspaceEdit workspace edit} this code action performs.
-		 */ edit??: WorkspaceEdit;
+		 */ edit?: WorkspaceEdit;
     /**
 		 * {@link Diagnostic Diagnostics} that this code action resolves.
-		 */ diagnostics??: Diagnostic[];
+		 */ diagnostics?: Diagnostic[];
     /**
 		 * A {@link Command} this code action executes.
 		 *
 		 * If this command throws an exception, the editor displays the exception message to users in the editor at the
 		 * current cursor position.
-		 */ command??: Command;
+		 */ command?: Command;
     /**
 		 * {@link CodeActionKind Kind} of the code action.
 		 *
 		 * Used to filter code actions.
-		 */ kind??: CodeActionKind;
+		 */ kind?: CodeActionKind;
     /**
 		 * Marks this as a preferred action. Preferred actions are used by the `auto fix` command and can be targeted
 		 * by keybindings.
 		 *
 		 * A quick fix should be marked preferred if it properly addresses the underlying error.
 		 * A refactoring should be marked preferred if it is the most reasonable choice of actions to take.
-		 */ isPreferred??: boolean;
+		 */ isPreferred?: boolean;
     /**
 		 * Marks that the code action cannot currently be applied.
 		 *
@@ -309,7 +309,7 @@
 		 * - If the user has a [keybinding](https://code.visualstudio.com/docs/editor/refactoring#_keybindings-for-code-actions)
 		 * that auto applies a code action and only a disabled code actions are returned, the editor will show the user an
 		 * error message with `reason` in the editor.
-		 */ disabled??: {
+		 */ disabled?: {
         /**
 			 * Human readable description of why the code action is currently disabled.
 			 *
@@ -341,7 +341,7 @@
 		 */ range: Range;
     /**
 		 * The command this code lens represents.
-		 */ command??: Command;
+		 */ command?: Command;
     /**
 		 * `true` when there is a command associated.
 		 */ readonly isResolved: boolean;
@@ -370,12 +370,12 @@
 		 * Defaults to `false` (commands are disabled).
 		 *
 		 * If this is an object, only the set of commands listed in `enabledCommands` are allowed.
-		 */ isTrusted??: boolean | {
+		 */ isTrusted?: boolean | {
         readonly enabledCommands: readonly string[];
     };
     /**
 		 * Indicates that this markdown string can contain {@link ThemeIcon ThemeIcons}, e.g. `$(zap)`.
-		 */ supportThemeIcons??: boolean;
+		 */ supportThemeIcons?: boolean;
     /**
 		 * Indicates that this markdown string can contain raw html tags. Defaults to `false`.
 		 *
@@ -385,7 +385,7 @@
 		 * When `supportHtml` is true, the markdown render will also allow a safe subset of html tags
 		 * and attributes to be rendered. See https://github.com/microsoft/vscode/blob/6d2920473c6f13759c978dd89104c4270a83422d/src/vs/base/browser/markdownRenderer.ts#L296
 		 * for a list of all supported tags and attributes.
-		 */ supportHtml??: boolean;
+		 */ supportHtml?: boolean;
     /**
 		 * Uri that relative paths are resolved relative to.
 		 *
@@ -404,7 +404,7 @@
 		 * md.baseUri = vscode.Uri.file('/path/to/otherFile.js');
 		 * // Here 'link' in the rendered markdown resolves to '/path/to/file.js'
 		 * ```
-		 */ baseUri??: Uri;
+		 */ baseUri?: Uri;
     /**
 		 * Creates a new markdown string with the given value.
 		 *
@@ -423,7 +423,7 @@
 		 * The range to which this hover applies. When missing, the
 		 * editor will use the range at the current position or the
 		 * current position itself.
-		 */ range??: Range;
+		 */ range?: Range;
     /**
 		 * Creates a new hover object.
 		 *
@@ -443,7 +443,7 @@
 		 */ readonly range: Range;
     /*
 		 * If specified the expression overrides the extracted expression.
-		 */ readonly expression??: string | undefined;
+		 */ readonly expression?: string | undefined;
     /**
 		 * Creates a new evaluatable expression object.
 		 *
@@ -478,7 +478,7 @@
 		 */ readonly range: Range;
     /**
 		 * If specified the name of the variable to look up.
-		 */ readonly variableName??: string | undefined;
+		 */ readonly variableName?: string | undefined;
     /**
 		 * How to perform the lookup.
 		 */ readonly caseSensitiveLookup: boolean;
@@ -501,7 +501,7 @@
 		 */ readonly range: Range;
     /**
 		 * If specified the expression overrides the extracted expression.
-		 */ readonly expression??: string | undefined;
+		 */ readonly expression?: string | undefined;
     /**
 		 * Creates a new InlineValueEvaluatableExpression object.
 		 *
@@ -519,7 +519,7 @@
 		 */ range: Range;
     /**
 		 * The highlight kind, default is {@link DocumentHighlightKind.Text text}.
-		 */ kind??: DocumentHighlightKind;
+		 */ kind?: DocumentHighlightKind;
     /**
 		 * Creates a new document highlight object.
 		 *
@@ -542,7 +542,7 @@
 		 */ kind: SymbolKind;
     /**
 		 * Tags for this symbol.
-		 */ tags??: readonly SymbolTag[];
+		 */ tags?: readonly SymbolTag[];
     /**
 		 * The location of this symbol.
 		 */ location: Location;
@@ -582,7 +582,7 @@
 		 */ kind: SymbolKind;
     /**
 		 * Tags for this symbol.
-		 */ tags??: readonly SymbolTag[];
+		 */ tags?: readonly SymbolTag[];
     /**
 		 * The range enclosing this symbol not including leading/trailing whitespace but everything else, e.g. comments and code.
 		 */ range: Range;
@@ -618,7 +618,7 @@
 		 *
 		 * *Note* that the eol-sequence will be applied to the
 		 * whole document.
-		 */ newEol??: EndOfLine;
+		 */ newEol?: EndOfLine;
     /**
 		 * Create a new TextEdit.
 		 *
@@ -659,12 +659,12 @@
 		 */ newCells: NotebookCellData[];
     /**
 		 * Optional new metadata for the cells.
-		 */ newCellMetadata??: {
+		 */ newCellMetadata?: {
         [key: string]: any;
     };
     /**
 		 * Optional new metadata for the notebook.
-		 */ newNotebookMetadata??: {
+		 */ newNotebookMetadata?: {
         [key: string]: any;
     };
     new(range: NotebookRange, newCells: NotebookCellData[]): NotebookEdit;
@@ -772,7 +772,7 @@
     /**
 		 * The human-readable doc-comment of this signature. Will be shown
 		 * in the UI but can be omitted.
-		 */ documentation??: string | MarkdownString;
+		 */ documentation?: string | MarkdownString;
     /**
 		 * Creates a new parameter information object.
 		 *
@@ -792,7 +792,7 @@
     /**
 		 * The human-readable doc-comment of this signature. Will be shown
 		 * in the UI but can be omitted.
-		 */ documentation??: string | MarkdownString;
+		 */ documentation?: string | MarkdownString;
     /**
 		 * The parameters of this signature.
 		 */ parameters: ParameterInformation[];
@@ -800,7 +800,7 @@
 		 * The index of the active parameter.
 		 *
 		 * If provided, this is used in place of {@linkcode SignatureHelp.activeParameter}.
-		 */ activeParameter??: number;
+		 */ activeParameter?: number;
     /**
 		 * Creates a new signature information object.
 		 *
@@ -846,17 +846,17 @@
     /**
 		 * The kind of this completion item. Based on the kind
 		 * an icon is chosen by the editor.
-		 */ kind??: CompletionItemKind;
+		 */ kind?: CompletionItemKind;
     /**
 		 * Tags for this completion item.
-		 */ tags??: readonly CompletionItemTag[];
+		 */ tags?: readonly CompletionItemTag[];
     /**
 		 * A human-readable string with additional information
 		 * about this item, like type or symbol information.
-		 */ detail??: string;
+		 */ detail?: string;
     /**
 		 * A human-readable string that represents a doc-comment.
-		 */ documentation??: string | MarkdownString;
+		 */ documentation?: string | MarkdownString;
     /**
 		 * A string that should be used when comparing this item
 		 * with other items. When `falsy` the {@link CompletionItem.label label}
@@ -868,7 +868,7 @@
 		 * when completions match equally well. The prefix is defined by the
 		 * {@linkcode CompletionItem.range range}-property and can therefore be different
 		 * for each completion.
-		 */ sortText??: string;
+		 */ sortText?: string;
     /**
 		 * A string that should be used when filtering a set of
 		 * completion items. When `falsy` the {@link CompletionItem.label label}
@@ -876,17 +876,17 @@
 		 *
 		 * Note that the filter text is matched against the leading word (prefix) which is defined
 		 * by the {@linkcode CompletionItem.range range}-property.
-		 */ filterText??: string;
+		 */ filterText?: string;
     /**
 		 * Select this item when showing. *Note* that only one completion item can be selected and
 		 * that the editor decides which item that is. The rule is that the *first* item of those
 		 * that match best is selected.
-		 */ preselect??: boolean;
+		 */ preselect?: boolean;
     /**
 		 * A string or snippet that should be inserted in a document when selecting
 		 * this completion. When `falsy` the {@link CompletionItem.label label}
 		 * is used.
-		 */ insertText??: string | SnippetString;
+		 */ insertText?: string | SnippetString;
     /**
 		 * A range or a insert and replace range selecting the text that should be replaced by this completion item.
 		 *
@@ -897,7 +897,7 @@
 		 * *Note 1:* A range must be a {@link Range.isSingleLine single line} and it must
 		 * {@link Range.contains contain} the position at which completion has been {@link CompletionItemProvider.provideCompletionItems requested}.
 		 * *Note 2:* A insert range must be a prefix of a replace range, that means it must be contained and starting at the same position.
-		 */ range??: Range | {
+		 */ range?: Range | {
         inserting: Range;
         replacing: Range;
     };
@@ -905,12 +905,12 @@
 		 * An optional set of characters that when pressed while this completion is active will accept it first and
 		 * then type that character. *Note* that all commit characters should have `length=1` and that superfluous
 		 * characters will be ignored.
-		 */ commitCharacters??: string[];
+		 */ commitCharacters?: string[];
     /**
 		 * Keep whitespace of the {@link CompletionItem.insertText insertText} as is. By default, the editor adjusts leading
 		 * whitespace of new lines so that they match the indentation of the line for which the item is accepted - setting
 		 * this to `true` will prevent that.
-		 */ keepWhitespace??: boolean;
+		 */ keepWhitespace?: boolean;
     /**
 		 * @deprecated Use `CompletionItem.insertText` and `CompletionItem.range` instead.
 		 *
@@ -920,17 +920,17 @@
 		 *
 		 * The {@link Range} of the edit must be single-line and on the same
 		 * line completions were {@link CompletionItemProvider.provideCompletionItems requested} at.
-		 */ textEdit??: TextEdit;
+		 */ textEdit?: TextEdit;
     /**
 		 * An optional array of additional {@link TextEdit text edits} that are applied when
 		 * selecting this completion. Edits must not overlap with the main {@link CompletionItem.textEdit edit}
 		 * nor with themselves.
-		 */ additionalTextEdits??: TextEdit[];
+		 */ additionalTextEdits?: TextEdit[];
     /**
 		 * An optional {@link Command} that is executed *after* inserting this completion. *Note* that
 		 * additional modifications to the current document should be described with the
 		 * {@link CompletionItem.additionalTextEdits additionalTextEdits}-property.
-		 */ command??: Command;
+		 */ command?: Command;
     /**
 		 * Creates a new completion item.
 		 *
@@ -948,7 +948,7 @@
     /**
 		 * This list is not complete. Further typing should result in recomputing
 		 * this list.
-		 */ isIncomplete??: boolean;
+		 */ isIncomplete?: boolean;
     /**
 		 * The completion items.
 		 */ items: T[];
@@ -984,16 +984,16 @@
 		 * the {@link InlineCompletionItem.insertText} is used.
 		 *
 		 * An inline completion is shown if the text to replace is a prefix of the filter text.
-		 */ filterText??: string;
+		 */ filterText?: string;
     /**
 		 * The range to replace.
 		 * Must begin and end on the same line.
 		 *
 		 * Prefer replacements over insertions to provide a better experience when the user deletes typed text.
-		 */ range??: Range;
+		 */ range?: Range;
     /**
 		 * An optional {@link Command} that is executed *after* inserting this completion.
-		 */ command??: Command;
+		 */ command?: Command;
     /**
 		 * Creates a new inline completion item.
 		 *
@@ -1011,14 +1011,14 @@
 		 */ range: Range;
     /**
 		 * The uri this link points to.
-		 */ target??: Uri;
+		 */ target?: Uri;
     /**
 		 * The tooltip text when you hover over this link.
 		 *
 		 * If a tooltip is provided, is will be displayed in a string that includes instructions on how to
 		 * trigger the link, such as `{0} (ctrl + click)`. The specific instructions vary depending on OS,
 		 * user settings, and localization.
-		 */ tooltip??: string;
+		 */ tooltip?: string;
     /**
 		 * Creates a new document link.
 		 *
@@ -1083,11 +1083,11 @@
 		 * An {@link TextEdit edit} which is applied to a document when selecting
 		 * this presentation for the color.  When `falsy` the {@link ColorPresentation.label label}
 		 * is used.
-		 */ textEdit??: TextEdit;
+		 */ textEdit?: TextEdit;
     /**
 		 * An optional array of additional {@link TextEdit text edits} that are applied when
 		 * selecting this color presentation. Edits must not overlap with the main {@link ColorPresentation.textEdit edit} nor with themselves.
-		 */ additionalTextEdits??: TextEdit[];
+		 */ additionalTextEdits?: TextEdit[];
     /**
 		 * Creates a new color presentation.
 		 *
@@ -1105,7 +1105,7 @@
 		 *
 		 * *Note* that this property can be set late during
 		 * {@link InlayHintsProvider.resolveInlayHint resolving} of inlay hints.
-		 */ tooltip??: string | MarkdownString | undefined;
+		 */ tooltip?: string | MarkdownString | undefined;
     /**
 		 * An optional {@link Location source code location} that represents this label
 		 * part.
@@ -1117,7 +1117,7 @@
 		 *
 		 * *Note* that this property can be set late during
 		 * {@link InlayHintsProvider.resolveInlayHint resolving} of inlay hints.
-		 */ location??: Location | undefined;
+		 */ location?: Location | undefined;
     /**
 		 * An optional command for this label part.
 		 *
@@ -1126,7 +1126,7 @@
 		 *
 		 * *Note* that this property can be set late during
 		 * {@link InlayHintsProvider.resolveInlayHint resolving} of inlay hints.
-		 */ command??: Command | undefined;
+		 */ command?: Command | undefined;
     /**
 		 * Creates a new inlay hint label part.
 		 *
@@ -1149,10 +1149,10 @@
 		 *
 		 * *Note* that this property can be set late during
 		 * {@link InlayHintsProvider.resolveInlayHint resolving} of inlay hints.
-		 */ tooltip??: string | MarkdownString | undefined;
+		 */ tooltip?: string | MarkdownString | undefined;
     /**
 		 * The kind of this hint. The inlay hint kind defines the appearance of this inlay hint.
-		 */ kind??: InlayHintKind;
+		 */ kind?: InlayHintKind;
     /**
 		 * Optional {@link TextEdit text edits} that are performed when accepting this inlay hint. The default
 		 * gesture for accepting an inlay hint is the double click.
@@ -1162,17 +1162,17 @@
 		 *
 		 * *Note* that this property can be set late during
 		 * {@link InlayHintsProvider.resolveInlayHint resolving} of inlay hints.
-		 */ textEdits??: TextEdit[];
+		 */ textEdits?: TextEdit[];
     /**
 		 * Render padding before the hint. Padding will use the editor's background color,
 		 * not the background color of the hint itself. That means padding can be used to visually
 		 * align/separate an inlay hint.
-		 */ paddingLeft??: boolean;
+		 */ paddingLeft?: boolean;
     /**
 		 * Render padding after the hint. Padding will use the editor's background color,
 		 * not the background color of the hint itself. That means padding can be used to visually
 		 * align/separate an inlay hint.
-		 */ paddingRight??: boolean;
+		 */ paddingRight?: boolean;
     /**
 		 * Creates a new inlay hint.
 		 *
@@ -1199,7 +1199,7 @@
 		 * like 'Fold all comments'. See
 		 * {@link FoldingRangeKind} for an enumeration of all kinds.
 		 * If not set, the range is originated from a syntax element.
-		 */ kind??: FoldingRangeKind;
+		 */ kind?: FoldingRangeKind;
     /**
 		 * Creates a new folding range.
 		 *
@@ -1217,7 +1217,7 @@
 		 */ range: Range;
     /**
 		 * The parent selection range containing this range.
-		 */ parent??: SelectionRange;
+		 */ parent?: SelectionRange;
     /**
 		 * Creates a new selection range.
 		 *
@@ -1237,10 +1237,10 @@
 		 */ kind: SymbolKind;
     /**
 		 * Tags for this item.
-		 */ tags??: readonly SymbolTag[];
+		 */ tags?: readonly SymbolTag[];
     /**
 		 * More detail for this item, e.g. the signature of a function.
-		 */ detail??: string;
+		 */ detail?: string;
     /**
 		 * The resource identifier of this item.
 		 */ uri: Uri;
@@ -1301,10 +1301,10 @@
 		 */ kind: SymbolKind;
     /**
 		 * Tags for this item.
-		 */ tags??: ReadonlyArray<SymbolTag>;
+		 */ tags?: ReadonlyArray<SymbolTag>;
     /**
 		 * More detail for this item, e.g. the signature of a function.
-		 */ detail??: string;
+		 */ detail?: string;
     /**
 		 * The resource identifier of this item.
 		 */ uri: Uri;
@@ -1353,7 +1353,7 @@
 		 */ insertText: string | SnippetString;
     /**
 		 * An optional additional edit to apply on drop.
-		 */ additionalEdit??: WorkspaceEdit;
+		 */ additionalEdit?: WorkspaceEdit;
     /**
 		 * @param insertText The text or snippet to insert at the drop location.
 		 */ new(insertText: string | SnippetString): DocumentDropEdit;
@@ -1409,11 +1409,11 @@
     /**
 		 * A human-readable string describing the source of this
 		 * diagnostic, e.g. 'typescript' or 'super lint'.
-		 */ source??: string;
+		 */ source?: string;
     /**
 		 * A code or identifier for this diagnostic.
 		 * Should be used for later processing, e.g. when providing {@link CodeActionContext code actions}.
-		 */ code??: string | number | {
+		 */ code?: string | number | {
         /**
 			 * A code or identifier for this diagnostic.
 			 * Should be used for later processing, e.g. when providing {@link CodeActionContext code actions}.
@@ -1425,10 +1425,10 @@
     /**
 		 * An array of related diagnostic information, e.g. when symbol-names within
 		 * a scope collide all definitions can be marked via this property.
-		 */ relatedInformation??: DiagnosticRelatedInformation[];
+		 */ relatedInformation?: DiagnosticRelatedInformation[];
     /**
 		 * Additional metadata about the diagnostic.
-		 */ tags??: DiagnosticTag[];
+		 */ tags?: DiagnosticTag[];
     /**
 		 * Creates a new diagnostic object.
 		 *
@@ -1452,7 +1452,7 @@
 		 * If a tooltip is provided, is will be displayed in a string that includes instructions on
 		 * how to trigger the link, such as `{0} (ctrl + click)`. The specific instructions vary
 		 * depending on OS, user settings, and localization.
-		 */ tooltip??: string;
+		 */ tooltip?: string;
     /**
 		 * Creates a new terminal link.
 		 * @param startIndex The start index of the link on {@link TerminalLinkContext.line}.
@@ -1480,17 +1480,17 @@
 	 */ export type FileDecoration = {
     /**
 		 * A very short string that represents this decoration.
-		 */ badge??: string;
+		 */ badge?: string;
     /**
 		 * A human-readable tooltip for this decoration.
-		 */ tooltip??: string;
+		 */ tooltip?: string;
     /**
 		 * The color of this decoration.
-		 */ color??: ThemeColor;
+		 */ color?: ThemeColor;
     /**
 		 * A flag expressing that this decoration should be
 		 * propagated to its parents.
-		 */ propagate??: boolean;
+		 */ propagate?: boolean;
     /**
 		 * Creates a new decoration.
 		 *
@@ -1538,7 +1538,7 @@
     /**
 		 * The process options used when the process is executed.
 		 * Defaults to undefined.
-		 */ options??: ProcessExecutionOptions;
+		 */ options?: ProcessExecutionOptions;
 };
 export type ShellExecution = {
     /**
@@ -1569,7 +1569,7 @@ export type ShellExecution = {
     /**
 		 * The shell options used when the command line is executed in a shell.
 		 * Defaults to undefined.
-		 */ options??: ShellExecutionOptions;
+		 */ options?: ShellExecutionOptions;
 };
 /**
 	 * Class used to execute an extension callback as a task.
@@ -1625,10 +1625,10 @@ export type ShellExecution = {
 		 * A human-readable string which is rendered less prominently on a separate line in places
 		 * where the task's name is displayed. Supports rendering of {@link ThemeIcon theme icons}
 		 * via the `$(<name>)`-syntax.
-		 */ detail??: string;
+		 */ detail?: string;
     /**
 		 * The task's execution engine
-		 */ execution??: ProcessExecution | ShellExecution | CustomExecution;
+		 */ execution?: ProcessExecution | ShellExecution | CustomExecution;
     /**
 		 * Whether the task is a background task or not.
 		 */ isBackground: boolean;
@@ -1641,7 +1641,7 @@ export type ShellExecution = {
 		 * for a predefined set of available groups.
 		 * Defaults to undefined meaning that the task doesn't
 		 * belong to any special group.
-		 */ group??: TaskGroup;
+		 */ group?: TaskGroup;
     /**
 		 * The presentation options. Defaults to an empty literal.
 		 */ presentationOptions: TaskPresentationOptions;
@@ -1695,43 +1695,43 @@ export type ShellExecution = {
 export type TreeItem = {
     /**
 		 * A human-readable string describing this item. When `falsy`, it is derived from {@link TreeItem.resourceUri resourceUri}.
-		 */ label??: string | TreeItemLabel;
+		 */ label?: string | TreeItemLabel;
     /**
 		 * Optional id for the tree item that has to be unique across tree. The id is used to preserve the selection and expansion state of the tree item.
 		 *
 		 * If not provided, an id is generated using the tree item's label. **Note** that when labels change, ids will change and that selection and expansion state cannot be kept stable anymore.
-		 */ id??: string;
+		 */ id?: string;
     /**
 		 * The icon path or {@link ThemeIcon} for the tree item.
 		 * When `falsy`, {@link ThemeIcon.Folder Folder Theme Icon} is assigned, if item is collapsible otherwise {@link ThemeIcon.File File Theme Icon}.
 		 * When a file or folder {@link ThemeIcon} is specified, icon is derived from the current file icon theme for the specified theme icon using {@link TreeItem.resourceUri resourceUri} (if provided).
-		 */ iconPath??: string | Uri | {
+		 */ iconPath?: string | Uri | {
         light: string | Uri;
         dark: string | Uri;
     } | ThemeIcon;
     /**
 		 * A human-readable string which is rendered less prominent.
 		 * When `true`, it is derived from {@link TreeItem.resourceUri resourceUri} and when `falsy`, it is not shown.
-		 */ description??: string | boolean;
+		 */ description?: string | boolean;
     /**
 		 * The {@link Uri} of the resource representing this item.
 		 *
 		 * Will be used to derive the {@link TreeItem.label label}, when it is not provided.
 		 * Will be used to derive the icon from current file icon theme, when {@link TreeItem.iconPath iconPath} has {@link ThemeIcon} value.
-		 */ resourceUri??: Uri;
+		 */ resourceUri?: Uri;
     /**
 		 * The tooltip text when you hover over this item.
-		 */ tooltip??: string | MarkdownString | undefined;
+		 */ tooltip?: string | MarkdownString | undefined;
     /**
 		 * The {@link Command} that should be executed when the tree item is selected.
 		 *
 		 * Please use `vscode.open` or `vscode.diff` as command IDs when the tree item is opening
 		 * something in the editor. Using these commands ensures that the resulting editor will
 		 * appear consistent with how other built-in trees open editors.
-		 */ command??: Command;
+		 */ command?: Command;
     /**
 		 * {@link TreeItemCollapsibleState} of the tree item.
-		 */ collapsibleState??: TreeItemCollapsibleState;
+		 */ collapsibleState?: TreeItemCollapsibleState;
     /**
 		 * Context value of the tree item. This can be used to contribute item specific actions in the tree.
 		 * For example, a tree item is given a context value as `folder`. When contributing actions to `view/item/context`
@@ -1749,12 +1749,12 @@ export type TreeItem = {
 		 * }
 		 * ```
 		 * This will show action `extension.deleteFolder` only for items with `contextValue` is `folder`.
-		 */ contextValue??: string;
+		 */ contextValue?: string;
     /**
 		 * Accessibility information used when screen reader interacts with this tree item.
 		 * Generally, a TreeItem has no need to set the `role` of the accessibilityInformation;
 		 * however, there are cases where a TreeItem is not displayed in a tree-like way where setting the `role` may make sense.
-		 */ accessibilityInformation??: AccessibilityInformation;
+		 */ accessibilityInformation?: AccessibilityInformation;
     /**
 		 * @param label A human-readable string describing this item
 		 * @param collapsibleState {@link TreeItemCollapsibleState} of the tree item. Default is {@link TreeItemCollapsibleState.None}
@@ -1832,7 +1832,7 @@ export type TreeItem = {
 		 */ items: NotebookCellOutputItem[];
     /**
 		 * Arbitrary metadata for this cell output. Can be anything but must be JSON-stringifyable.
-		 */ metadata??: {
+		 */ metadata?: {
         [key: string]: any;
     };
     /**
@@ -1859,15 +1859,15 @@ export type TreeItem = {
 		 */ languageId: string;
     /**
 		 * The outputs of this cell data.
-		 */ outputs??: NotebookCellOutput[];
+		 */ outputs?: NotebookCellOutput[];
     /**
 		 * Arbitrary metadata of this cell data. Can be anything but must be JSON-stringifyable.
-		 */ metadata??: {
+		 */ metadata?: {
         [key: string]: any;
     };
     /**
 		 * The execution summary of this cell data.
-		 */ executionSummary??: NotebookCellExecutionSummary;
+		 */ executionSummary?: NotebookCellExecutionSummary;
     /**
 		 * Create new cell data. Minimal cell data specifies its kind, its source value, and the
 		 * language identifier of its source.
@@ -1890,7 +1890,7 @@ export type TreeItem = {
 		 */ cells: NotebookCellData[];
     /**
 		 * Arbitrary metadata of notebook data.
-		 */ metadata??: {
+		 */ metadata?: {
         [key: string]: any;
     };
     /**
@@ -1915,16 +1915,16 @@ export type TreeItem = {
 		 *
 		 * Note that if this is a {@linkcode Command} object, only the {@linkcode Command.command command} and {@linkcode Command.arguments arguments}
 		 * are used by the editor.
-		 */ command??: string | Command;
+		 */ command?: string | Command;
     /**
 		 * A tooltip to show when the item is hovered.
-		 */ tooltip??: string;
+		 */ tooltip?: string;
     /**
 		 * The priority of the item. A higher value item will be shown more to the left.
-		 */ priority??: number;
+		 */ priority?: number;
     /**
 		 * Accessibility information used when a screen reader interacts with this item.
-		 */ accessibilityInformation??: AccessibilityInformation;
+		 */ accessibilityInformation?: AccessibilityInformation;
     /**
 		 * Creates a new NotebookCellStatusBarItem.
 		 * @param text The text to show for the item.
@@ -1952,7 +1952,7 @@ export type TreeItem = {
     /**
 		 * Optional options to be used when the debug adapter is started.
 		 * Defaults to undefined.
-		 */ readonly options??: DebugAdapterExecutableOptions;
+		 */ readonly options?: DebugAdapterExecutableOptions;
 };
 /**
 	 * Represents a debug adapter running as a socket based server.
@@ -1962,7 +1962,7 @@ export type TreeItem = {
 		 */ readonly port: number;
     /**
 		 * The host.
-		 */ readonly host??: string | undefined;
+		 */ readonly host?: string | undefined;
     /**
 		 * Create a description for a debug adapter running as a socket based server.
 		 */ new(port: number, host?: string): DebugAdapterServer;
@@ -1995,13 +1995,13 @@ export type TreeItem = {
 		 */ readonly enabled: boolean;
     /**
 		 * An optional expression for conditional breakpoints.
-		 */ readonly condition??: string | undefined;
+		 */ readonly condition?: string | undefined;
     /**
 		 * An optional expression that controls how many hits of the breakpoint are ignored.
-		 */ readonly hitCondition??: string | undefined;
+		 */ readonly hitCondition?: string | undefined;
     /**
 		 * An optional message that gets logged when this breakpoint is hit. Embedded expressions within {} are interpolated by the debug adapter.
-		 */ readonly logMessage??: string | undefined;
+		 */ readonly logMessage?: string | undefined;
     new(enabled?: boolean, condition?: string, hitCondition?: string, logMessage?: string): Breakpoint;
 };
 /**
@@ -2084,13 +2084,13 @@ export type TreeItem = {
 		 */ message: string | MarkdownString;
     /**
 		 * Expected test output. If given with {@link TestMessage.actualOutput actualOutput }, a diff view will be shown.
-		 */ expectedOutput??: string;
+		 */ expectedOutput?: string;
     /**
 		 * Actual test output. If given with {@link TestMessage.expectedOutput expectedOutput }, a diff view will be shown.
-		 */ actualOutput??: string;
+		 */ actualOutput?: string;
     /**
 		 * Associated file location.
-		 */ location??: Location;
+		 */ location?: Location;
     /**
 		 * Creates a new TestMessage instance.
 		 * @param message The message to show to the user.
