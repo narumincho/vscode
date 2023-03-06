@@ -42,15 +42,44 @@ pub async fn main() -> anyhow::Result<()> {
 
     let first_module_block = first_module_body.expect_ts_module_block();
 
-    let filtered = first_module_block
-        .body
-        .into_iter()
-        .filter_map(|b| module_item_transform(&b))
-        .collect::<Vec<_>>();
+    let mut module_map = Vec::<swc_ecma_ast::ModuleItem>::new();
+
+    let require_vs_code_span = swc_common::Span::default();
+    module_map.push(swc_ecma_ast::ModuleItem::ModuleDecl(
+        swc_ecma_ast::ModuleDecl::ExportDecl(swc_ecma_ast::ExportDecl {
+            span: require_vs_code_span,
+            decl: swc_ecma_ast::Decl::Fn(swc_ecma_ast::FnDecl {
+                ident: swc_ecma_ast::Ident::new(
+                    string_cache::Atom::from("requireVsCode"),
+                    swc_common::Span::default(),
+                ),
+                declare: false,
+                function: Box::new(swc_ecma_ast::Function {
+                    params: vec![],
+                    decorators: vec![],
+                    span: swc_common::Span::default(),
+                    body: Some(swc_ecma_ast::BlockStmt {
+                        span: swc_common::Span::default(),
+                        stmts: vec![],
+                    }),
+                    is_async: false,
+                    is_generator: false,
+                    type_params: None,
+                    return_type: None,
+                }),
+            }),
+        }),
+    ));
+
+    for module_item in first_module_block.body {
+        if let Some(new_module_item) = module_item_transform(&module_item) {
+            module_map.push(new_module_item);
+        }
+    }
 
     let result = swc_ecma_ast::TsModuleBlock {
         span: swc_common::Span::default(),
-        body: filtered,
+        body: module_map,
     };
 
     let cm = std::sync::Arc::<swc_common::SourceMap>::default();
@@ -68,7 +97,7 @@ pub async fn main() -> anyhow::Result<()> {
 
     let code = String::from_utf8(buf)?;
 
-    let _ = std::fs::write("./out.d.ts", code)?;
+    let _ = std::fs::write("./out.ts", code)?;
 
     Ok(())
 }
@@ -141,6 +170,12 @@ fn module_item_transform(
                     )),
                     type_params: None,
                 })),
+            }),
+        )),
+        swc_ecma_ast::Decl::TsInterface(interface) => Some(swc_ecma_ast::ModuleItem::ModuleDecl(
+            swc_ecma_ast::ModuleDecl::ExportDecl(swc_ecma_ast::ExportDecl {
+                span: export_declaration.span,
+                decl: swc_ecma_ast::Decl::TsInterface(interface.clone()),
             }),
         )),
         _ => None,
