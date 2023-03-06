@@ -38,7 +38,7 @@
 };
 /**
 	 * Represents a text selection in an editor.
-	 */ export type Selection = {
+	 */ export type Selection = Range & {
     /**
 		 * Create a selection from two positions.
 		 *
@@ -95,7 +95,7 @@
 	 * This type can be used in response to a {@link CancellationToken cancellation token}
 	 * being cancelled or when an operation is being cancelled by the
 	 * executor of that operation.
-	 */ export type CancellationError = {
+	 */ export type CancellationError = Error & {
     /**
 		 * Creates a new cancellation error.
 		 */ new(): CancellationError;
@@ -794,7 +794,7 @@ export type ShellExecution = {
 	 *
 	 * This class has factory methods for common error-cases, like `FileNotFound` when
 	 * a file or folder doesn't exist, use them like so: `throw vscode.FileSystemError.FileNotFound(someUri);`
-	 */ export type FileSystemError = {
+	 */ export type FileSystemError = Error & {
     /**
 		 * Creates a new filesystem error.
 		 *
@@ -943,14 +943,14 @@ export type TreeItem = {
 };
 /**
 	 * A breakpoint specified by a source location.
-	 */ export type SourceBreakpoint = {
+	 */ export type SourceBreakpoint = Breakpoint & {
     /**
 		 * Create a new breakpoint for a source location.
 		 */ new(location: Location, enabled?: boolean, condition?: string, hitCondition?: string, logMessage?: string): SourceBreakpoint;
 };
 /**
 	 * A breakpoint specified by a function name.
-	 */ export type FunctionBreakpoint = {
+	 */ export type FunctionBreakpoint = Breakpoint & {
     /**
 		 * Create a new function breakpoint.
 		 */ new(functionName: string, enabled?: boolean, condition?: string, hitCondition?: string, logMessage?: string): FunctionBreakpoint;

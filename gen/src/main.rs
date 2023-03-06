@@ -98,17 +98,47 @@ fn module_item_transform(
                     span: swc_common::Span::default(),
                     declare: false,
                     id: class.ident.clone(),
-                    type_ann: Box::new(swc_ecma_ast::TsType::TsTypeLit(swc_ecma_ast::TsTypeLit {
-                        span: swc_common::Span::default(),
-                        members: class
-                            .class
-                            .body
-                            .iter()
-                            .filter_map(|class_member| {
-                                class_member_to_ts_type_element(class_member, &class.ident)
-                            })
-                            .collect(),
-                    })),
+                    type_ann: Box::new(swc_ecma_ast::TsType::TsUnionOrIntersectionType(
+                        swc_ecma_ast::TsUnionOrIntersectionType::TsIntersectionType(
+                            swc_ecma_ast::TsIntersectionType {
+                                span: swc_common::Span::default(),
+                                types: {
+                                    let mut vec = Vec::<Box<swc_ecma_ast::TsType>>::new();
+                                    if let Some(super_class_expr) = &class.class.super_class {
+                                        if let Some(super_class_ident) = super_class_expr.as_ident()
+                                        {
+                                            vec.push(Box::new(swc_ecma_ast::TsType::TsTypeRef(
+                                                swc_ecma_ast::TsTypeRef {
+                                                    span: swc_common::Span::default(),
+                                                    type_name: swc_ecma_ast::TsEntityName::Ident(
+                                                        super_class_ident.clone(),
+                                                    ),
+                                                    type_params: None,
+                                                },
+                                            )));
+                                        }
+                                    }
+                                    vec.push(Box::new(swc_ecma_ast::TsType::TsTypeLit(
+                                        swc_ecma_ast::TsTypeLit {
+                                            span: swc_common::Span::default(),
+                                            members: class
+                                                .class
+                                                .body
+                                                .iter()
+                                                .filter_map(|class_member| {
+                                                    class_member_to_ts_type_element(
+                                                        class_member,
+                                                        &class.ident,
+                                                    )
+                                                })
+                                                .collect(),
+                                        },
+                                    )));
+                                    vec
+                                },
+                            },
+                        ),
+                    )),
                     type_params: None,
                 })),
             }),
