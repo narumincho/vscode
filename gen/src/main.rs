@@ -45,8 +45,8 @@ pub async fn main() -> anyhow::Result<()> {
     let mut module_map = Vec::<swc_ecma_ast::ModuleItem>::new();
 
     let require_vs_code_span = swc_common::Span::new(
-        swc_common::source_map::BytePos(1),
-        swc_common::source_map::BytePos(1),
+        swc_common::source_map::BytePos::SYNTHESIZED,
+        swc_common::source_map::BytePos::SYNTHESIZED,
         swc_common::hygiene::SyntaxContext::empty(),
     );
     println!("{:?}", require_vs_code_span);
