@@ -189,6 +189,39 @@ fn class_member_to_ts_type_element(
                 },
             ))
         }
+        swc_ecma_ast::ClassMember::ClassProp(classProp) => {
+            if classProp.is_static {
+                None
+            } else {
+                Some(swc_ecma_ast::TsTypeElement::TsPropertySignature(
+                    swc_ecma_ast::TsPropertySignature {
+                        span: classProp.span,
+                        readonly: classProp.readonly,
+                        key: Box::new(match &classProp.key {
+                            swc_ecma_ast::PropName::BigInt(big_int) => {
+                                swc_ecma_ast::Expr::Lit(swc_ecma_ast::Lit::BigInt(big_int.clone()))
+                            }
+                            swc_ecma_ast::PropName::Ident(ident) => {
+                                swc_ecma_ast::Expr::Ident(ident.clone())
+                            }
+                            swc_ecma_ast::PropName::Str(str) => {
+                                swc_ecma_ast::Expr::Lit(swc_ecma_ast::Lit::Str(str.clone()))
+                            }
+                            swc_ecma_ast::PropName::Num(num) => {
+                                swc_ecma_ast::Expr::Lit(swc_ecma_ast::Lit::Num(num.clone()))
+                            }
+                            swc_ecma_ast::PropName::Computed(computed) => *computed.expr.clone(),
+                        }),
+                        computed: false,
+                        optional: classProp.is_optional,
+                        init: None,
+                        params: vec![],
+                        type_ann: classProp.type_ann.clone(),
+                        type_params: None,
+                    },
+                ))
+            }
+        }
         _ => None,
     }
 }
