@@ -104,18 +104,8 @@ fn module_item_transform(
                             .class
                             .body
                             .iter()
-                            .filter_map(|class_member| match class_member {
-                                swc_ecma_ast::ClassMember::Constructor(constructor) => {
-                                    Some(swc_ecma_ast::TsTypeElement::TsConstructSignatureDecl(
-                                        swc_ecma_ast::TsConstructSignatureDecl {
-                                            span: constructor.span,
-                                            params: vec![],
-                                            type_ann: None,
-                                            type_params: None,
-                                        },
-                                    ))
-                                }
-                                _ => None,
+                            .filter_map(|class_member| {
+                                class_member_to_ts_type_element(class_member)
                             })
                             .collect(),
                     })),
@@ -124,5 +114,64 @@ fn module_item_transform(
             }),
         )),
         _ => None,
+    }
+}
+
+fn class_member_to_ts_type_element(
+    class_member: &swc_ecma_ast::ClassMember,
+) -> Option<swc_ecma_ast::TsTypeElement> {
+    match class_member {
+        swc_ecma_ast::ClassMember::Constructor(constructor) => {
+            Some(swc_ecma_ast::TsTypeElement::TsConstructSignatureDecl(
+                swc_ecma_ast::TsConstructSignatureDecl {
+                    span: constructor.span,
+                    params: constructor
+                        .params
+                        .iter()
+                        .map(|p| match p {
+                            swc_ecma_ast::ParamOrTsParamProp::Param(param) => {
+                                param_to_ts_fn_param(&param.pat)
+                            }
+                            swc_ecma_ast::ParamOrTsParamProp::TsParamProp(ts_param_prop) => {
+                                match &ts_param_prop.param {
+                                    swc_ecma_ast::TsParamPropParam::Assign(assign_pat) => {
+                                        param_to_ts_fn_param(&assign_pat.left)
+                                    }
+                                    swc_ecma_ast::TsParamPropParam::Ident(ident) => {
+                                        swc_ecma_ast::TsFnParam::Ident(ident.clone())
+                                    }
+                                }
+                            }
+                        })
+                        .collect(),
+                    type_ann: None,
+                    type_params: None,
+                },
+            ))
+        }
+        _ => None,
+    }
+}
+
+fn param_to_ts_fn_param(param: &swc_ecma_ast::Pat) -> swc_ecma_ast::TsFnParam {
+    match param {
+        swc_ecma_ast::Pat::Ident(ident) => swc_ecma_ast::TsFnParam::Ident(ident.clone()),
+        swc_ecma_ast::Pat::Array(array) => swc_ecma_ast::TsFnParam::Array(array.clone()),
+        swc_ecma_ast::Pat::Rest(rest) => swc_ecma_ast::TsFnParam::Rest(rest.clone()),
+        swc_ecma_ast::Pat::Object(object) => swc_ecma_ast::TsFnParam::Object(object.clone()),
+        swc_ecma_ast::Pat::Assign(assign) => param_to_ts_fn_param(&assign.left),
+        swc_ecma_ast::Pat::Invalid(invalid) => {
+            swc_ecma_ast::TsFnParam::Ident(swc_ecma_ast::BindingIdent {
+                id: swc_ecma_ast::Ident::new(string_cache::Atom::from("__invalid__"), invalid.span),
+                type_ann: None,
+            })
+        }
+        swc_ecma_ast::Pat::Expr(_) => swc_ecma_ast::TsFnParam::Ident(swc_ecma_ast::BindingIdent {
+            id: swc_ecma_ast::Ident::new(
+                string_cache::Atom::from("__expr__"),
+                swc_common::Span::default(),
+            ),
+            type_ann: None,
+        }),
     }
 }
