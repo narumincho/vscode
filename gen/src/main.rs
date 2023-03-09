@@ -42,89 +42,106 @@ pub async fn main() -> anyhow::Result<()> {
 
     let mut module_map = Vec::<swc_ecma_ast::ModuleItem>::new();
 
-    let require_vs_code_byte_pos = swc_common::source_map::Pos::from_u32(1);
+    let result = swc_common::GLOBALS.set(&swc_common::Globals::default(), || {
+        module_map.push(swc_ecma_ast::ModuleItem::ModuleDecl(
+            swc_ecma_ast::ModuleDecl::ExportDecl(swc_ecma_ast::ExportDecl {
+                span: {
+                    let span = swc_common::Span::dummy_with_cmt();
+                    swc_common::comments::Comments::add_leading(
+                        &comments,
+                        span.lo,
+                        swc_common::comments::Comment {
+                            span: swc_common::DUMMY_SP,
+                            kind: swc_common::comments::CommentKind::Block,
+                            text: swc_atoms::atom!("サンプルコメント"),
+                        },
+                    );
 
-    swc_common::comments::Comments::add_leading(
-        &comments,
-        require_vs_code_byte_pos,
-        swc_common::comments::Comment {
-            span: swc_common::DUMMY_SP,
-            kind: swc_common::comments::CommentKind::Block,
-            text: swc_atoms::atom!("サンプルコメント"),
-        },
-    );
-
-    module_map.push(swc_ecma_ast::ModuleItem::ModuleDecl(
-        swc_ecma_ast::ModuleDecl::ExportDecl(swc_ecma_ast::ExportDecl {
-            span: swc_common::Spanned::span(&require_vs_code_byte_pos),
-            decl: swc_ecma_ast::Decl::Fn(swc_ecma_ast::FnDecl {
-                ident: swc_ecma_ast::Ident::new(
-                    string_cache::Atom::from("requireVsCode"),
-                    swc_common::Span::default(),
-                ),
-                declare: false,
-                function: Box::new(swc_ecma_ast::Function {
-                    params: vec![],
-                    decorators: vec![],
-                    span: swc_common::Span::default(),
-                    body: Some(swc_ecma_ast::BlockStmt {
+                    span
+                },
+                decl: swc_ecma_ast::Decl::Fn(swc_ecma_ast::FnDecl {
+                    ident: swc_ecma_ast::Ident::new(
+                        string_cache::Atom::from("requireVsCode"),
+                        swc_common::Span::default(),
+                    ),
+                    declare: false,
+                    function: Box::new(swc_ecma_ast::Function {
+                        params: vec![],
+                        decorators: vec![],
                         span: swc_common::Span::default(),
-                        stmts: vec![],
+                        body: Some(swc_ecma_ast::BlockStmt {
+                            span: swc_common::Span::default(),
+                            stmts: vec![],
+                        }),
+                        is_async: false,
+                        is_generator: false,
+                        type_params: None,
+                        return_type: None,
                     }),
-                    is_async: false,
-                    is_generator: false,
-                    type_params: None,
-                    return_type: None,
                 }),
             }),
-        }),
-    ));
+        ));
 
-    let type_vscode_api_byte_pos = swc_common::source_map::Pos::from_u32(2);
-    swc_common::comments::Comments::add_leading(
-        &comments,
-        type_vscode_api_byte_pos,
-        swc_common::comments::Comment {
-            span: swc_common::DUMMY_SP,
-            kind: swc_common::comments::CommentKind::Block,
-            text: swc_atoms::Atom::from(
-                "import VS Code API
+        module_map.push(swc_ecma_ast::ModuleItem::ModuleDecl(
+            swc_ecma_ast::ModuleDecl::ExportDecl(swc_ecma_ast::ExportDecl {
+                span: {
+                    let span = swc_common::Span::dummy_with_cmt();
+                    swc_common::comments::Comments::add_leading(
+                        &comments,
+                        span.lo,
+                        swc_common::comments::Comment {
+                            span: swc_common::DUMMY_SP,
+                            kind: swc_common::comments::CommentKind::Block,
+                            text: swc_atoms::Atom::from(
+                                "import VS Code API
 ```ts
- require(\"vscode\")
+require(\"vscode\")
 ```",
-            ),
-        },
-    );
-    module_map.push(swc_ecma_ast::ModuleItem::ModuleDecl(
-        swc_ecma_ast::ModuleDecl::ExportDecl(swc_ecma_ast::ExportDecl {
-            span: swc_common::Spanned::span(&type_vscode_api_byte_pos),
-            decl: swc_ecma_ast::Decl::TsTypeAlias(Box::new(swc_ecma_ast::TsTypeAliasDecl {
-                id: swc_ecma_ast::Ident::new(
-                    string_cache::Atom::from("requireVsCode"),
-                    swc_common::Span::default(),
-                ),
-                declare: false,
-                span: swc_common::Span::default(),
-                type_ann: Box::new(swc_ecma_ast::TsType::TsLitType(swc_ecma_ast::TsLitType {
+                            ),
+                        },
+                    );
+
+                    span
+                },
+                decl: swc_ecma_ast::Decl::TsTypeAlias(Box::new(swc_ecma_ast::TsTypeAliasDecl {
+                    id: swc_ecma_ast::Ident::new(
+                        string_cache::Atom::from("requireVsCode"),
+                        swc_common::Span::default(),
+                    ),
+                    declare: false,
                     span: swc_common::Span::default(),
-                    lit: swc_ecma_ast::TsLit::Str(swc_ecma_ast::Str::from("aa")),
+                    type_ann: Box::new(swc_ecma_ast::TsType::TsLitType(swc_ecma_ast::TsLitType {
+                        span: swc_common::Span::default(),
+                        lit: swc_ecma_ast::TsLit::Str(swc_ecma_ast::Str::from("aa")),
+                    })),
+                    type_params: None,
                 })),
-                type_params: None,
-            })),
-        }),
-    ));
+            }),
+        ));
 
-    for module_item in first_module_block.body {
-        if let Some(new_module_item) = module_item_transform(&module_item) {
-            module_map.push(new_module_item);
+        for module_item in first_module_block.body {
+            if let Some(new_module_item) = module_item_transform(&module_item) {
+                module_map.push(new_module_item);
+            }
         }
-    }
 
-    let result = swc_ecma_ast::TsModuleBlock {
-        span: swc_common::Span::default(),
-        body: module_map,
-    };
+        swc_ecma_ast::TsModuleBlock {
+            span: swc_common::Span::default(),
+            body: module_map,
+        }
+    });
 
+    let code = node_to_code_string(&result, &comments)?;
+
+    let _ = std::fs::write("./out.ts", code)?;
+
+    Ok(())
+}
+
+fn node_to_code_string<Node: swc_ecma_codegen::Node>(
+    node: &Node,
+    comments: &dyn swc_common::comments::Comments,
+) -> anyhow::Result<String> {
     let cm = swc_common::sync::Lrc::<swc_common::SourceMap>::default();
     let mut buf = vec![];
     let writer = swc_ecma_codegen::text_writer::JsWriter::new(cm.clone(), "\n", &mut buf, None);
@@ -136,13 +153,10 @@ pub async fn main() -> anyhow::Result<()> {
         wr: writer,
     };
 
-    swc_ecma_codegen::Node::emit_with(&result, &mut emitter)?;
+    swc_ecma_codegen::Node::emit_with(&node, &mut emitter)?;
 
     let code = String::from_utf8(buf)?;
-
-    let _ = std::fs::write("./out.ts", code)?;
-
-    Ok(())
+    Ok(code)
 }
 
 #[derive(thiserror::Error, Debug)]
