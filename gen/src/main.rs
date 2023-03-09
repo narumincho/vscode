@@ -12,10 +12,8 @@ pub async fn main() -> anyhow::Result<()> {
     let comments = swc_common::comments::SingleThreadedComments::default();
     let lexer = swc_ecma_parser::lexer::Lexer::new(
         swc_ecma_parser::Syntax::Typescript(swc_ecma_parser::TsConfig {
-            tsx: false,
-            decorators: false,
             dts: true,
-            no_early_errors: true,
+            ..Default::default()
         }),
         swc_ecma_ast::EsVersion::Es2022,
         swc_ecma_parser::StringInput::new(
@@ -52,7 +50,7 @@ pub async fn main() -> anyhow::Result<()> {
         swc_common::comments::Comment {
             span: swc_common::DUMMY_SP,
             kind: swc_common::comments::CommentKind::Block,
-            text: swc::atoms::atom!("サンプルコメント"),
+            text: swc_atoms::atom!("サンプルコメント"),
         },
     );
 
@@ -89,7 +87,7 @@ pub async fn main() -> anyhow::Result<()> {
         swc_common::comments::Comment {
             span: swc_common::DUMMY_SP,
             kind: swc_common::comments::CommentKind::Block,
-            text: swc::atoms::Atom::from(
+            text: swc_atoms::Atom::from(
                 "import VS Code API
 ```ts
  require(\"vscode\")
@@ -127,7 +125,7 @@ pub async fn main() -> anyhow::Result<()> {
         body: module_map,
     };
 
-    let cm = std::sync::Arc::<swc_common::SourceMap>::default();
+    let cm = swc_common::sync::Lrc::<swc_common::SourceMap>::default();
     let mut buf = vec![];
     let writer = swc_ecma_codegen::text_writer::JsWriter::new(cm.clone(), "\n", &mut buf, None);
 
