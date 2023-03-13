@@ -14,6 +14,434 @@ Returns VSCodeApi only within the vscode extension.
  * Type Definition for Visual Studio Code 1.75 Extension API
  * See https://code.visualstudio.com/api for more information
  */ export type VSCodeAPI = {
+    /**
+	 * Represents a line and character position, such as
+	 * the position of the cursor.
+	 *
+	 * Position objects are __immutable__. Use the {@link Position.with with} or
+	 * {@link Position.translate translate} methods to derive new positions
+	 * from an existing position.
+	 */ readonly Position: "__wip*__";
+    /**
+	 * A range represents an ordered pair of two positions.
+	 * It is guaranteed that {@link Range.start start}.isBeforeOrEqual({@link Range.end end})
+	 *
+	 * Range objects are __immutable__. Use the {@link Range.with with},
+	 * {@link Range.intersection intersection}, or {@link Range.union union} methods
+	 * to derive new ranges from an existing range.
+	 */ readonly Range: "__wip*__";
+    /**
+	 * Represents a text selection in an editor.
+	 */ readonly Selection: "__wip*__";
+    /**
+	 * A reference to one of the workbench colors as defined in https://code.visualstudio.com/docs/getstarted/theme-color-reference.
+	 * Using a theme color is preferred over a custom color as it gives theme authors and users the possibility to change the color.
+	 */ readonly ThemeColor: "__wip*__";
+    /**
+	 * A reference to a named icon. Currently, {@link ThemeIcon.File File}, {@link ThemeIcon.Folder Folder},
+	 * and [ThemeIcon ids](https://code.visualstudio.com/api/references/icons-in-labels#icon-listing) are supported.
+	 * Using a theme icon is preferred over a custom icon as it gives product theme authors the possibility to change the icons.
+	 *
+	 * *Note* that theme icons can also be rendered inside labels and descriptions. Places that support theme icons spell this out
+	 * and they use the `$(<name>)`-syntax, for instance `quickPick.label = "Hello World $(globe)"`.
+	 */ readonly ThemeIcon: "__wip*__";
+    /**
+	 * A universal resource identifier representing either a file on disk
+	 * or another resource, like untitled resources.
+	 */ readonly Uri: "__wip*__";
+    /**
+	 * A cancellation source creates and controls a {@link CancellationToken cancellation token}.
+	 */ readonly CancellationTokenSource: "__wip*__";
+    /**
+	 * An error type that should be used to signal cancellation of an operation.
+	 *
+	 * This type can be used in response to a {@link CancellationToken cancellation token}
+	 * being cancelled or when an operation is being cancelled by the
+	 * executor of that operation.
+	 */ readonly CancellationError: "__wip*__";
+    /**
+	 * Represents a type which can release resources, such
+	 * as event listening or a timer.
+	 */ readonly Disposable: "__wip*__";
+    /**
+	 * An event emitter can be used to create and manage an {@link Event} for others
+	 * to subscribe to. One emitter always owns one event.
+	 *
+	 * Use this class if you want to provide event from within your extension, for instance
+	 * inside a {@link TextDocumentContentProvider} or when providing
+	 * API to other extensions.
+	 */ readonly EventEmitter: "__wip*__";
+    /**
+	 * A relative pattern is a helper to construct glob patterns that are matched
+	 * relatively to a base file path. The base path can either be an absolute file
+	 * path as string or uri or a {@link WorkspaceFolder workspace folder}, which is the
+	 * preferred way of creating the relative pattern.
+	 */ readonly RelativePattern: "__wip*__";
+    /**
+	 * Kind of a code action.
+	 *
+	 * Kinds are a hierarchical list of identifiers separated by `.`, e.g. `"refactor.extract.function"`.
+	 *
+	 * Code action kinds are used by the editor for UI elements such as the refactoring context menu. Users
+	 * can also trigger code actions with a specific kind with the `editor.action.codeAction` command.
+	 */ readonly CodeActionKind: "__wip*__";
+    /**
+	 * A code action represents a change that can be performed in code, e.g. to fix a problem or
+	 * to refactor code.
+	 *
+	 * A CodeAction must set either {@linkcode CodeAction.edit edit} and/or a {@linkcode CodeAction.command command}. If both are supplied, the `edit` is applied first, then the command is executed.
+	 */ readonly CodeAction: "__wip*__";
+    /**
+	 * A code lens represents a {@link Command} that should be shown along with
+	 * source text, like the number of references, a way to run tests, etc.
+	 *
+	 * A code lens is _unresolved_ when no command is associated to it. For performance
+	 * reasons the creation of a code lens and resolving should be done to two stages.
+	 *
+	 * @see {@link CodeLensProvider.provideCodeLenses}
+	 * @see {@link CodeLensProvider.resolveCodeLens}
+	 */ readonly CodeLens: "__wip*__";
+    /**
+	 * Human-readable text that supports formatting via the [markdown syntax](https://commonmark.org).
+	 *
+	 * Rendering of {@link ThemeIcon theme icons} via the `$(<name>)`-syntax is supported
+	 * when the {@linkcode supportThemeIcons} is set to `true`.
+	 *
+	 * Rendering of embedded html is supported when {@linkcode supportHtml} is set to `true`.
+	 */ readonly MarkdownString: "__wip*__";
+    /**
+	 * A hover represents additional information for a symbol or word. Hovers are
+	 * rendered in a tooltip-like widget.
+	 */ readonly Hover: "__wip*__";
+    /**
+	 * An EvaluatableExpression represents an expression in a document that can be evaluated by an active debugger or runtime.
+	 * The result of this evaluation is shown in a tooltip-like widget.
+	 * If only a range is specified, the expression will be extracted from the underlying document.
+	 * An optional expression can be used to override the extracted expression.
+	 * In this case the range is still used to highlight the range in the document.
+	 */ readonly EvaluatableExpression: "__wip*__";
+    /**
+	 * Provide inline value as text.
+	 */ readonly InlineValueText: "__wip*__";
+    /**
+	 * Provide inline value through a variable lookup.
+	 * If only a range is specified, the variable name will be extracted from the underlying document.
+	 * An optional variable name can be used to override the extracted name.
+	 */ readonly InlineValueVariableLookup: "__wip*__";
+    /**
+	 * Provide an inline value through an expression evaluation.
+	 * If only a range is specified, the expression will be extracted from the underlying document.
+	 * An optional expression can be used to override the extracted expression.
+	 */ readonly InlineValueEvaluatableExpression: "__wip*__";
+    /**
+	 * A document highlight is a range inside a text document which deserves
+	 * special attention. Usually a document highlight is visualized by changing
+	 * the background color of its range.
+	 */ readonly DocumentHighlight: "__wip*__";
+    /**
+	 * Represents information about programming constructs like variables, classes,
+	 * interfaces etc.
+	 */ readonly SymbolInformation: "__wip*__";
+    /**
+	 * Represents programming constructs like variables, classes, interfaces etc. that appear in a document. Document
+	 * symbols can be hierarchical and they have two ranges: one that encloses its definition and one that points to
+	 * its most interesting range, e.g. the range of an identifier.
+	 */ readonly DocumentSymbol: "__wip*__";
+    /**
+	 * A text edit represents edits that should be applied
+	 * to a document.
+	 */ readonly TextEdit: "__wip*__";
+    /**
+	 * A snippet edit represents an interactive edit that is performed by
+	 * the editor.
+	 *
+	 * *Note* that a snippet edit can always be performed as a normal {@link TextEdit text edit}.
+	 * This will happen when no matching editor is open or when a {@link WorkspaceEdit workspace edit}
+	 * contains snippet edits for multiple files. In that case only those that match the active editor
+	 * will be performed as snippet edits and the others as normal text edits.
+	 */ readonly SnippetTextEdit: "__wip*__";
+    /**
+	 * A notebook edit represents edits that should be applied to the contents of a notebook.
+	 */ readonly NotebookEdit: "__wip*__";
+    /**
+	 * A workspace edit is a collection of textual and files changes for
+	 * multiple resources and documents.
+	 *
+	 * Use the {@link workspace.applyEdit applyEdit}-function to apply a workspace edit.
+	 */ readonly WorkspaceEdit: "__wip*__";
+    /**
+	 * A snippet string is a template which allows to insert text
+	 * and to control the editor cursor when insertion happens.
+	 *
+	 * A snippet can define tab stops and placeholders with `$1`, `$2`
+	 * and `${3:foo}`. `$0` defines the final tab stop, it defaults to
+	 * the end of the snippet. Variables are defined with `$name` and
+	 * `${name:default value}`. Also see
+	 * [the full snippet syntax](https://code.visualstudio.com/docs/editor/userdefinedsnippets#_creating-your-own-snippets).
+	 */ readonly SnippetString: "__wip*__";
+    /**
+	 * A semantic tokens legend contains the needed information to decipher
+	 * the integer encoded representation of semantic tokens.
+	 */ readonly SemanticTokensLegend: "__wip*__";
+    /**
+	 * A semantic tokens builder can help with creating a `SemanticTokens` instance
+	 * which contains delta encoded semantic tokens.
+	 */ readonly SemanticTokensBuilder: "__wip*__";
+    /**
+	 * Represents semantic tokens, either in a range or in an entire document.
+	 * @see {@link DocumentSemanticTokensProvider.provideDocumentSemanticTokens provideDocumentSemanticTokens} for an explanation of the format.
+	 * @see {@link SemanticTokensBuilder} for a helper to create an instance.
+	 */ readonly SemanticTokens: "__wip*__";
+    /**
+	 * Represents edits to semantic tokens.
+	 * @see {@link DocumentSemanticTokensProvider.provideDocumentSemanticTokensEdits provideDocumentSemanticTokensEdits} for an explanation of the format.
+	 */ readonly SemanticTokensEdits: "__wip*__";
+    /**
+	 * Represents an edit to semantic tokens.
+	 * @see {@link DocumentSemanticTokensProvider.provideDocumentSemanticTokensEdits provideDocumentSemanticTokensEdits} for an explanation of the format.
+	 */ readonly SemanticTokensEdit: "__wip*__";
+    /**
+	 * Represents a parameter of a callable-signature. A parameter can
+	 * have a label and a doc-comment.
+	 */ readonly ParameterInformation: "__wip*__";
+    /**
+	 * Represents the signature of something callable. A signature
+	 * can have a label, like a function-name, a doc-comment, and
+	 * a set of parameters.
+	 */ readonly SignatureInformation: "__wip*__";
+    /**
+	 * Signature help represents the signature of something
+	 * callable. There can be multiple signatures but only one
+	 * active and only one active parameter.
+	 */ readonly SignatureHelp: "__wip*__";
+    /**
+	 * A completion item represents a text snippet that is proposed to complete text that is being typed.
+	 *
+	 * It is sufficient to create a completion item from just a {@link CompletionItem.label label}. In that
+	 * case the completion item will replace the {@link TextDocument.getWordRangeAtPosition word}
+	 * until the cursor with the given label or {@link CompletionItem.insertText insertText}. Otherwise the
+	 * given {@link CompletionItem.textEdit edit} is used.
+	 *
+	 * When selecting a completion item in the editor its defined or synthesized text edit will be applied
+	 * to *all* cursors/selections whereas {@link CompletionItem.additionalTextEdits additionalTextEdits} will be
+	 * applied as provided.
+	 *
+	 * @see {@link CompletionItemProvider.provideCompletionItems}
+	 * @see {@link CompletionItemProvider.resolveCompletionItem}
+	 */ readonly CompletionItem: "__wip*__";
+    /**
+	 * Represents a collection of {@link CompletionItem completion items} to be presented
+	 * in the editor.
+	 */ readonly CompletionList: "__wip*__";
+    /**
+	 * Represents a collection of {@link InlineCompletionItem inline completion items} to be presented
+	 * in the editor.
+	 */ readonly InlineCompletionList: "__wip*__";
+    /**
+	 * An inline completion item represents a text snippet that is proposed inline to complete text that is being typed.
+	 *
+	 * @see {@link InlineCompletionItemProvider.provideInlineCompletionItems}
+	 */ readonly InlineCompletionItem: "__wip*__";
+    /**
+	 * A document link is a range in a text document that links to an internal or external resource, like another
+	 * text document or a web site.
+	 */ readonly DocumentLink: "__wip*__";
+    /**
+	 * Represents a color in RGBA space.
+	 */ readonly Color: "__wip*__";
+    /**
+	 * Represents a color range from a document.
+	 */ readonly ColorInformation: "__wip*__";
+    /**
+	 * A color presentation object describes how a {@linkcode Color} should be represented as text and what
+	 * edits are required to refer to it from source code.
+	 *
+	 * For some languages one color can have multiple presentations, e.g. css can represent the color red with
+	 * the constant `Red`, the hex-value `#ff0000`, or in rgba and hsla forms. In csharp other representations
+	 * apply, e.g. `System.Drawing.Color.Red`.
+	 */ readonly ColorPresentation: "__wip*__";
+    /**
+	 * An inlay hint label part allows for interactive and composite labels of inlay hints.
+	 */ readonly InlayHintLabelPart: "__wip*__";
+    /**
+	 * Inlay hint information.
+	 */ readonly InlayHint: "__wip*__";
+    /**
+	 * A line based folding range. To be valid, start and end line must be bigger than zero and smaller than the number of lines in the document.
+	 * Invalid ranges will be ignored.
+	 */ readonly FoldingRange: "__wip*__";
+    /**
+	 * A selection range represents a part of a selection hierarchy. A selection range
+	 * may have a parent selection range that contains it.
+	 */ readonly SelectionRange: "__wip*__";
+    /**
+	 * Represents programming constructs like functions or constructors in the context
+	 * of call hierarchy.
+	 */ readonly CallHierarchyItem: "__wip*__";
+    /**
+	 * Represents an incoming call, e.g. a caller of a method or constructor.
+	 */ readonly CallHierarchyIncomingCall: "__wip*__";
+    /**
+	 * Represents an outgoing call, e.g. calling a getter from a method or a method from a constructor etc.
+	 */ readonly CallHierarchyOutgoingCall: "__wip*__";
+    /**
+	 * Represents an item of a type hierarchy, like a class or an interface.
+	 */ readonly TypeHierarchyItem: "__wip*__";
+    /**
+	 * Represents a list of ranges that can be edited together along with a word pattern to describe valid range contents.
+	 */ readonly LinkedEditingRanges: "__wip*__";
+    /**
+	 * An edit operation applied {@link DocumentDropEditProvider on drop}.
+	 */ readonly DocumentDropEdit: "__wip*__";
+    /**
+	 * Represents a location inside a resource, such as a line
+	 * inside a text file.
+	 */ readonly Location: "__wip*__";
+    /**
+	 * Represents a related message and source code location for a diagnostic. This should be
+	 * used to point to code locations that cause or related to a diagnostics, e.g. when duplicating
+	 * a symbol in a scope.
+	 */ readonly DiagnosticRelatedInformation: "__wip*__";
+    /**
+	 * Represents a diagnostic, such as a compiler error or warning. Diagnostic objects
+	 * are only valid in the scope of a file.
+	 */ readonly Diagnostic: "__wip*__";
+    /**
+	 * A link on a terminal line.
+	 */ readonly TerminalLink: "__wip*__";
+    /**
+	 * A terminal profile defines how a terminal will be launched.
+	 */ readonly TerminalProfile: "__wip*__";
+    /**
+	 * A file decoration represents metadata that can be rendered with a file.
+	 */ readonly FileDecoration: "__wip*__";
+    /**
+	 * A grouping for tasks. The editor by default supports the
+	 * 'Clean', 'Build', 'RebuildAll' and 'Test' group.
+	 */ readonly TaskGroup: "__wip*__";
+    /**
+	 * The execution of a task happens as an external process
+	 * without shell interaction.
+	 */ readonly ProcessExecution: "__wip*__";
+    readonly ShellExecution: "__wip*__";
+    /**
+	 * Class used to execute an extension callback as a task.
+	 */ readonly CustomExecution: "__wip*__";
+    /**
+	 * A task to execute
+	 */ readonly Task: "__wip*__";
+    /**
+	 * A type that filesystem providers should use to signal errors.
+	 *
+	 * This class has factory methods for common error-cases, like `FileNotFound` when
+	 * a file or folder doesn't exist, use them like so: `throw vscode.FileSystemError.FileNotFound(someUri);`
+	 */ readonly FileSystemError: "__wip*__";
+    /**
+	 * Encapsulates data transferred during drag and drop operations.
+	 */ readonly DataTransferItem: "__wip*__";
+    /**
+	 * A map containing a mapping of the mime type of the corresponding transferred data.
+	 *
+	 * Drag and drop controllers that implement {@link TreeDragAndDropController.handleDrag `handleDrag`} can add additional mime types to the
+	 * data transfer. These additional mime types will only be included in the `handleDrop` when the the drag was initiated from
+	 * an element in the same drag and drop controller.
+	 */ readonly DataTransfer: "__wip*__";
+    readonly TreeItem: "__wip*__";
+    /**
+	 * Predefined buttons for {@link QuickPick} and {@link InputBox}.
+	 */ readonly QuickInputButtons: "__wip*__";
+    /**
+	 * A notebook range represents an ordered pair of two cell indices.
+	 * It is guaranteed that start is less than or equal to end.
+	 */ readonly NotebookRange: "__wip*__";
+    /**
+	 * One representation of a {@link NotebookCellOutput notebook output}, defined by MIME type and data.
+	 */ readonly NotebookCellOutputItem: "__wip*__";
+    /**
+	 * Notebook cell output represents a result of executing a cell. It is a container type for multiple
+	 * {@link NotebookCellOutputItem output items} where contained items represent the same result but
+	 * use different MIME types.
+	 */ readonly NotebookCellOutput: "__wip*__";
+    /**
+	 * NotebookCellData is the raw representation of notebook cells. Its is part of {@linkcode NotebookData}.
+	 */ readonly NotebookCellData: "__wip*__";
+    /**
+	 * Raw representation of a notebook.
+	 *
+	 * Extensions are responsible for creating {@linkcode NotebookData} so that the editor
+	 * can create a {@linkcode NotebookDocument}.
+	 *
+	 * @see {@link NotebookSerializer}
+	 */ readonly NotebookData: "__wip*__";
+    /**
+	 * A contribution to a cell's status bar
+	 */ readonly NotebookCellStatusBarItem: "__wip*__";
+    /**
+	 * Represents a debug adapter executable and optional arguments and runtime options passed to it.
+	 */ readonly DebugAdapterExecutable: "__wip*__";
+    /**
+	 * Represents a debug adapter running as a socket based server.
+	 */ readonly DebugAdapterServer: "__wip*__";
+    /**
+	 * Represents a debug adapter running as a Named Pipe (on Windows)/UNIX Domain Socket (on non-Windows) based server.
+	 */ readonly DebugAdapterNamedPipeServer: "__wip*__";
+    /**
+	 * A debug adapter descriptor for an inline implementation.
+	 */ readonly DebugAdapterInlineImplementation: "__wip*__";
+    /**
+	 * The base class of all breakpoint types.
+	 */ readonly Breakpoint: "__wip*__";
+    /**
+	 * A breakpoint specified by a source location.
+	 */ readonly SourceBreakpoint: "__wip*__";
+    /**
+	 * A breakpoint specified by a function name.
+	 */ readonly FunctionBreakpoint: "__wip*__";
+    /**
+	 * Tags can be associated with {@link TestItem TestItems} and
+	 * {@link TestRunProfile TestRunProfiles}. A profile with a tag can only
+	 * execute tests that include that tag in their {@link TestItem.tags} array.
+	 */ readonly TestTag: "__wip*__";
+    /**
+	 * A TestRunRequest is a precursor to a {@link TestRun}, which in turn is
+	 * created by passing a request to {@link TestController.createTestRun}. The
+	 * TestRunRequest contains information about which tests should be run, which
+	 * should not be run, and how they are run (via the {@link TestRunRequest.profile profile}).
+	 *
+	 * In general, TestRunRequests are created by the editor and pass to
+	 * {@link TestRunProfile.runHandler}, however you can also create test
+	 * requests and runs outside of the `runHandler`.
+	 */ readonly TestRunRequest: "__wip*__";
+    /**
+	 * Message associated with the test state. Can be linked to a specific
+	 * source range -- useful for assertion failures, for example.
+	 */ readonly TestMessage: "__wip*__";
+    /**
+	 * The tab represents a single text based resource.
+	 */ readonly TabInputText: "__wip*__";
+    /**
+	 * The tab represents two text based resources
+	 * being rendered as a diff.
+	 */ readonly TabInputTextDiff: "__wip*__";
+    /**
+	 * The tab represents a custom editor.
+	 */ readonly TabInputCustom: "__wip*__";
+    /**
+	 * The tab represents a webview.
+	 */ readonly TabInputWebview: "__wip*__";
+    /**
+	 * The tab represents a notebook.
+	 */ readonly TabInputNotebook: "__wip*__";
+    /**
+	 * The tabs represents two notebooks in a diff configuration.
+	 */ readonly TabInputNotebookDiff: "__wip*__";
+    /**
+	 * The tab represents a terminal in the editor area.
+	 */ readonly TabInputTerminal: "__wip*__";
+    /**
+	 * A special value wrapper denoting a value that is safe to not clean.
+	 * This is to be used when you can guarantee no identifiable information is contained in the value and the cleaning is improperly redacting it.
+	 */ readonly TelemetryTrustedValue: "__wip*__";
 };
 /**
 	 * Represents a reference to a command. Provides a title which
@@ -184,14 +612,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @return The given position or a new, adjusted position.
 		 */ validatePosition(position: Position): Position;
 }
-/**
-	 * Represents a line and character position, such as
-	 * the position of the cursor.
-	 *
-	 * Position objects are __immutable__. Use the {@link Position.with with} or
-	 * {@link Position.translate translate} methods to derive new positions
-	 * from an existing position.
-	 */ export type Position = {
+export type Position = {
     /**
 		 * The zero-based line value.
 		 */ readonly line: number;
@@ -203,14 +624,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param character A zero-based character value.
 		 */ new(line: number, character: number): Position;
 };
-/**
-	 * A range represents an ordered pair of two positions.
-	 * It is guaranteed that {@link Range.start start}.isBeforeOrEqual({@link Range.end end})
-	 *
-	 * Range objects are __immutable__. Use the {@link Range.with with},
-	 * {@link Range.intersection intersection}, or {@link Range.union union} methods
-	 * to derive new ranges from an existing range.
-	 */ export type Range = {
+export type Range = {
     /**
 		 * The start position. It is before or equal to {@link Range.end end}.
 		 */ readonly start: Position;
@@ -240,9 +654,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * `true` if `start.line` and `end.line` are equal.
 		 */ isSingleLine: boolean;
 };
-/**
-	 * Represents a text selection in an editor.
-	 */ export type Selection = Range & {
+export type Selection = Range & {
     /**
 		 * The position at which the selection starts.
 		 * This position might be before or after {@link Selection.active active}.
@@ -509,23 +921,13 @@ Returns VSCodeApi only within the vscode extension.
 		 * An optional selection to apply for the document in the {@link NotebookEditor notebook editor}.
 		 */ readonly selections?: readonly NotebookRange[];
 }
-/**
-	 * A reference to one of the workbench colors as defined in https://code.visualstudio.com/docs/getstarted/theme-color-reference.
-	 * Using a theme color is preferred over a custom color as it gives theme authors and users the possibility to change the color.
-	 */ export type ThemeColor = {
+export type ThemeColor = {
     /**
 		 * Creates a reference to a theme color.
 		 * @param id of the color. The available colors are listed in https://code.visualstudio.com/docs/getstarted/theme-color-reference.
 		 */ new(id: string): ThemeColor;
 };
-/**
-	 * A reference to a named icon. Currently, {@link ThemeIcon.File File}, {@link ThemeIcon.Folder Folder},
-	 * and [ThemeIcon ids](https://code.visualstudio.com/api/references/icons-in-labels#icon-listing) are supported.
-	 * Using a theme icon is preferred over a custom icon as it gives product theme authors the possibility to change the icons.
-	 *
-	 * *Note* that theme icons can also be rendered inside labels and descriptions. Places that support theme icons spell this out
-	 * and they use the `$(<name>)`-syntax, for instance `quickPick.label = "Hello World $(globe)"`.
-	 */ export type ThemeIcon = {
+export type ThemeIcon = {
     /**
 		 * The id of the icon. The available icons are listed in https://code.visualstudio.com/api/references/icons-in-labels#icon-listing.
 		 */ readonly id: string;
@@ -837,10 +1239,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * @param endOfLine The new end of line for the {@link TextDocument document}.
 		 */ setEndOfLine(endOfLine: EndOfLine): void;
 }
-/**
-	 * A universal resource identifier representing either a file on disk
-	 * or another resource, like untitled resources.
-	 */ export type Uri = {
+export type Uri = {
     /**
 		 * Use the `file` and `parse` factory functions to create new `Uri` objects.
 		 */ new(scheme: string, authority: string, path: string, query: string, fragment: string): Uri;
@@ -897,28 +1296,17 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * An {@link Event} which fires upon cancellation.
 		 */ onCancellationRequested: Event<any>;
 }
-/**
-	 * A cancellation source creates and controls a {@link CancellationToken cancellation token}.
-	 */ export type CancellationTokenSource = {
+export type CancellationTokenSource = {
     /**
 		 * The cancellation token of this source.
 		 */ token: CancellationToken;
 };
-/**
-	 * An error type that should be used to signal cancellation of an operation.
-	 *
-	 * This type can be used in response to a {@link CancellationToken cancellation token}
-	 * being cancelled or when an operation is being cancelled by the
-	 * executor of that operation.
-	 */ export type CancellationError = Error & {
+export type CancellationError = Error & {
     /**
 		 * Creates a new cancellation error.
 		 */ new(): CancellationError;
 };
-/**
-	 * Represents a type which can release resources, such
-	 * as event listening or a timer.
-	 */ export type Disposable = {
+export type Disposable = {
     /**
 		 * Creates a new disposable that calls the provided function
 		 * on dispose.
@@ -947,14 +1335,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * @return A disposable which unsubscribes the event listener.
 		 */ (listener: (e: T) => any, thisArgs?: any, disposables?: Disposable[]) : Disposable;
 }
-/**
-	 * An event emitter can be used to create and manage an {@link Event} for others
-	 * to subscribe to. One emitter always owns one event.
-	 *
-	 * Use this class if you want to provide event from within your extension, for instance
-	 * inside a {@link TextDocumentContentProvider} or when providing
-	 * API to other extensions.
-	 */ export type EventEmitter = {
+export type EventEmitter = {
     /**
 		 * The event listeners can subscribe to.
 		 */ event: Event<T>;
@@ -1272,12 +1653,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 *  which can provide a specific message severity. Return `undefined`, `null`, or the empty string when 'value' is valid.
 		 */ validateInput?(value: string): string | InputBoxValidationMessage | undefined | null | Thenable<string | InputBoxValidationMessage | undefined | null>;
 }
-/**
-	 * A relative pattern is a helper to construct glob patterns that are matched
-	 * relatively to a base file path. The base path can either be an absolute file
-	 * path as string or uri or a {@link WorkspaceFolder workspace folder}, which is the
-	 * preferred way of creating the relative pattern.
-	 */ export type RelativePattern = {
+export type RelativePattern = {
     /**
 		 * A base file path to which this pattern will be matched against relatively. The
 		 * file path must be absolute, should not have any trailing path separators and
@@ -1414,14 +1790,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 	 * }
 	 * ```
 	 */ export type ProviderResult<T> = T | undefined | null | Thenable<T | undefined | null>;
-/**
-	 * Kind of a code action.
-	 *
-	 * Kinds are a hierarchical list of identifiers separated by `.`, e.g. `"refactor.extract.function"`.
-	 *
-	 * Code action kinds are used by the editor for UI elements such as the refactoring context menu. Users
-	 * can also trigger code actions with a specific kind with the `editor.action.codeAction` command.
-	 */ export type CodeActionKind = {
+export type CodeActionKind = {
     new(value: string): CodeActionKind;
     /**
 		 * String value of the kind, e.g. `"refactor.extract.function"`.
@@ -1456,12 +1825,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * Actions not of this kind are filtered out before being shown by the [lightbulb](https://code.visualstudio.com/docs/editor/editingevolved#_code-action).
 		 */ readonly only: CodeActionKind | undefined;
 }
-/**
-	 * A code action represents a change that can be performed in code, e.g. to fix a problem or
-	 * to refactor code.
-	 *
-	 * A CodeAction must set either {@linkcode CodeAction.edit edit} and/or a {@linkcode CodeAction.command command}. If both are supplied, the `edit` is applied first, then the command is executed.
-	 */ export type CodeAction = {
+export type CodeAction = {
     /**
 		 * A short, human-readable, title for this code action.
 		 */ title: string;
@@ -1608,16 +1972,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 			 */ readonly command: Command;
     }>;
 }
-/**
-	 * A code lens represents a {@link Command} that should be shown along with
-	 * source text, like the number of references, a way to run tests, etc.
-	 *
-	 * A code lens is _unresolved_ when no command is associated to it. For performance
-	 * reasons the creation of a code lens and resolving should be done to two stages.
-	 *
-	 * @see {@link CodeLensProvider.provideCodeLenses}
-	 * @see {@link CodeLensProvider.resolveCodeLens}
-	 */ export type CodeLens = {
+export type CodeLens = {
     /**
 		 * The range in which this code lens is valid. Should only span a single line.
 		 */ range: Range;
@@ -1732,14 +2087,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * signaled by returning `undefined` or `null`.
 		 */ provideDeclaration(document: TextDocument, position: Position, token: CancellationToken): ProviderResult<Declaration>;
 }
-/**
-	 * Human-readable text that supports formatting via the [markdown syntax](https://commonmark.org).
-	 *
-	 * Rendering of {@link ThemeIcon theme icons} via the `$(<name>)`-syntax is supported
-	 * when the {@linkcode supportThemeIcons} is set to `true`.
-	 *
-	 * Rendering of embedded html is supported when {@linkcode supportHtml} is set to `true`.
-	 */ export type MarkdownString = {
+export type MarkdownString = {
     /**
 		 * The markdown string.
 		 */ value: string;
@@ -1802,10 +2150,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
     language: string;
     value: string;
 };
-/**
-	 * A hover represents additional information for a symbol or word. Hovers are
-	 * rendered in a tooltip-like widget.
-	 */ export type Hover = {
+export type Hover = {
     /**
 		 * The contents of this hover.
 		 */ contents: Array<MarkdownString | MarkedString>;
@@ -1837,13 +2182,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * signaled by returning `undefined` or `null`.
 		 */ provideHover(document: TextDocument, position: Position, token: CancellationToken): ProviderResult<Hover>;
 }
-/**
-	 * An EvaluatableExpression represents an expression in a document that can be evaluated by an active debugger or runtime.
-	 * The result of this evaluation is shown in a tooltip-like widget.
-	 * If only a range is specified, the expression will be extracted from the underlying document.
-	 * An optional expression can be used to override the extracted expression.
-	 * In this case the range is still used to highlight the range in the document.
-	 */ export type EvaluatableExpression = {
+export type EvaluatableExpression = {
     /*
 		 * The range is used to extract the evaluatable expression from the underlying document and to highlight it.
 		 */ readonly range: Range;
@@ -1874,9 +2213,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * signaled by returning `undefined` or `null`.
 		 */ provideEvaluatableExpression(document: TextDocument, position: Position, token: CancellationToken): ProviderResult<EvaluatableExpression>;
 }
-/**
-	 * Provide inline value as text.
-	 */ export type InlineValueText = {
+export type InlineValueText = {
     /**
 		 * The document range for which the inline value applies.
 		 */ readonly range: Range;
@@ -1890,11 +2227,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * @param text The value to be shown for the line.
 		 */ new(range: Range, text: string): InlineValueText;
 };
-/**
-	 * Provide inline value through a variable lookup.
-	 * If only a range is specified, the variable name will be extracted from the underlying document.
-	 * An optional variable name can be used to override the extracted name.
-	 */ export type InlineValueVariableLookup = {
+export type InlineValueVariableLookup = {
     /**
 		 * The document range for which the inline value applies.
 		 * The range is used to extract the variable name from the underlying document.
@@ -1913,11 +2246,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * @param caseSensitiveLookup How to perform the lookup. If missing lookup is case sensitive.
 		 */ new(range: Range, variableName?: string, caseSensitiveLookup?: boolean): InlineValueVariableLookup;
 };
-/**
-	 * Provide an inline value through an expression evaluation.
-	 * If only a range is specified, the expression will be extracted from the underlying document.
-	 * An optional expression can be used to override the extracted expression.
-	 */ export type InlineValueEvaluatableExpression = {
+export type InlineValueEvaluatableExpression = {
     /**
 		 * The document range for which the inline value applies.
 		 * The range is used to extract the evaluatable expression from the underlying document.
@@ -1985,11 +2314,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * Write-access of a symbol, like writing to a variable.
 		 */ Write = 2
 }
-/**
-	 * A document highlight is a range inside a text document which deserves
-	 * special attention. Usually a document highlight is visualized by changing
-	 * the background color of its range.
-	 */ export type DocumentHighlight = {
+export type DocumentHighlight = {
     /**
 		 * The range this highlight applies to.
 		 */ range: Range;
@@ -2055,10 +2380,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * Render a symbol as obsolete, usually using a strike-out.
 		 */ Deprecated = 1
 }
-/**
-	 * Represents information about programming constructs like variables, classes,
-	 * interfaces etc.
-	 */ export type SymbolInformation = {
+export type SymbolInformation = {
     /**
 		 * The name of this symbol.
 		 */ name: string;
@@ -2094,11 +2416,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * @param containerName The name of the symbol containing the symbol.
 		 */ new(name: string, kind: SymbolKind, range: Range, uri?: Uri, containerName?: string): SymbolInformation;
 };
-/**
-	 * Represents programming constructs like variables, classes, interfaces etc. that appear in a document. Document
-	 * symbols can be hierarchical and they have two ranges: one that encloses its definition and one that points to
-	 * its most interesting range, e.g. the range of an identifier.
-	 */ export type DocumentSymbol = {
+export type DocumentSymbol = {
     /**
 		 * The name of this symbol.
 		 */ name: string;
@@ -2208,10 +2526,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * signaled by returning `undefined`, `null`, or an empty array.
 		 */ provideReferences(document: TextDocument, position: Position, context: ReferenceContext, token: CancellationToken): ProviderResult<Location[]>;
 }
-/**
-	 * A text edit represents edits that should be applied
-	 * to a document.
-	 */ export type TextEdit = {
+export type TextEdit = {
     /**
 		 * The range this edit applies to.
 		 */ range: Range;
@@ -2231,15 +2546,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * @param newText A string.
 		 */ new(range: Range, newText: string): TextEdit;
 };
-/**
-	 * A snippet edit represents an interactive edit that is performed by
-	 * the editor.
-	 *
-	 * *Note* that a snippet edit can always be performed as a normal {@link TextEdit text edit}.
-	 * This will happen when no matching editor is open or when a {@link WorkspaceEdit workspace edit}
-	 * contains snippet edits for multiple files. In that case only those that match the active editor
-	 * will be performed as snippet edits and the others as normal text edits.
-	 */ export type SnippetTextEdit = {
+export type SnippetTextEdit = {
     /**
 		 * The range this edit applies to.
 		 */ range: Range;
@@ -2253,9 +2560,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * @param snippet A snippet string.
 		 */ new(range: Range, snippet: SnippetString): SnippetTextEdit;
 };
-/**
-	 * A notebook edit represents edits that should be applied to the contents of a notebook.
-	 */ export type NotebookEdit = {
+export type NotebookEdit = {
     /**
 		 * Range of the cells being edited. May be empty.
 		 */ range: NotebookRange;
@@ -2302,26 +2607,12 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * Signal to the editor that this edit is a refactoring.
 		 */ isRefactoring?: boolean;
 }
-/**
-	 * A workspace edit is a collection of textual and files changes for
-	 * multiple resources and documents.
-	 *
-	 * Use the {@link workspace.applyEdit applyEdit}-function to apply a workspace edit.
-	 */ export type WorkspaceEdit = {
+export type WorkspaceEdit = {
     /**
 		 * The number of affected resources of textual or resource changes.
 		 */ readonly size: number;
 };
-/**
-	 * A snippet string is a template which allows to insert text
-	 * and to control the editor cursor when insertion happens.
-	 *
-	 * A snippet can define tab stops and placeholders with `$1`, `$2`
-	 * and `${3:foo}`. `$0` defines the final tab stop, it defaults to
-	 * the end of the snippet. Variables are defined with `$name` and
-	 * `${name:default value}`. Also see
-	 * [the full snippet syntax](https://code.visualstudio.com/docs/editor/userdefinedsnippets#_creating-your-own-snippets).
-	 */ export type SnippetString = {
+export type SnippetString = {
     /**
 		 * The snippet string.
 		 */ value: string;
@@ -2359,10 +2650,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
         placeholder: string;
     }>;
 }
-/**
-	 * A semantic tokens legend contains the needed information to decipher
-	 * the integer encoded representation of semantic tokens.
-	 */ export type SemanticTokensLegend = {
+export type SemanticTokensLegend = {
     /**
 		 * The possible token types.
 		 */ readonly tokenTypes: string[];
@@ -2371,17 +2659,10 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 */ readonly tokenModifiers: string[];
     new(tokenTypes: string[], tokenModifiers?: string[]): SemanticTokensLegend;
 };
-/**
-	 * A semantic tokens builder can help with creating a `SemanticTokens` instance
-	 * which contains delta encoded semantic tokens.
-	 */ export type SemanticTokensBuilder = {
+export type SemanticTokensBuilder = {
     new(legend?: SemanticTokensLegend): SemanticTokensBuilder;
 };
-/**
-	 * Represents semantic tokens, either in a range or in an entire document.
-	 * @see {@link DocumentSemanticTokensProvider.provideDocumentSemanticTokens provideDocumentSemanticTokens} for an explanation of the format.
-	 * @see {@link SemanticTokensBuilder} for a helper to create an instance.
-	 */ export type SemanticTokens = {
+export type SemanticTokens = {
     /**
 		 * The result id of the tokens.
 		 *
@@ -2393,10 +2674,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 */ readonly data: Uint32Array;
     new(data: Uint32Array, resultId?: string): SemanticTokens;
 };
-/**
-	 * Represents edits to semantic tokens.
-	 * @see {@link DocumentSemanticTokensProvider.provideDocumentSemanticTokensEdits provideDocumentSemanticTokensEdits} for an explanation of the format.
-	 */ export type SemanticTokensEdits = {
+export type SemanticTokensEdits = {
     /**
 		 * The result id of the tokens.
 		 *
@@ -2408,10 +2686,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 */ readonly edits: SemanticTokensEdit[];
     new(edits: SemanticTokensEdit[], resultId?: string): SemanticTokensEdits;
 };
-/**
-	 * Represents an edit to semantic tokens.
-	 * @see {@link DocumentSemanticTokensProvider.provideDocumentSemanticTokensEdits provideDocumentSemanticTokensEdits} for an explanation of the format.
-	 */ export type SemanticTokensEdit = {
+export type SemanticTokensEdit = {
     /**
 		 * The start offset of the edit.
 		 */ readonly start: number;
@@ -2593,10 +2868,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * signaled by returning `undefined`, `null`, or an empty array.
 		 */ provideOnTypeFormattingEdits(document: TextDocument, position: Position, ch: string, options: FormattingOptions, token: CancellationToken): ProviderResult<TextEdit[]>;
 }
-/**
-	 * Represents a parameter of a callable-signature. A parameter can
-	 * have a label and a doc-comment.
-	 */ export type ParameterInformation = {
+export type ParameterInformation = {
     /**
 		 * The label of this signature.
 		 *
@@ -2615,11 +2887,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * @param documentation A doc string.
 		 */ new(label: string | [number, number], documentation?: string | MarkdownString): ParameterInformation;
 };
-/**
-	 * Represents the signature of something callable. A signature
-	 * can have a label, like a function-name, a doc-comment, and
-	 * a set of parameters.
-	 */ export type SignatureInformation = {
+export type SignatureInformation = {
     /**
 		 * The label of this signature. Will be shown in
 		 * the UI.
@@ -2643,11 +2911,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * @param documentation A doc string.
 		 */ new(label: string, documentation?: string | MarkdownString): SignatureInformation;
 };
-/**
-	 * Signature help represents the signature of something
-	 * callable. There can be multiple signatures but only one
-	 * active and only one active parameter.
-	 */ export type SignatureHelp = {
+export type SignatureHelp = {
     /**
 		 * One or more signatures.
 		 */ signatures: SignatureInformation[];
@@ -2782,21 +3046,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * Render a completion as obsolete, usually using a strike-out.
 		 */ Deprecated = 1
 }
-/**
-	 * A completion item represents a text snippet that is proposed to complete text that is being typed.
-	 *
-	 * It is sufficient to create a completion item from just a {@link CompletionItem.label label}. In that
-	 * case the completion item will replace the {@link TextDocument.getWordRangeAtPosition word}
-	 * until the cursor with the given label or {@link CompletionItem.insertText insertText}. Otherwise the
-	 * given {@link CompletionItem.textEdit edit} is used.
-	 *
-	 * When selecting a completion item in the editor its defined or synthesized text edit will be applied
-	 * to *all* cursors/selections whereas {@link CompletionItem.additionalTextEdits additionalTextEdits} will be
-	 * applied as provided.
-	 *
-	 * @see {@link CompletionItemProvider.provideCompletionItems}
-	 * @see {@link CompletionItemProvider.resolveCompletionItem}
-	 */ export type CompletionItem = {
+export type CompletionItem = {
     /**
 		 * The label of this completion item. By default
 		 * this is also the text that is inserted when selecting
@@ -2900,10 +3150,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * @param kind The {@link CompletionItemKind kind} of the completion.
 		 */ new(label: string | CompletionItemLabel, kind?: CompletionItemKind): CompletionItem;
 };
-/**
-	 * Represents a collection of {@link CompletionItem completion items} to be presented
-	 * in the editor.
-	 */ export type CompletionList = {
+export type CompletionList = {
     /**
 		 * This list is not complete. Further typing should result in recomputing
 		 * this list.
@@ -3010,10 +3257,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * @return An array of completion items or a thenable that resolves to an array of completion items.
 		 */ provideInlineCompletionItems(document: TextDocument, position: Position, context: InlineCompletionContext, token: CancellationToken): ProviderResult<InlineCompletionItem[] | InlineCompletionList>;
 }
-/**
-	 * Represents a collection of {@link InlineCompletionItem inline completion items} to be presented
-	 * in the editor.
-	 */ export type InlineCompletionList = {
+export type InlineCompletionList = {
     /**
 		 * The inline completion items.
 		 */ items: InlineCompletionItem[];
@@ -3060,11 +3304,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * It is sufficient to return a single completion item in this case.
 		 */ Automatic = 1
 }
-/**
-	 * An inline completion item represents a text snippet that is proposed inline to complete text that is being typed.
-	 *
-	 * @see {@link InlineCompletionItemProvider.provideInlineCompletionItems}
-	 */ export type InlineCompletionItem = {
+export type InlineCompletionItem = {
     /**
 		 * The text to replace the range with. Must be set.
 		 * Is used both for the preview and the accept operation.
@@ -3092,10 +3332,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * @param command An optional {@link Command} that is executed *after* inserting this completion.
 		 */ new(insertText: string | SnippetString, range?: Range, command?: Command): InlineCompletionItem;
 };
-/**
-	 * A document link is a range in a text document that links to an internal or external resource, like another
-	 * text document or a web site.
-	 */ export type DocumentLink = {
+export type DocumentLink = {
     /**
 		 * The range this link applies to.
 		 */ range: Range;
@@ -3139,9 +3376,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * @param token A cancellation token.
 		 */ resolveDocumentLink?(link: T, token: CancellationToken): ProviderResult<T>;
 }
-/**
-	 * Represents a color in RGBA space.
-	 */ export type Color = {
+export type Color = {
     /**
 		 * The red component of this color in the range [0-1].
 		 */ readonly red: number;
@@ -3163,9 +3398,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * @param alpha The alpha component.
 		 */ new(red: number, green: number, blue: number, alpha: number): Color;
 };
-/**
-	 * Represents a color range from a document.
-	 */ export type ColorInformation = {
+export type ColorInformation = {
     /**
 		 * The range in the document where this color appears.
 		 */ range: Range;
@@ -3179,14 +3412,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * @param color The value of the color.
 		 */ new(range: Range, color: Color): ColorInformation;
 };
-/**
-	 * A color presentation object describes how a {@linkcode Color} should be represented as text and what
-	 * edits are required to refer to it from source code.
-	 *
-	 * For some languages one color can have multiple presentations, e.g. css can represent the color red with
-	 * the constant `Red`, the hex-value `#ff0000`, or in rgba and hsla forms. In csharp other representations
-	 * apply, e.g. `System.Drawing.Color.Red`.
-	 */ export type ColorPresentation = {
+export type ColorPresentation = {
     /**
 		 * The label of this color presentation. It will be shown on the color
 		 * picker header. By default this is also the text that is inserted when selecting
@@ -3245,9 +3471,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * An inlay hint that is for a parameter.
 		 */ Parameter = 2
 }
-/**
-	 * An inlay hint label part allows for interactive and composite labels of inlay hints.
-	 */ export type InlayHintLabelPart = {
+export type InlayHintLabelPart = {
     /**
 		 * The value of this label part.
 		 */ value: string;
@@ -3284,9 +3508,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * @param value The value of the part.
 		 */ new(value: string): InlayHintLabelPart;
 };
-/**
-	 * Inlay hint information.
-	 */ export type InlayHint = {
+export type InlayHint = {
     /**
 		 * The position of this hint.
 		 */ position: Position;
@@ -3360,10 +3582,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * @return The resolved inlay hint or a thenable that resolves to such. It is OK to return the given `item`. When no result is returned, the given `item` will be used.
 		 */ resolveInlayHint?(hint: T, token: CancellationToken): ProviderResult<T>;
 }
-/**
-	 * A line based folding range. To be valid, start and end line must be bigger than zero and smaller than the number of lines in the document.
-	 * Invalid ranges will be ignored.
-	 */ export type FoldingRange = {
+export type FoldingRange = {
     /**
 		 * The zero-based start line of the range to fold. The folded area starts after the line's last character.
 		 * To be valid, the end must be zero or larger and smaller than the number of lines in the document.
@@ -3422,10 +3641,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * @param token A cancellation token.
 		 */ provideFoldingRanges(document: TextDocument, context: FoldingContext, token: CancellationToken): ProviderResult<FoldingRange[]>;
 }
-/**
-	 * A selection range represents a part of a selection hierarchy. A selection range
-	 * may have a parent selection range that contains it.
-	 */ export type SelectionRange = {
+export type SelectionRange = {
     /**
 		 * The {@link Range} of this selection range.
 		 */ range: Range;
@@ -3454,10 +3670,7 @@ export interface SelectionRangeProvider {
 		 * signaled by returning `undefined` or `null`.
 		 */ provideSelectionRanges(document: TextDocument, positions: readonly Position[], token: CancellationToken): ProviderResult<SelectionRange[]>;
 }
-/**
-	 * Represents programming constructs like functions or constructors in the context
-	 * of call hierarchy.
-	 */ export type CallHierarchyItem = {
+export type CallHierarchyItem = {
     /**
 		 * The name of this item.
 		 */ name: string;
@@ -3484,9 +3697,7 @@ export interface SelectionRangeProvider {
 		 * Creates a new call hierarchy item.
 		 */ new(kind: SymbolKind, name: string, detail: string, uri: Uri, range: Range, selectionRange: Range): CallHierarchyItem;
 };
-/**
-	 * Represents an incoming call, e.g. a caller of a method or constructor.
-	 */ export type CallHierarchyIncomingCall = {
+export type CallHierarchyIncomingCall = {
     /**
 		 * The item that makes the call.
 		 */ from: CallHierarchyItem;
@@ -3501,9 +3712,7 @@ export interface SelectionRangeProvider {
 		 * @param fromRanges The ranges at which the calls appear.
 		 */ new(item: CallHierarchyItem, fromRanges: Range[]): CallHierarchyIncomingCall;
 };
-/**
-	 * Represents an outgoing call, e.g. calling a getter from a method or a method from a constructor etc.
-	 */ export type CallHierarchyOutgoingCall = {
+export type CallHierarchyOutgoingCall = {
     /**
 		 * The item that is called.
 		 */ to: CallHierarchyItem;
@@ -3556,9 +3765,7 @@ export interface SelectionRangeProvider {
 		 * signaled by returning `undefined` or `null`.
 		 */ provideCallHierarchyOutgoingCalls(item: CallHierarchyItem, token: CancellationToken): ProviderResult<CallHierarchyOutgoingCall[]>;
 }
-/**
-	 * Represents an item of a type hierarchy, like a class or an interface.
-	 */ export type TypeHierarchyItem = {
+export type TypeHierarchyItem = {
     /**
 		 * The name of this item.
 		 */ name: string;
@@ -3629,9 +3836,7 @@ export interface SelectionRangeProvider {
 		 * signaled by returning `undefined` or `null`.
 		 */ provideTypeHierarchySubtypes(item: TypeHierarchyItem, token: CancellationToken): ProviderResult<TypeHierarchyItem[]>;
 }
-/**
-	 * Represents a list of ranges that can be edited together along with a word pattern to describe valid range contents.
-	 */ export type LinkedEditingRanges = {
+export type LinkedEditingRanges = {
     /**
 		 * Create a new linked editing ranges object.
 		 *
@@ -3663,9 +3868,7 @@ export interface SelectionRangeProvider {
 		 * @return A list of ranges that can be edited together
 		 */ provideLinkedEditingRanges(document: TextDocument, position: Position, token: CancellationToken): ProviderResult<LinkedEditingRanges>;
 }
-/**
-	 * An edit operation applied {@link DocumentDropEditProvider on drop}.
-	 */ export type DocumentDropEdit = {
+export type DocumentDropEdit = {
     /**
 		 * The text or snippet to insert at the drop location.
 		 */ insertText: string | SnippetString;
@@ -3983,10 +4186,7 @@ export interface SelectionRangeProvider {
 		 * Readable dictionary that backs this configuration.
 		 */ readonly [key: string]: any;
 }
-/**
-	 * Represents a location inside a resource, such as a line
-	 * inside a text file.
-	 */ export type Location = {
+export type Location = {
     /**
 		 * The resource identifier of this location.
 		 */ uri: Uri;
@@ -4044,11 +4244,7 @@ export interface SelectionRangeProvider {
 		 * a refactoring.
 		 */ Hint = 3
 }
-/**
-	 * Represents a related message and source code location for a diagnostic. This should be
-	 * used to point to code locations that cause or related to a diagnostics, e.g. when duplicating
-	 * a symbol in a scope.
-	 */ export type DiagnosticRelatedInformation = {
+export type DiagnosticRelatedInformation = {
     /**
 		 * The location of this related diagnostic information.
 		 */ location: Location;
@@ -4081,10 +4277,7 @@ export interface SelectionRangeProvider {
 		 * Diagnostics with this tag are rendered with a strike through.
 		 */ Deprecated = 2
 }
-/**
-	 * Represents a diagnostic, such as a compiler error or warning. Diagnostic objects
-	 * are only valid in the scope of a file.
-	 */ export type Diagnostic = {
+export type Diagnostic = {
     /**
 		 * The range to which this diagnostic applies.
 		 */ range: Range;
@@ -4611,9 +4804,7 @@ export interface SelectionRangeProvider {
 		 * @param link The link to handle.
 		 */ handleTerminalLink(link: T): ProviderResult<void>;
 }
-/**
-	 * A link on a terminal line.
-	 */ export type TerminalLink = {
+export type TerminalLink = {
     /**
 		 * The start index of the link on {@link TerminalLinkContext.line}.
 		 */ startIndex: number;
@@ -4648,9 +4839,7 @@ export interface SelectionRangeProvider {
 		 * @returns The terminal profile.
 		 */ provideTerminalProfile(token: CancellationToken): ProviderResult<TerminalProfile>;
 }
-/**
-	 * A terminal profile defines how a terminal will be launched.
-	 */ export type TerminalProfile = {
+export type TerminalProfile = {
     /**
 		 * The options that the terminal will launch with.
 		 */ options: TerminalOptions | ExtensionTerminalOptions;
@@ -4659,9 +4848,7 @@ export interface SelectionRangeProvider {
 		 * @param options The options that the terminal will launch with.
 		 */ new(options: TerminalOptions | ExtensionTerminalOptions): TerminalProfile;
 };
-/**
-	 * A file decoration represents metadata that can be rendered with a file.
-	 */ export type FileDecoration = {
+export type FileDecoration = {
     /**
 		 * A very short string that represents this decoration.
 		 */ badge?: string;
@@ -5030,10 +5217,7 @@ export interface SelectionRangeProvider {
 		 * Controls whether the terminal is cleared before executing the task.
 		 */ clear?: boolean;
 }
-/**
-	 * A grouping for tasks. The editor by default supports the
-	 * 'Clean', 'Build', 'RebuildAll' and 'Test' group.
-	 */ export type TaskGroup = {
+export type TaskGroup = {
     /**
 		 * Whether the task that is part of this group is the default for the group.
 		 * This property cannot be set through API, and is controlled by a user's task configurations.
@@ -5081,10 +5265,7 @@ export interface SelectionRangeProvider {
         [key: string]: string;
     };
 }
-/**
-	 * The execution of a task happens as an external process
-	 * without shell interaction.
-	 */ export type ProcessExecution = {
+export type ProcessExecution = {
     /**
 		 * Creates a process execution.
 		 *
@@ -5222,9 +5403,7 @@ export type ShellExecution = {
 		 * Defaults to undefined.
 		 */ options?: ShellExecutionOptions;
 };
-/**
-	 * Class used to execute an extension callback as a task.
-	 */ export type CustomExecution = {
+export type CustomExecution = {
     /**
 		 * Constructs a CustomExecution task object. The callback will be executed when the task is run, at which point the
 		 * extension should return the Pseudoterminal it will "run in". The task should wait to do further execution until
@@ -5252,9 +5431,7 @@ export type ShellExecution = {
 		 * Controls whether task variables are re-evaluated on rerun.
 		 */ reevaluateOnRerun?: boolean;
 }
-/**
-	 * A task to execute
-	 */ export type Task = {
+export type Task = {
     /**
 		 * Creates a new task.
 		 *
@@ -5452,12 +5629,7 @@ export enum FilePermission {
 		 * *Note:* This value might be a bitmask, e.g. `FilePermission.Readonly | FilePermission.Other`.
 		 */ permissions?: FilePermission;
 }
-/**
-	 * A type that filesystem providers should use to signal errors.
-	 *
-	 * This class has factory methods for common error-cases, like `FileNotFound` when
-	 * a file or folder doesn't exist, use them like so: `throw vscode.FileSystemError.FileNotFound(someUri);`
-	 */ export type FileSystemError = Error & {
+export type FileSystemError = Error & {
     /**
 		 * Creates a new filesystem error.
 		 *
@@ -6232,9 +6404,7 @@ export enum FilePermission {
 		 * The full file contents of the file.
 		 */ data(): Thenable<Uint8Array>;
 }
-/**
-	 * Encapsulates data transferred during drag and drop operations.
-	 */ export type DataTransferItem = {
+export type DataTransferItem = {
     /**
 		 * Custom data stored on this item.
 		 *
@@ -6245,13 +6415,7 @@ export enum FilePermission {
 		 * @param value Custom data stored on this item. Can be retrieved using {@linkcode DataTransferItem.value}.
 		 */ new(value: any): DataTransferItem;
 };
-/**
-	 * A map containing a mapping of the mime type of the corresponding transferred data.
-	 *
-	 * Drag and drop controllers that implement {@link TreeDragAndDropController.handleDrag `handleDrag`} can add additional mime types to the
-	 * data transfer. These additional mime types will only be included in the `handleDrop` when the the drag was initiated from
-	 * an element in the same drag and drop controller.
-	 */ export type DataTransfer = {
+export type DataTransfer = {
 };
 /**
 	 * Provides support for drag and drop in `TreeView`.
@@ -6953,9 +7117,7 @@ export type TreeItem = {
 		 * An optional tooltip.
 		 */ readonly tooltip?: string | undefined;
 }
-/**
-	 * Predefined buttons for {@link QuickPick} and {@link InputBox}.
-	 */ export type QuickInputButtons = {
+export type QuickInputButtons = {
     /**
 		 * @hidden
 		 */ new(): QuickInputButtons;
@@ -7496,10 +7658,7 @@ export enum TextDocumentChangeReason {
         readonly endTime: number;
     };
 }
-/**
-	 * A notebook range represents an ordered pair of two cell indices.
-	 * It is guaranteed that start is less than or equal to end.
-	 */ export type NotebookRange = {
+export type NotebookRange = {
     /**
 		 * The zero-based start index of this range.
 		 */ readonly start: number;
@@ -7517,9 +7676,7 @@ export enum TextDocumentChangeReason {
 		 * @param end end index.
 		 */ new(start: number, end: number): NotebookRange;
 };
-/**
-	 * One representation of a {@link NotebookCellOutput notebook output}, defined by MIME type and data.
-	 */ export type NotebookCellOutputItem = {
+export type NotebookCellOutputItem = {
     /**
 		 * The mime type which determines how the {@linkcode NotebookCellOutputItem.data data}-property
 		 * is interpreted.
@@ -7537,11 +7694,7 @@ export enum TextDocumentChangeReason {
 		 * @param mime The mime type of the output item.
 		 */ new(data: Uint8Array, mime: string): NotebookCellOutputItem;
 };
-/**
-	 * Notebook cell output represents a result of executing a cell. It is a container type for multiple
-	 * {@link NotebookCellOutputItem output items} where contained items represent the same result but
-	 * use different MIME types.
-	 */ export type NotebookCellOutput = {
+export type NotebookCellOutput = {
     /**
 		 * The output items of this output. Each item must represent the same result. _Note_ that repeated
 		 * MIME types per output is invalid and that the editor will just pick one of them.
@@ -7569,9 +7722,7 @@ export enum TextDocumentChangeReason {
         [key: string]: any;
     }): NotebookCellOutput;
 };
-/**
-	 * NotebookCellData is the raw representation of notebook cells. Its is part of {@linkcode NotebookData}.
-	 */ export type NotebookCellData = {
+export type NotebookCellData = {
     /**
 		 * The {@link NotebookCellKind kind} of this cell data.
 		 */ kind: NotebookCellKind;
@@ -7602,14 +7753,7 @@ export enum TextDocumentChangeReason {
 		 * @param languageId The language identifier of the source value.
 		 */ new(kind: NotebookCellKind, value: string, languageId: string): NotebookCellData;
 };
-/**
-	 * Raw representation of a notebook.
-	 *
-	 * Extensions are responsible for creating {@linkcode NotebookData} so that the editor
-	 * can create a {@linkcode NotebookDocument}.
-	 *
-	 * @see {@link NotebookSerializer}
-	 */ export type NotebookData = {
+export type NotebookData = {
     /**
 		 * The cell data of this notebook data.
 		 */ cells: NotebookCellData[];
@@ -7873,9 +8017,7 @@ export enum TextDocumentChangeReason {
 		 * Aligned to the right side.
 		 */ Right = 2
 }
-/**
-	 * A contribution to a cell's status bar
-	 */ export type NotebookCellStatusBarItem = {
+export type NotebookCellStatusBarItem = {
     /**
 		 * The text to show for the item.
 		 */ text: string;
@@ -8190,9 +8332,7 @@ export enum TextDocumentChangeReason {
 		 * @return The resolved debug configuration or undefined or null.
 		 */ resolveDebugConfigurationWithSubstitutedVariables?(folder: WorkspaceFolder | undefined, debugConfiguration: DebugConfiguration, token?: CancellationToken): ProviderResult<DebugConfiguration>;
 }
-/**
-	 * Represents a debug adapter executable and optional arguments and runtime options passed to it.
-	 */ export type DebugAdapterExecutable = {
+export type DebugAdapterExecutable = {
     /**
 		 * Creates a description for a debug adapter based on an executable program.
 		 *
@@ -8227,9 +8367,7 @@ export enum TextDocumentChangeReason {
 		 * The current working directory for the executed debug adapter.
 		 */ cwd?: string;
 }
-/**
-	 * Represents a debug adapter running as a socket based server.
-	 */ export type DebugAdapterServer = {
+export type DebugAdapterServer = {
     /**
 		 * The port.
 		 */ readonly port: number;
@@ -8240,9 +8378,7 @@ export enum TextDocumentChangeReason {
 		 * Create a description for a debug adapter running as a socket based server.
 		 */ new(port: number, host?: string): DebugAdapterServer;
 };
-/**
-	 * Represents a debug adapter running as a Named Pipe (on Windows)/UNIX Domain Socket (on non-Windows) based server.
-	 */ export type DebugAdapterNamedPipeServer = {
+export type DebugAdapterNamedPipeServer = {
     /**
 		 * The path to the NamedPipe/UNIX Domain Socket.
 		 */ readonly path: string;
@@ -8264,9 +8400,7 @@ export enum TextDocumentChangeReason {
 		 * @param message A Debug Adapter Protocol message
 		 */ handleMessage(message: DebugProtocolMessage): void;
 }
-/**
-	 * A debug adapter descriptor for an inline implementation.
-	 */ export type DebugAdapterInlineImplementation = {
+export type DebugAdapterInlineImplementation = {
     /**
 		 * Create a descriptor for an inline implementation of a debug adapter.
 		 */ new(implementation: DebugAdapter): DebugAdapterInlineImplementation;
@@ -8350,9 +8484,7 @@ export interface DebugAdapterTrackerFactory {
 		 * Changed breakpoints.
 		 */ readonly changed: readonly Breakpoint[];
 }
-/**
-	 * The base class of all breakpoint types.
-	 */ export type Breakpoint = {
+export type Breakpoint = {
     /**
 		 * The unique ID of the breakpoint.
 		 */ readonly id: string;
@@ -8370,9 +8502,7 @@ export interface DebugAdapterTrackerFactory {
 		 */ readonly logMessage?: string | undefined;
     new(enabled?: boolean, condition?: string, hitCondition?: string, logMessage?: string): Breakpoint;
 };
-/**
-	 * A breakpoint specified by a source location.
-	 */ export type SourceBreakpoint = Breakpoint & {
+export type SourceBreakpoint = Breakpoint & {
     /**
 		 * The source and line position of this breakpoint.
 		 */ readonly location: Location;
@@ -8380,9 +8510,7 @@ export interface DebugAdapterTrackerFactory {
 		 * Create a new breakpoint for a source location.
 		 */ new(location: Location, enabled?: boolean, condition?: string, hitCondition?: string, logMessage?: string): SourceBreakpoint;
 };
-/**
-	 * A breakpoint specified by a function name.
-	 */ export type FunctionBreakpoint = Breakpoint & {
+export type FunctionBreakpoint = Breakpoint & {
     /**
 		 * The name of the function to which this breakpoint is attached.
 		 */ readonly functionName: string;
@@ -8820,11 +8948,7 @@ export interface DebugAdapterTrackerFactory {
     Debug = 2,
     Coverage = 3
 }
-/**
-	 * Tags can be associated with {@link TestItem TestItems} and
-	 * {@link TestRunProfile TestRunProfiles}. A profile with a tag can only
-	 * execute tests that include that tag in their {@link TestItem.tags} array.
-	 */ export type TestTag = {
+export type TestTag = {
     /**
 		 * ID of the test tag. `TestTag` instances with the same ID are considered
 		 * to be identical.
@@ -8984,16 +9108,7 @@ export interface DebugAdapterTrackerFactory {
 		 * and unpersisted results.
 		 */ dispose(): void;
 }
-/**
-	 * A TestRunRequest is a precursor to a {@link TestRun}, which in turn is
-	 * created by passing a request to {@link TestController.createTestRun}. The
-	 * TestRunRequest contains information about which tests should be run, which
-	 * should not be run, and how they are run (via the {@link TestRunRequest.profile profile}).
-	 *
-	 * In general, TestRunRequests are created by the editor and pass to
-	 * {@link TestRunProfile.runHandler}, however you can also create test
-	 * requests and runs outside of the `runHandler`.
-	 */ export type TestRunRequest = {
+export type TestRunRequest = {
     /**
 		 * A filter for specific tests to run. If given, the extension should run
 		 * all of the included tests and all their children, excluding any tests
@@ -9183,10 +9298,7 @@ export interface DebugAdapterTrackerFactory {
 		 * test discovery, such as syntax errors.
 		 */ error: string | MarkdownString | undefined;
 }
-/**
-	 * Message associated with the test state. Can be linked to a specific
-	 * source range -- useful for assertion failures, for example.
-	 */ export type TestMessage = {
+export type TestMessage = {
     /**
 		 * Human-readable message text to display.
 		 */ message: string | MarkdownString;
@@ -9204,9 +9316,7 @@ export interface DebugAdapterTrackerFactory {
 		 * @param message The message to show to the user.
 		 */ new(message: string | MarkdownString): TestMessage;
 };
-/**
-	 * The tab represents a single text based resource.
-	 */ export type TabInputText = {
+export type TabInputText = {
     /**
 		 * The uri represented by the tab.
 		 */ readonly uri: Uri;
@@ -9215,10 +9325,7 @@ export interface DebugAdapterTrackerFactory {
 		 * @param uri The URI of the tab.
 		 */ new(uri: Uri): TabInputText;
 };
-/**
-	 * The tab represents two text based resources
-	 * being rendered as a diff.
-	 */ export type TabInputTextDiff = {
+export type TabInputTextDiff = {
     /**
 		 * The uri of the original text resource.
 		 */ readonly original: Uri;
@@ -9231,9 +9338,7 @@ export interface DebugAdapterTrackerFactory {
 		 * @param modified The uri of the modified text resource.
 		 */ new(original: Uri, modified: Uri): TabInputTextDiff;
 };
-/**
-	 * The tab represents a custom editor.
-	 */ export type TabInputCustom = {
+export type TabInputCustom = {
     /**
 		 * The uri that the tab is representing.
 		 */ readonly uri: Uri;
@@ -9246,9 +9351,7 @@ export interface DebugAdapterTrackerFactory {
 		 * @param viewType The viewtype of the custom editor.
 		 */ new(uri: Uri, viewType: string): TabInputCustom;
 };
-/**
-	 * The tab represents a webview.
-	 */ export type TabInputWebview = {
+export type TabInputWebview = {
     /**
 		 * The type of webview. Maps to {@linkcode WebviewPanel.viewType WebviewPanel's viewType}
 		 */ readonly viewType: string;
@@ -9257,9 +9360,7 @@ export interface DebugAdapterTrackerFactory {
 		 * @param viewType The type of webview. Maps to {@linkcode WebviewPanel.viewType WebviewPanel's viewType}
 		 */ new(viewType: string): TabInputWebview;
 };
-/**
-	 * The tab represents a notebook.
-	 */ export type TabInputNotebook = {
+export type TabInputNotebook = {
     /**
 		 * The uri that the tab is representing.
 		 */ readonly uri: Uri;
@@ -9272,9 +9373,7 @@ export interface DebugAdapterTrackerFactory {
 		 * @param notebookType The type of notebook. Maps to {@linkcode NotebookDocument.notebookType NotebookDocuments's notebookType}
 		 */ new(uri: Uri, notebookType: string): TabInputNotebook;
 };
-/**
-	 * The tabs represents two notebooks in a diff configuration.
-	 */ export type TabInputNotebookDiff = {
+export type TabInputNotebookDiff = {
     /**
 		 * The uri of the original notebook.
 		 */ readonly original: Uri;
@@ -9291,9 +9390,7 @@ export interface DebugAdapterTrackerFactory {
 		 * @param notebookType The type of notebook. Maps to {@linkcode NotebookDocument.notebookType NotebookDocuments's notebookType}
 		 */ new(original: Uri, modified: Uri, notebookType: string): TabInputNotebookDiff;
 };
-/**
-	 * The tab represents a terminal in the editor area.
-	 */ export type TabInputTerminal = {
+export type TabInputTerminal = {
     /**
 		 * Constructs a terminal tab input.
 		 */ new(): TabInputTerminal;
@@ -9412,10 +9509,7 @@ export interface DebugAdapterTrackerFactory {
 		 * @returns A promise that resolves to `true` when all tab groups have been closed.
 		 */ close(tabGroup: TabGroup | readonly TabGroup[], preserveFocus?: boolean): Thenable<boolean>;
 }
-/**
-	 * A special value wrapper denoting a value that is safe to not clean.
-	 * This is to be used when you can guarantee no identifiable information is contained in the value and the cleaning is improperly redacting it.
-	 */ export type TelemetryTrustedValue = {
+export type TelemetryTrustedValue = {
     readonly value: T;
     new(value: T): TelemetryTrustedValue;
 };
