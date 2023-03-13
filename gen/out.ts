@@ -179,10 +179,10 @@ Returns VSCodeApi only within the vscode extension.
 	 */ readonly ThemeIcon: {
         /**
 		 * Reference to an icon representing a file. The icon is taken from the current file icon theme or a placeholder icon is used.
-		 */ readonly File;
+		 */ readonly File: ThemeIcon;
         /**
 		 * Reference to an icon representing a folder. The icon is taken from the current file icon theme or a placeholder icon is used.
-		 */ readonly Folder;
+		 */ readonly Folder: ThemeIcon;
         /**
 		 * Creates a reference to a theme icon.
 		 * @param id id of the icon. The available icons are listed in https://code.visualstudio.com/api/references/icons-in-labels#icon-listing.
@@ -381,17 +381,17 @@ Returns VSCodeApi only within the vscode extension.
 	 */ readonly CodeActionKind: {
         /**
 		 * Empty kind.
-		 */ readonly Empty;
+		 */ readonly Empty: CodeActionKind;
         /**
 		 * Base kind for quickfix actions: `quickfix`.
 		 *
 		 * Quick fix actions address a problem in the code and are shown in the normal code action context menu.
-		 */ readonly QuickFix;
+		 */ readonly QuickFix: CodeActionKind;
         /**
 		 * Base kind for refactoring actions: `refactor`
 		 *
 		 * Refactoring actions are shown in the refactoring context menu.
-		 */ readonly Refactor;
+		 */ readonly Refactor: CodeActionKind;
         /**
 		 * Base kind for refactoring extraction actions: `refactor.extract`
 		 *
@@ -402,7 +402,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * - Extract variable
 		 * - Extract interface from class
 		 * - ...
-		 */ readonly RefactorExtract;
+		 */ readonly RefactorExtract: CodeActionKind;
         /**
 		 * Base kind for refactoring inline actions: `refactor.inline`
 		 *
@@ -412,7 +412,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * - Inline variable
 		 * - Inline constant
 		 * - ...
-		 */ readonly RefactorInline;
+		 */ readonly RefactorInline: CodeActionKind;
         /**
 		 * Base kind for refactoring move actions: `refactor.move`
 		 *
@@ -422,7 +422,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * - Move a property between classes
 		 * - Move method to base class
 		 * - ...
-		 */ readonly RefactorMove;
+		 */ readonly RefactorMove: CodeActionKind;
         /**
 		 * Base kind for refactoring rewrite actions: `refactor.rewrite`
 		 *
@@ -433,23 +433,23 @@ Returns VSCodeApi only within the vscode extension.
 		 * - Encapsulate field
 		 * - Make method static
 		 * - ...
-		 */ readonly RefactorRewrite;
+		 */ readonly RefactorRewrite: CodeActionKind;
         /**
 		 * Base kind for source actions: `source`
 		 *
 		 * Source code actions apply to the entire file. They must be explicitly requested and will not show in the
 		 * normal [lightbulb](https://code.visualstudio.com/docs/editor/editingevolved#_code-action) menu. Source actions
 		 * can be run on save using `editor.codeActionsOnSave` and are also shown in the `source` context menu.
-		 */ readonly Source;
+		 */ readonly Source: CodeActionKind;
         /**
 		 * Base kind for an organize imports source action: `source.organizeImports`.
-		 */ readonly SourceOrganizeImports;
+		 */ readonly SourceOrganizeImports: CodeActionKind;
         /**
 		 * Base kind for auto-fix source actions: `source.fixAll`.
 		 *
 		 * Fix all actions automatically fix errors that have a clear fix that do not require user input.
 		 * They should not suppress errors or perform unsafe fixes such as generating new types or classes.
-		 */ readonly SourceFixAll;
+		 */ readonly SourceFixAll: CodeActionKind;
         new(value: string): CodeActionKind;
     };
     /**
@@ -1444,16 +1444,16 @@ Returns VSCodeApi only within the vscode extension.
 	 */ readonly TaskGroup: {
         /**
 		 * The clean task group;
-		 */ readonly Clean;
+		 */ readonly Clean: TaskGroup;
         /**
 		 * The build task group;
-		 */ readonly Build;
+		 */ readonly Build: TaskGroup;
         /**
 		 * The rebuild all task group;
-		 */ readonly Rebuild;
+		 */ readonly Rebuild: TaskGroup;
         /**
 		 * The test all task group;
-		 */ readonly Test;
+		 */ readonly Test: TaskGroup;
         new(id: string, label: string): TaskGroup;
     };
     /**
@@ -1774,7 +1774,7 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * When a navigation 'back' button is needed this one should be used for consistency.
 		 * It comes with a predefined icon, tooltip and location.
-		 */ readonly Back;
+		 */ readonly Back: QuickInputButton;
         /**
 		 * @hidden
 		 */ new(): QuickInputButtons;

@@ -165,7 +165,7 @@ fn class_member_to_ts_type_element(
                         computed: false,
                         optional: prop.is_optional,
                         params: vec![],
-                        type_ann: None,
+                        type_ann: prop.type_ann.clone(),
                         type_params: None,
                         init: None,
                     },
