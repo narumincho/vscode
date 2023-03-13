@@ -70,10 +70,33 @@ fn statement_to_result_decl_vec(statement: &swc_ecma_ast::Stmt) -> Vec<ResultDec
         swc_ecma_ast::Stmt::ForIn(_) => vec![],
         swc_ecma_ast::Stmt::ForOf(_) => vec![],
         swc_ecma_ast::Stmt::Decl(decl) => match decl {
+            swc_ecma_ast::Decl::Class(decl) => vec![ResultDeclWithSpan {
+                span: decl.class.span.clone(),
+                decl: ResultDecl::Class(decl.clone()),
+            }],
+            swc_ecma_ast::Decl::Fn(decl) => vec![ResultDeclWithSpan {
+                span: decl.function.span.clone(),
+                decl: ResultDecl::Fn(decl.clone()),
+            }],
+            swc_ecma_ast::Decl::Var(decl) => vec![ResultDeclWithSpan {
+                span: decl.span.clone(),
+                decl: ResultDecl::Var(*decl.clone()),
+            }],
+            swc_ecma_ast::Decl::TsInterface(decl) => vec![ResultDeclWithSpan {
+                span: decl.span.clone(),
+                decl: ResultDecl::TsInterface(*decl.clone()),
+            }],
+            swc_ecma_ast::Decl::TsTypeAlias(decl) => vec![ResultDeclWithSpan {
+                span: decl.span.clone(),
+                decl: ResultDecl::TsTypeAlias(*decl.clone()),
+            }],
+            swc_ecma_ast::Decl::TsEnum(decl) => vec![ResultDeclWithSpan {
+                span: decl.span.clone(),
+                decl: ResultDecl::TsEnum(*decl.clone()),
+            }],
             swc_ecma_ast::Decl::TsModule(module_decl) => {
                 ts_module_decl_to_result_decl_vec(module_decl)
             }
-            _ => vec![],
         },
         swc_ecma_ast::Stmt::Expr(_) => todo!(),
     }
