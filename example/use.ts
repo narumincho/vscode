@@ -12,4 +12,4 @@ const api = (() => {
 
 const pos = new api.Position(1, 3);
 pos.line;
-pos.caller;
+pos.character;

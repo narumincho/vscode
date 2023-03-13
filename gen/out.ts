@@ -1571,7 +1571,6 @@ export type Position = {
     /**
 		 * The zero-based character value.
 		 */ readonly character: number;
-    new(line: number, character: number): Position;
 };
 export type Range = {
     /**
@@ -1580,8 +1579,6 @@ export type Range = {
     /**
 		 * The end position. It is after or equal to {@link Range.start start}.
 		 */ readonly end: Position;
-    new(start: Position, end: Position): Range;
-    new(startLine: number, startCharacter: number, endLine: number, endCharacter: number): Range;
     /**
 		 * `true` if `start` and `end` are equal.
 		 */ isEmpty: boolean;
@@ -1598,8 +1595,6 @@ export type Selection = Range & {
 		 * The position of the cursor.
 		 * This position might be before or after {@link Selection.anchor anchor}.
 		 */ active: Position;
-    new(anchor: Position, active: Position): Selection;
-    new(anchorLine: number, anchorCharacter: number, activeLine: number, activeCharacter: number): Selection;
     /**
 		 * A selection is reversed if its {@link Selection.anchor anchor} is the {@link Selection.end end} position.
 		 */ isReversed: boolean;
@@ -1845,7 +1840,6 @@ export type Selection = Range & {
 		 */ readonly selections?: readonly NotebookRange[];
 }
 export type ThemeColor = {
-    new(id: string): ThemeColor;
 };
 export type ThemeIcon = {
     /**
@@ -1854,7 +1848,6 @@ export type ThemeIcon = {
     /**
 		 * The optional ThemeColor of the icon. The color is currently only used in {@link TreeItem}.
 		 */ readonly color?: ThemeColor | undefined;
-    new(id: string, color?: ThemeColor): ThemeIcon;
 };
 /**
 	 * Represents theme specific rendering styles for a {@link TextEditorDecorationType text editor decoration}.
@@ -2156,7 +2149,6 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 */ setEndOfLine(endOfLine: EndOfLine): void;
 }
 export type Uri = {
-    new(scheme: string, authority: string, path: string, query: string, fragment: string): Uri;
     /**
 		 * Scheme is the `http` part of `http://www.example.com/some/path?query#fragment`.
 		 * The part before the first colon.
@@ -2216,10 +2208,8 @@ export type CancellationTokenSource = {
 		 */ token: CancellationToken;
 };
 export type CancellationError = Error & {
-    new(): CancellationError;
 };
 export type Disposable = {
-    new(callOnDispose: () => any): Disposable;
 };
 /**
 	 * Represents a typed event.
@@ -2581,7 +2571,6 @@ export type RelativePattern = {
 		 * Example: Given a base of `/home/work/folder` and a file path of `/home/work/folder/index.js`,
 		 * the file glob pattern will match on `index.js`.
 		 */ pattern: string;
-    new(base: WorkspaceFolder | Uri | string, pattern: string): RelativePattern;
 };
 /**
 	 * A file glob pattern to match file paths against. This can either be a glob pattern string
@@ -2675,7 +2664,6 @@ export type RelativePattern = {
 	 * ```
 	 */ export type ProviderResult<T> = T | undefined | null | Thenable<T | undefined | null>;
 export type CodeActionKind = {
-    new(value: string): CodeActionKind;
     /**
 		 * String value of the kind, e.g. `"refactor.extract.function"`.
 		 */ readonly value: string;
@@ -2756,7 +2744,6 @@ export type CodeAction = {
 			 * This is displayed in the code actions UI.
 			 */ readonly reason: string;
     };
-    new(title: string, kind?: CodeActionKind): CodeAction;
 };
 /**
 	 * Provides contextual actions for code. Code actions typically either fix problems or beautify/refactor code.
@@ -2858,7 +2845,6 @@ export type CodeLens = {
     /**
 		 * `true` when there is a command associated.
 		 */ readonly isResolved: boolean;
-    new(range: Range, command?: Command): CodeLens;
 };
 /**
 	 * A code lens provider adds {@link Command commands} to source text. The commands will be shown
@@ -3004,7 +2990,6 @@ export type MarkdownString = {
 		 * // Here 'link' in the rendered markdown resolves to '/path/to/file.js'
 		 * ```
 		 */ baseUri?: Uri;
-    new(value?: string, supportThemeIcons?: boolean): MarkdownString;
 };
 /**
 	 * MarkedString can be used to render human-readable text. It is either a markdown string
@@ -3025,7 +3010,6 @@ export type Hover = {
 		 * editor will use the range at the current position or the
 		 * current position itself.
 		 */ range?: Range;
-    new(contents: MarkdownString | MarkedString | Array<MarkdownString | MarkedString>, range?: Range): Hover;
 };
 /**
 	 * The hover provider interface defines the contract between extensions and
@@ -3050,7 +3034,6 @@ export type EvaluatableExpression = {
     /*
 		 * If specified the expression overrides the extracted expression.
 		 */ readonly expression?: string | undefined;
-    new(range: Range, expression?: string): EvaluatableExpression;
 };
 /**
 	 * The evaluatable expression provider interface defines the contract between extensions and
@@ -3076,7 +3059,6 @@ export type InlineValueText = {
     /**
 		 * The text of the inline value.
 		 */ readonly text: string;
-    new(range: Range, text: string): InlineValueText;
 };
 export type InlineValueVariableLookup = {
     /**
@@ -3089,7 +3071,6 @@ export type InlineValueVariableLookup = {
     /**
 		 * How to perform the lookup.
 		 */ readonly caseSensitiveLookup: boolean;
-    new(range: Range, variableName?: string, caseSensitiveLookup?: boolean): InlineValueVariableLookup;
 };
 export type InlineValueEvaluatableExpression = {
     /**
@@ -3099,7 +3080,6 @@ export type InlineValueEvaluatableExpression = {
     /**
 		 * If specified the expression overrides the extracted expression.
 		 */ readonly expression?: string | undefined;
-    new(range: Range, expression?: string): InlineValueEvaluatableExpression;
 };
 /**
 	 * Inline value information can be provided by different means:
@@ -3161,7 +3141,6 @@ export type DocumentHighlight = {
     /**
 		 * The highlight kind, default is {@link DocumentHighlightKind.Text text}.
 		 */ kind?: DocumentHighlightKind;
-    new(range: Range, kind?: DocumentHighlightKind): DocumentHighlight;
 };
 /**
 	 * The document highlight provider interface defines the contract between extensions and
@@ -3231,8 +3210,6 @@ export type SymbolInformation = {
     /**
 		 * The location of this symbol.
 		 */ location: Location;
-    new(name: string, kind: SymbolKind, containerName: string, location: Location): SymbolInformation;
-    new(name: string, kind: SymbolKind, range: Range, uri?: Uri, containerName?: string): SymbolInformation;
 };
 export type DocumentSymbol = {
     /**
@@ -3257,7 +3234,6 @@ export type DocumentSymbol = {
     /**
 		 * Children of this symbol, e.g. properties of a class.
 		 */ children: DocumentSymbol[];
-    new(name: string, detail: string, kind: SymbolKind, range: Range, selectionRange: Range): DocumentSymbol;
 };
 /**
 	 * The document symbol provider interface defines the contract between extensions and
@@ -3349,7 +3325,6 @@ export type TextEdit = {
 		 * *Note* that the eol-sequence will be applied to the
 		 * whole document.
 		 */ newEol?: EndOfLine;
-    new(range: Range, newText: string): TextEdit;
 };
 export type SnippetTextEdit = {
     /**
@@ -3358,7 +3333,6 @@ export type SnippetTextEdit = {
     /**
 		 * The {@link SnippetString snippet} this edit will perform.
 		 */ snippet: SnippetString;
-    new(range: Range, snippet: SnippetString): SnippetTextEdit;
 };
 export type NotebookEdit = {
     /**
@@ -3377,7 +3351,6 @@ export type NotebookEdit = {
 		 */ newNotebookMetadata?: {
         [key: string]: any;
     };
-    new(range: NotebookRange, newCells: NotebookCellData[]): NotebookEdit;
 };
 /**
 	 * Additional data for entries of a workspace edit. Supports to label entries and marks entries
@@ -3416,7 +3389,6 @@ export type SnippetString = {
     /**
 		 * The snippet string.
 		 */ value: string;
-    new(value?: string): SnippetString;
 };
 /**
 	 * The rename provider interface defines the contract between extensions and
@@ -3457,10 +3429,8 @@ export type SemanticTokensLegend = {
     /**
 		 * The possible token modifiers.
 		 */ readonly tokenModifiers: string[];
-    new(tokenTypes: string[], tokenModifiers?: string[]): SemanticTokensLegend;
 };
 export type SemanticTokensBuilder = {
-    new(legend?: SemanticTokensLegend): SemanticTokensBuilder;
 };
 export type SemanticTokens = {
     /**
@@ -3472,7 +3442,6 @@ export type SemanticTokens = {
 		 * The actual tokens data.
 		 * @see {@link DocumentSemanticTokensProvider.provideDocumentSemanticTokens provideDocumentSemanticTokens} for an explanation of the format.
 		 */ readonly data: Uint32Array;
-    new(data: Uint32Array, resultId?: string): SemanticTokens;
 };
 export type SemanticTokensEdits = {
     /**
@@ -3484,7 +3453,6 @@ export type SemanticTokensEdits = {
 		 * The edits to the tokens data.
 		 * All edits refer to the initial data state.
 		 */ readonly edits: SemanticTokensEdit[];
-    new(edits: SemanticTokensEdit[], resultId?: string): SemanticTokensEdits;
 };
 export type SemanticTokensEdit = {
     /**
@@ -3496,7 +3464,6 @@ export type SemanticTokensEdit = {
     /**
 		 * The elements to insert.
 		 */ readonly data: Uint32Array | undefined;
-    new(start: number, deleteCount: number, data?: Uint32Array): SemanticTokensEdit;
 };
 /**
 	 * The document semantic tokens provider interface defines the contract between extensions and
@@ -3680,7 +3647,6 @@ export type ParameterInformation = {
 		 * The human-readable doc-comment of this signature. Will be shown
 		 * in the UI but can be omitted.
 		 */ documentation?: string | MarkdownString;
-    new(label: string | [number, number], documentation?: string | MarkdownString): ParameterInformation;
 };
 export type SignatureInformation = {
     /**
@@ -3699,7 +3665,6 @@ export type SignatureInformation = {
 		 *
 		 * If provided, this is used in place of {@linkcode SignatureHelp.activeParameter}.
 		 */ activeParameter?: number;
-    new(label: string, documentation?: string | MarkdownString): SignatureInformation;
 };
 export type SignatureHelp = {
     /**
@@ -3930,7 +3895,6 @@ export type CompletionItem = {
 		 * additional modifications to the current document should be described with the
 		 * {@link CompletionItem.additionalTextEdits additionalTextEdits}-property.
 		 */ command?: Command;
-    new(label: string | CompletionItemLabel, kind?: CompletionItemKind): CompletionItem;
 };
 export type CompletionList = {
     /**
@@ -3940,7 +3904,6 @@ export type CompletionList = {
     /**
 		 * The completion items.
 		 */ items: T[];
-    new(items?: T[], isIncomplete?: boolean): CompletionList;
 };
 /**
 	 * How a {@link CompletionItemProvider completion provider} was triggered
@@ -4038,7 +4001,6 @@ export type InlineCompletionList = {
     /**
 		 * The inline completion items.
 		 */ items: InlineCompletionItem[];
-    new(items: InlineCompletionItem[]): InlineCompletionList;
 };
 /**
 	 * Provides information about the context in which an inline completion was requested.
@@ -4099,7 +4061,6 @@ export type InlineCompletionItem = {
     /**
 		 * An optional {@link Command} that is executed *after* inserting this completion.
 		 */ command?: Command;
-    new(insertText: string | SnippetString, range?: Range, command?: Command): InlineCompletionItem;
 };
 export type DocumentLink = {
     /**
@@ -4115,7 +4076,6 @@ export type DocumentLink = {
 		 * trigger the link, such as `{0} (ctrl + click)`. The specific instructions vary depending on OS,
 		 * user settings, and localization.
 		 */ tooltip?: string;
-    new(range: Range, target?: Uri): DocumentLink;
 };
 /**
 	 * The document link provider defines the contract between extensions and feature of showing
@@ -4153,7 +4113,6 @@ export type Color = {
     /**
 		 * The alpha component of this color in the range [0-1].
 		 */ readonly alpha: number;
-    new(red: number, green: number, blue: number, alpha: number): Color;
 };
 export type ColorInformation = {
     /**
@@ -4162,7 +4121,6 @@ export type ColorInformation = {
     /**
 		 * The actual color value for this color range.
 		 */ color: Color;
-    new(range: Range, color: Color): ColorInformation;
 };
 export type ColorPresentation = {
     /**
@@ -4179,7 +4137,6 @@ export type ColorPresentation = {
 		 * An optional array of additional {@link TextEdit text edits} that are applied when
 		 * selecting this color presentation. Edits must not overlap with the main {@link ColorPresentation.textEdit edit} nor with themselves.
 		 */ additionalTextEdits?: TextEdit[];
-    new(label: string): ColorPresentation;
 };
 /**
 	 * The document color provider defines the contract between extensions and feature of
@@ -4250,7 +4207,6 @@ export type InlayHintLabelPart = {
 		 * *Note* that this property can be set late during
 		 * {@link InlayHintsProvider.resolveInlayHint resolving} of inlay hints.
 		 */ command?: Command | undefined;
-    new(value: string): InlayHintLabelPart;
 };
 export type InlayHint = {
     /**
@@ -4290,7 +4246,6 @@ export type InlayHint = {
 		 * not the background color of the hint itself. That means padding can be used to visually
 		 * align/separate an inlay hint.
 		 */ paddingRight?: boolean;
-    new(position: Position, label: string | InlayHintLabelPart[], kind?: InlayHintKind): InlayHint;
 };
 /**
 	 * The inlay hints provider interface defines the contract between extensions and
@@ -4336,7 +4291,6 @@ export type FoldingRange = {
 		 * {@link FoldingRangeKind} for an enumeration of all kinds.
 		 * If not set, the range is originated from a syntax element.
 		 */ kind?: FoldingRangeKind;
-    new(start: number, end: number, kind?: FoldingRangeKind): FoldingRange;
 };
 /**
 	 * An enumeration of specific folding range kinds. The kind is an optional field of a {@link FoldingRange}
@@ -4380,7 +4334,6 @@ export type SelectionRange = {
     /**
 		 * The parent selection range containing this range.
 		 */ parent?: SelectionRange;
-    new(range: Range, parent?: SelectionRange): SelectionRange;
 };
 export interface SelectionRangeProvider {
     /**
@@ -4420,7 +4373,6 @@ export type CallHierarchyItem = {
 		 * The range that should be selected and revealed when this symbol is being picked, e.g. the name of a function.
 		 * Must be contained by the {@linkcode CallHierarchyItem.range range}.
 		 */ selectionRange: Range;
-    new(kind: SymbolKind, name: string, detail: string, uri: Uri, range: Range, selectionRange: Range): CallHierarchyItem;
 };
 export type CallHierarchyIncomingCall = {
     /**
@@ -4430,7 +4382,6 @@ export type CallHierarchyIncomingCall = {
 		 * The range at which at which the calls appears. This is relative to the caller
 		 * denoted by {@linkcode CallHierarchyIncomingCall.from this.from}.
 		 */ fromRanges: Range[];
-    new(item: CallHierarchyItem, fromRanges: Range[]): CallHierarchyIncomingCall;
 };
 export type CallHierarchyOutgoingCall = {
     /**
@@ -4441,7 +4392,6 @@ export type CallHierarchyOutgoingCall = {
 		 * passed to {@linkcode CallHierarchyProvider.provideCallHierarchyOutgoingCalls provideCallHierarchyOutgoingCalls}
 		 * and not {@linkcode CallHierarchyOutgoingCall.to this.to}.
 		 */ fromRanges: Range[];
-    new(item: CallHierarchyItem, fromRanges: Range[]): CallHierarchyOutgoingCall;
 };
 /**
 	 * The call hierarchy provider interface describes the contract between extensions
@@ -4504,7 +4454,6 @@ export type TypeHierarchyItem = {
 		 * The range that should be selected and revealed when this symbol is being
 		 * picked, e.g. the name of a class. Must be contained by the {@link TypeHierarchyItem.range range}-property.
 		 */ selectionRange: Range;
-    new(kind: SymbolKind, name: string, detail: string, uri: Uri, range: Range, selectionRange: Range): TypeHierarchyItem;
 };
 /**
 	 * The type hierarchy provider interface describes the contract between extensions
@@ -4543,7 +4492,6 @@ export type TypeHierarchyItem = {
 		 */ provideTypeHierarchySubtypes(item: TypeHierarchyItem, token: CancellationToken): ProviderResult<TypeHierarchyItem[]>;
 }
 export type LinkedEditingRanges = {
-    new(ranges: Range[], wordPattern?: RegExp): LinkedEditingRanges;
     /**
 		 * A list of ranges that can be edited together. The ranges must have
 		 * identical length and text content. The ranges cannot overlap.
@@ -4576,7 +4524,6 @@ export type DocumentDropEdit = {
     /**
 		 * An optional additional edit to apply on drop.
 		 */ additionalEdit?: WorkspaceEdit;
-    new(insertText: string | SnippetString): DocumentDropEdit;
 };
 /**
 	 * Provider which handles dropping of resources into a text editor.
@@ -4892,7 +4839,6 @@ export type Location = {
     /**
 		 * The document range of this location.
 		 */ range: Range;
-    new(uri: Uri, rangeOrPosition: Range | Position): Location;
 };
 /**
 	 * Represents the connection of two locations. Provides additional metadata over normal {@link Location locations},
@@ -4945,7 +4891,6 @@ export type DiagnosticRelatedInformation = {
     /**
 		 * The message of this related diagnostic information.
 		 */ message: string;
-    new(location: Location, message: string): DiagnosticRelatedInformation;
 };
 /**
 	 * Additional metadata about the type of a diagnostic.
@@ -4999,7 +4944,6 @@ export type Diagnostic = {
     /**
 		 * Additional metadata about the diagnostic.
 		 */ tags?: DiagnosticTag[];
-    new(range: Range, message: string, severity?: DiagnosticSeverity): Diagnostic;
 };
 /**
 	 * A diagnostics collection is a container that manages a set of
@@ -5501,7 +5445,6 @@ export type TerminalLink = {
 		 * how to trigger the link, such as `{0} (ctrl + click)`. The specific instructions vary
 		 * depending on OS, user settings, and localization.
 		 */ tooltip?: string;
-    new(startIndex: number, length: number, tooltip?: string): TerminalLink;
 };
 /**
 	 * Provides a terminal profile for the contributed terminal profile when launched via the UI or
@@ -5517,7 +5460,6 @@ export type TerminalProfile = {
     /**
 		 * The options that the terminal will launch with.
 		 */ options: TerminalOptions | ExtensionTerminalOptions;
-    new(options: TerminalOptions | ExtensionTerminalOptions): TerminalProfile;
 };
 export type FileDecoration = {
     /**
@@ -5533,7 +5475,6 @@ export type FileDecoration = {
 		 * A flag expressing that this decoration should be
 		 * propagated to its parents.
 		 */ propagate?: boolean;
-    new(badge?: string, tooltip?: string, color?: ThemeColor): FileDecoration;
 };
 /**
 	 * The decoration provider interfaces defines the contract between extensions and
@@ -5890,7 +5831,6 @@ export type TaskGroup = {
     /**
 		 * The ID of the task group. Is one of TaskGroup.Clean.id, TaskGroup.Build.id, TaskGroup.Rebuild.id, or TaskGroup.Test.id.
 		 */ readonly id: string;
-    new(id: string, label: string): TaskGroup;
 };
 /**
 	 * A structure that defines a task kind in the system.
@@ -5931,8 +5871,6 @@ export type TaskGroup = {
     };
 }
 export type ProcessExecution = {
-    new(process: string, options?: ProcessExecutionOptions): ProcessExecution;
-    new(process: string, args: string[], options?: ProcessExecutionOptions): ProcessExecution;
     /**
 		 * The process to be executed.
 		 */ process: string;
@@ -6027,8 +5965,6 @@ export type ProcessExecution = {
 		 */ quoting: ShellQuoting;
 }
 export type ShellExecution = {
-    new(commandLine: string, options?: ShellExecutionOptions): ShellExecution;
-    new(command: string | ShellQuotedString, args: (string | ShellQuotedString)[], options?: ShellExecutionOptions): ShellExecution;
     /**
 		 * The shell command line. Is `undefined` if created with a command and arguments.
 		 */ commandLine: string | undefined;
@@ -6044,7 +5980,6 @@ export type ShellExecution = {
 		 */ options?: ShellExecutionOptions;
 };
 export type CustomExecution = {
-    new(callback: (resolvedDefinition: TaskDefinition) => Thenable<Pseudoterminal>): CustomExecution;
 };
 /**
 	 * The scope of a task.
@@ -6064,8 +5999,6 @@ export type CustomExecution = {
 		 */ reevaluateOnRerun?: boolean;
 }
 export type Task = {
-    new(taskDefinition: TaskDefinition, scope: WorkspaceFolder | TaskScope.Global | TaskScope.Workspace, name: string, source: string, execution?: ProcessExecution | ShellExecution | CustomExecution, problemMatchers?: string | string[]): Task;
-    new(taskDefinition: TaskDefinition, name: string, source: string, execution?: ProcessExecution | ShellExecution, problemMatchers?: string | string[]): Task;
     /**
 		 * The task's definition.
 		 */ definition: TaskDefinition;
@@ -6257,7 +6190,6 @@ export enum FilePermission {
 		 */ permissions?: FilePermission;
 }
 export type FileSystemError = Error & {
-    new(messageOrUri?: string | Uri): FileSystemError;
     /**
 		 * A code that identifies this error.
 		 *
@@ -7270,7 +7202,6 @@ export type DataTransferItem = {
 		 * You can use `value` to share data across operations. The original object can be retrieved so long as the extension that
 		 * created the `DataTransferItem` runs in the same extension host.
 		 */ readonly value: any;
-    new(value: any): DataTransferItem;
 };
 export type DataTransfer = {
 };
@@ -7504,8 +7435,6 @@ export type TreeItem = {
 		 * Generally, a TreeItem has no need to set the `role` of the accessibilityInformation;
 		 * however, there are cases where a TreeItem is not displayed in a tree-like way where setting the `role` may make sense.
 		 */ accessibilityInformation?: AccessibilityInformation;
-    new(label: string | TreeItemLabel, collapsibleState?: TreeItemCollapsibleState): TreeItem;
-    new(resourceUri: Uri, collapsibleState?: TreeItemCollapsibleState): TreeItem;
 };
 /**
 	 * Collapsible state of the tree item
@@ -8115,7 +8044,6 @@ export type TreeItem = {
 		 */ readonly tooltip?: string | undefined;
 }
 export type QuickInputButtons = {
-    new(): QuickInputButtons;
 };
 /**
 	 * An event signaling when a button in a particular {@link QuickPickItem} was triggered.
@@ -8663,7 +8591,6 @@ export type NotebookRange = {
     /**
 		 * `true` if `start` and `end` are equal.
 		 */ readonly isEmpty: boolean;
-    new(start: number, end: number): NotebookRange;
 };
 export type NotebookCellOutputItem = {
     /**
@@ -8676,7 +8603,6 @@ export type NotebookCellOutputItem = {
     /**
 		 * The data of this output item. Must always be an array of unsigned 8-bit integers.
 		 */ data: Uint8Array;
-    new(data: Uint8Array, mime: string): NotebookCellOutputItem;
 };
 export type NotebookCellOutput = {
     /**
@@ -8697,9 +8623,6 @@ export type NotebookCellOutput = {
 		 */ metadata?: {
         [key: string]: any;
     };
-    new(items: NotebookCellOutputItem[], metadata?: {
-        [key: string]: any;
-    }): NotebookCellOutput;
 };
 export type NotebookCellData = {
     /**
@@ -8723,7 +8646,6 @@ export type NotebookCellData = {
     /**
 		 * The execution summary of this cell data.
 		 */ executionSummary?: NotebookCellExecutionSummary;
-    new(kind: NotebookCellKind, value: string, languageId: string): NotebookCellData;
 };
 export type NotebookData = {
     /**
@@ -8734,7 +8656,6 @@ export type NotebookData = {
 		 */ metadata?: {
         [key: string]: any;
     };
-    new(cells: NotebookCellData[]): NotebookData;
 };
 /**
 	 * The notebook serializer enables the editor to open notebook files.
@@ -9009,7 +8930,6 @@ export type NotebookCellStatusBarItem = {
     /**
 		 * Accessibility information used when a screen reader interacts with this item.
 		 */ accessibilityInformation?: AccessibilityInformation;
-    new(text: string, alignment: NotebookCellStatusBarAlignment): NotebookCellStatusBarItem;
 };
 /**
 	 * A provider that can contribute items to the status bar that appears below a cell's editor.
@@ -9306,7 +9226,6 @@ export interface QuickDiffProvider {
 		 */ resolveDebugConfigurationWithSubstitutedVariables?(folder: WorkspaceFolder | undefined, debugConfiguration: DebugConfiguration, token?: CancellationToken): ProviderResult<DebugConfiguration>;
 }
 export type DebugAdapterExecutable = {
-    new(command: string, args?: string[], options?: DebugAdapterExecutableOptions): DebugAdapterExecutable;
     /**
 		 * The command or path of the debug adapter executable.
 		 * A command must be either an absolute path of an executable or the name of an command to be looked up via the PATH environment variable.
@@ -9341,13 +9260,11 @@ export type DebugAdapterServer = {
     /**
 		 * The host.
 		 */ readonly host?: string | undefined;
-    new(port: number, host?: string): DebugAdapterServer;
 };
 export type DebugAdapterNamedPipeServer = {
     /**
 		 * The path to the NamedPipe/UNIX Domain Socket.
 		 */ readonly path: string;
-    new(path: string): DebugAdapterNamedPipeServer;
 };
 /**
 	 * A debug adapter that implements the Debug Adapter Protocol can be registered with the editor if it implements the DebugAdapter interface.
@@ -9364,7 +9281,6 @@ export type DebugAdapterNamedPipeServer = {
 		 */ handleMessage(message: DebugProtocolMessage): void;
 }
 export type DebugAdapterInlineImplementation = {
-    new(implementation: DebugAdapter): DebugAdapterInlineImplementation;
 };
 export type DebugAdapterDescriptor = DebugAdapterExecutable | DebugAdapterServer | DebugAdapterNamedPipeServer | DebugAdapterInlineImplementation;
 export interface DebugAdapterDescriptorFactory {
@@ -9461,19 +9377,16 @@ export type Breakpoint = {
     /**
 		 * An optional message that gets logged when this breakpoint is hit. Embedded expressions within {} are interpolated by the debug adapter.
 		 */ readonly logMessage?: string | undefined;
-    new(enabled?: boolean, condition?: string, hitCondition?: string, logMessage?: string): Breakpoint;
 };
 export type SourceBreakpoint = Breakpoint & {
     /**
 		 * The source and line position of this breakpoint.
 		 */ readonly location: Location;
-    new(location: Location, enabled?: boolean, condition?: string, hitCondition?: string, logMessage?: string): SourceBreakpoint;
 };
 export type FunctionBreakpoint = Breakpoint & {
     /**
 		 * The name of the function to which this breakpoint is attached.
 		 */ readonly functionName: string;
-    new(functionName: string, enabled?: boolean, condition?: string, hitCondition?: string, logMessage?: string): FunctionBreakpoint;
 };
 /**
 	 * Debug console mode used by debug session, see {@link DebugSessionOptions options}.
@@ -9910,7 +9823,6 @@ export type TestTag = {
 		 * ID of the test tag. `TestTag` instances with the same ID are considered
 		 * to be identical.
 		 */ readonly id: string;
-    new(id: string): TestTag;
 };
 /**
 	 * A TestRunProfile describes one way to execute tests in a {@link TestController}.
@@ -10084,7 +9996,6 @@ export type TestRunRequest = {
 		 * for requests issued from the editor UI, though extensions may
 		 * programmatically create requests not associated with any profile.
 		 */ readonly profile: TestRunProfile | undefined;
-    new(include?: readonly TestItem[], exclude?: readonly TestItem[], profile?: TestRunProfile): TestRunRequest;
 };
 /**
 	 * A TestRun represents an in-progress or completed test run and
@@ -10261,13 +10172,11 @@ export type TestMessage = {
     /**
 		 * Associated file location.
 		 */ location?: Location;
-    new(message: string | MarkdownString): TestMessage;
 };
 export type TabInputText = {
     /**
 		 * The uri represented by the tab.
 		 */ readonly uri: Uri;
-    new(uri: Uri): TabInputText;
 };
 export type TabInputTextDiff = {
     /**
@@ -10276,7 +10185,6 @@ export type TabInputTextDiff = {
     /**
 		 * The uri of the modified text resource.
 		 */ readonly modified: Uri;
-    new(original: Uri, modified: Uri): TabInputTextDiff;
 };
 export type TabInputCustom = {
     /**
@@ -10285,13 +10193,11 @@ export type TabInputCustom = {
     /**
 		 * The type of custom editor.
 		 */ readonly viewType: string;
-    new(uri: Uri, viewType: string): TabInputCustom;
 };
 export type TabInputWebview = {
     /**
 		 * The type of webview. Maps to {@linkcode WebviewPanel.viewType WebviewPanel's viewType}
 		 */ readonly viewType: string;
-    new(viewType: string): TabInputWebview;
 };
 export type TabInputNotebook = {
     /**
@@ -10300,7 +10206,6 @@ export type TabInputNotebook = {
     /**
 		 * The type of notebook. Maps to {@linkcode NotebookDocument.notebookType NotebookDocuments's notebookType}
 		 */ readonly notebookType: string;
-    new(uri: Uri, notebookType: string): TabInputNotebook;
 };
 export type TabInputNotebookDiff = {
     /**
@@ -10312,10 +10217,8 @@ export type TabInputNotebookDiff = {
     /**
 		 * The type of notebook. Maps to {@linkcode NotebookDocument.notebookType NotebookDocuments's notebookType}
 		 */ readonly notebookType: string;
-    new(original: Uri, modified: Uri, notebookType: string): TabInputNotebookDiff;
 };
 export type TabInputTerminal = {
-    new(): TabInputTerminal;
 };
 /**
 	 * Represents a tab within a {@link TabGroup group of tabs}.
@@ -10433,7 +10336,6 @@ export type TabInputTerminal = {
 }
 export type TelemetryTrustedValue = {
     readonly value: T;
-    new(value: T): TelemetryTrustedValue;
 };
 /**
 	 * A telemetry logger which can be used by extensions to log usage and error telementry.

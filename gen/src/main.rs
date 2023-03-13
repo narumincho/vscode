@@ -132,10 +132,7 @@ fn module_item_transform(
                                                 .body
                                                 .iter()
                                                 .filter_map(|class_member| {
-                                                    class_member_to_ts_type_element(
-                                                        class_member,
-                                                        &class.ident,
-                                                    )
+                                                    class_member_to_ts_type_element(class_member)
                                                 })
                                                 .collect(),
                                         },
@@ -173,32 +170,8 @@ fn module_item_transform(
 
 fn class_member_to_ts_type_element(
     class_member: &swc_ecma_ast::ClassMember,
-    class_name: &swc_ecma_ast::Ident,
 ) -> Option<swc_ecma_ast::TsTypeElement> {
     match class_member {
-        swc_ecma_ast::ClassMember::Constructor(constructor) => {
-            Some(swc_ecma_ast::TsTypeElement::TsConstructSignatureDecl(
-                swc_ecma_ast::TsConstructSignatureDecl {
-                    span: constructor.span,
-                    params: constructor
-                        .params
-                        .iter()
-                        .map(|p| fn_to_type::param_or_ts_param_prop_to_ts_fn_param(p))
-                        .collect(),
-                    type_ann: Some(Box::new(swc_ecma_ast::TsTypeAnn {
-                        span: swc_common::Span::default(),
-                        type_ann: Box::new(swc_ecma_ast::TsType::TsTypeRef(
-                            swc_ecma_ast::TsTypeRef {
-                                span: swc_common::Span::default(),
-                                type_name: swc_ecma_ast::TsEntityName::Ident(class_name.clone()),
-                                type_params: None,
-                            },
-                        )),
-                    })),
-                    type_params: None,
-                },
-            ))
-        }
         swc_ecma_ast::ClassMember::ClassProp(class_prop) => {
             if class_prop.is_static {
                 None
