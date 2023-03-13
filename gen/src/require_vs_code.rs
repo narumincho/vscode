@@ -91,31 +91,34 @@ fn func_body() -> swc_ecma_ast::BlockStmt {
     }
 }
 
+/// ```ts
+/// ((globalThis as unknown) as {
+///   require?: undefined | ((path: "vscode") => VSCodeApi);
+/// }).require;
+/// ```
 fn require_expr() -> swc_ecma_ast::Expr {
     swc_ecma_ast::Expr::Member(swc_ecma_ast::MemberExpr {
         span: swc_common::Span::default(),
-        obj: Box::new(swc_ecma_ast::Expr::Paren(
-            swc_ecma_ast::ParenExpr { span: swc_common::Span::default(), expr: Box::new(
-            swc_ecma_ast::Expr::TsAs(
-            swc_ecma_ast::TsAsExpr {
+        obj: Box::new(swc_ecma_ast::Expr::Paren(swc_ecma_ast::ParenExpr {
+            span: swc_common::Span::default(),
+            expr: Box::new(swc_ecma_ast::Expr::TsAs(swc_ecma_ast::TsAsExpr {
                 span: swc_common::Span::default(),
-                expr: Box::new(swc_ecma_ast::Expr::Paren(
-                    swc_ecma_ast::ParenExpr { span: swc_common::Span::default(), expr: Box::new( swc_ecma_ast::Expr::TsAs(
-                        swc_ecma_ast::TsAsExpr {
-                            span: swc_common::Span::default(),
-                            expr: Box::new(swc_ecma_ast::Expr::Ident(swc_ecma_ast::Ident::new(
-                                string_cache::Atom::from("globalThis"),
-                                swc_common::Span::default(),
-                            ))),
-                            type_ann: Box::new(swc_ecma_ast::TsType::TsKeywordType(
-                                swc_ecma_ast::TsKeywordType {
-                                    span: swc_common::Span::default(),
-                                    kind: swc_ecma_ast::TsKeywordTypeKind::TsUnknownKeyword,
-                                },
-                            )),
-                        },
-                    ))}
-                )),
+                expr: Box::new(swc_ecma_ast::Expr::Paren(swc_ecma_ast::ParenExpr {
+                    span: swc_common::Span::default(),
+                    expr: Box::new(swc_ecma_ast::Expr::TsAs(swc_ecma_ast::TsAsExpr {
+                        span: swc_common::Span::default(),
+                        expr: Box::new(swc_ecma_ast::Expr::Ident(swc_ecma_ast::Ident::new(
+                            string_cache::Atom::from("globalThis"),
+                            swc_common::Span::default(),
+                        ))),
+                        type_ann: Box::new(swc_ecma_ast::TsType::TsKeywordType(
+                            swc_ecma_ast::TsKeywordType {
+                                span: swc_common::Span::default(),
+                                kind: swc_ecma_ast::TsKeywordTypeKind::TsUnknownKeyword,
+                            },
+                        )),
+                    })),
+                })),
                 type_ann: Box::new(swc_ecma_ast::TsType::TsTypeLit(swc_ecma_ast::TsTypeLit {
                     span: swc_common::Span::default(),
                     members: vec![swc_ecma_ast::TsTypeElement::TsPropertySignature(
@@ -132,39 +135,86 @@ fn require_expr() -> swc_ecma_ast::Expr {
                             params: vec![],
                             type_ann: Some(Box::new(swc_ecma_ast::TsTypeAnn {
                                 span: swc_common::Span::default(),
-                                type_ann: Box::new(
-                                    swc_ecma_ast::TsType::TsUnionOrIntersectionType(
-                                        swc_ecma_ast::TsUnionOrIntersectionType::TsUnionType(
-                                            swc_ecma_ast::TsUnionType {
-                                                span: swc_common::Span::default(),
-                                                types: vec![Box::new(swc_ecma_ast::TsType::TsKeywordType(
-                                                    swc_ecma_ast::TsKeywordType {
-                                                        span:swc_common::Span::default(),
-                                                        kind: swc_ecma_ast::TsKeywordTypeKind::TsUndefinedKeyword,
-                                                    },
-                                                )),
-                                                Box::new(swc_ecma_ast::TsType::TsKeywordType(
-                                                    swc_ecma_ast::TsKeywordType {
-                                                        span:swc_common::Span::default(),
-                                                        kind: swc_ecma_ast::TsKeywordTypeKind::TsUndefinedKeyword,
-                                                    },
-                                                ))],
-                                            },
-                                        ),
-                                    ),
-                                ),
+                                type_ann: Box::new(require_function_type()),
                             })),
                             type_params: None,
                         },
                     )],
                 })),
-            },
-        ))})),
+            })),
+        })),
         prop: swc_ecma_ast::MemberProp::Ident(swc_ecma_ast::Ident::new(
             string_cache::Atom::from("require"),
             swc_common::Span::default(),
         )),
     })
+}
+
+/// ```ts
+/// undefined | ((path: "vscode") => VSCodeApi)
+/// ```
+fn require_function_type() -> swc_ecma_ast::TsType {
+    swc_ecma_ast::TsType::TsUnionOrIntersectionType(
+        swc_ecma_ast::TsUnionOrIntersectionType::TsUnionType(swc_ecma_ast::TsUnionType {
+            span: swc_common::Span::default(),
+            types: vec![
+                Box::new(swc_ecma_ast::TsType::TsKeywordType(
+                    swc_ecma_ast::TsKeywordType {
+                        span: swc_common::Span::default(),
+                        kind: swc_ecma_ast::TsKeywordTypeKind::TsUndefinedKeyword,
+                    },
+                )),
+                Box::new(swc_ecma_ast::TsType::TsParenthesizedType(
+                    swc_ecma_ast::TsParenthesizedType {
+                        span: swc_common::Span::default(),
+                        type_ann: Box::new(swc_ecma_ast::TsType::TsFnOrConstructorType(
+                            swc_ecma_ast::TsFnOrConstructorType::TsFnType(swc_ecma_ast::TsFnType {
+                                span: swc_common::Span::default(),
+                                params: vec![swc_ecma_ast::TsFnParam::Ident(
+                                    swc_ecma_ast::BindingIdent {
+                                        id: swc_ecma_ast::Ident::new(
+                                            string_cache::Atom::from("path"),
+                                            swc_common::Span::default(),
+                                        ),
+                                        type_ann: Some(Box::new(swc_ecma_ast::TsTypeAnn {
+                                            span: swc_common::Span::default(),
+                                            type_ann: Box::new(swc_ecma_ast::TsType::TsLitType(
+                                                swc_ecma_ast::TsLitType {
+                                                    span: swc_common::Span::default(),
+                                                    lit: swc_ecma_ast::TsLit::Str(
+                                                        swc_ecma_ast::Str {
+                                                            span: swc_common::Span::default(),
+                                                            value: string_cache::Atom::from(
+                                                                "vscode",
+                                                            ),
+                                                            raw: None,
+                                                        },
+                                                    ),
+                                                },
+                                            )),
+                                        })),
+                                    },
+                                )],
+                                type_params: None,
+                                type_ann: Box::new(swc_ecma_ast::TsTypeAnn {
+                                    span: swc_common::Span::default(),
+                                    type_ann: Box::new(swc_ecma_ast::TsType::TsTypeRef(
+                                        swc_ecma_ast::TsTypeRef {
+                                            span: swc_common::Span::default(),
+                                            type_name: swc_ecma_ast::TsEntityName::Ident(
+                                                crate::ident::vs_code_api_ident(),
+                                            ),
+                                            type_params: None,
+                                        },
+                                    )),
+                                }),
+                            }),
+                        )),
+                    },
+                )),
+            ],
+        }),
+    )
 }
 
 fn require_func_ident() -> swc_ecma_ast::Ident {

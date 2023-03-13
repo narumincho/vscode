@@ -4,7 +4,7 @@ require("vscode")
 ```
 */ export function requireVsCode(): VSCodeApi | undefined {
     const requireFunc = ((globalThis as unknown) as {
-        require?: undefined | undefined;
+        require?: undefined | ((path: "vscode") => requireVsCode);
     }).require;
 }
 /**
