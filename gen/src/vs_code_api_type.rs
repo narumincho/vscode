@@ -77,7 +77,27 @@ fn result_decl_to_ts_property_signature(
         crate::pickup::ResultDecl::Var(_) => None,
         crate::pickup::ResultDecl::TsInterface(_) => None,
         crate::pickup::ResultDecl::TsTypeAlias(_) => None,
-        crate::pickup::ResultDecl::TsEnum(_) => None,
+        crate::pickup::ResultDecl::TsEnum(ts_enum) => Some(swc_ecma_ast::TsPropertySignature {
+            span: result.span,
+            readonly: true,
+            key: Box::new(swc_ecma_ast::Expr::Ident(ts_enum.id.clone())),
+            computed: false,
+            optional: false,
+            init: None,
+            params: vec![],
+            type_ann: Some(Box::new(swc_ecma_ast::TsTypeAnn {
+                span: swc_common::Span::default(),
+                type_ann: Box::new(swc_ecma_ast::TsType::TsTypeLit(swc_ecma_ast::TsTypeLit {
+                    span: swc_common::Span::default(),
+                    members: ts_enum
+                        .members
+                        .iter()
+                        .map(|member| enum_member_to_ts_type_element(member))
+                        .collect(),
+                })),
+            })),
+            type_params: None,
+        }),
     }
 }
 
@@ -160,4 +180,71 @@ fn class_member_to_ts_type_element(
         swc_ecma_ast::ClassMember::StaticBlock(_) => None,
         swc_ecma_ast::ClassMember::AutoAccessor(_) => None,
     }
+}
+
+fn enum_member_to_ts_type_element(
+    enum_member: &swc_ecma_ast::TsEnumMember,
+) -> swc_ecma_ast::TsTypeElement {
+    swc_ecma_ast::TsTypeElement::TsPropertySignature(swc_ecma_ast::TsPropertySignature {
+        span: enum_member.span,
+        readonly: true,
+        key: Box::new(match &enum_member.id {
+            swc_ecma_ast::TsEnumMemberId::Ident(ident) => swc_ecma_ast::Expr::Ident(ident.clone()),
+            swc_ecma_ast::TsEnumMemberId::Str(str) => {
+                swc_ecma_ast::Expr::Lit(swc_ecma_ast::Lit::Str(str.clone()))
+            }
+        }),
+        computed: false,
+        optional: false,
+        params: vec![],
+        type_ann: Some(Box::new(match &enum_member.init {
+            Some(expr) => match &**expr {
+                swc_ecma_ast::Expr::Lit(lit) => swc_ecma_ast::TsTypeAnn {
+                    span: swc_common::Span::default(),
+                    type_ann: Box::new(swc_ecma_ast::TsType::TsLitType(swc_ecma_ast::TsLitType {
+                        span: swc_common::Span::default(),
+                        lit: match lit {
+                            swc_ecma_ast::Lit::Str(_) => todo!(),
+                            swc_ecma_ast::Lit::Bool(_) => todo!(),
+                            swc_ecma_ast::Lit::Null(_) => todo!(),
+                            swc_ecma_ast::Lit::Num(num) => swc_ecma_ast::TsLit::Number(num.clone()),
+                            swc_ecma_ast::Lit::BigInt(_) => todo!(),
+                            swc_ecma_ast::Lit::Regex(_) => todo!(),
+                            swc_ecma_ast::Lit::JSXText(_) => todo!(),
+                        },
+                    })),
+                },
+                swc_ecma_ast::Expr::Unary(unary_expr) => match unary_expr.op {
+                    swc_ecma_ast::UnaryOp::Minus => swc_ecma_ast::TsTypeAnn {
+                        span: swc_common::Span::default(),
+                        type_ann: Box::new(swc_ecma_ast::TsType::TsLitType(
+                            swc_ecma_ast::TsLitType {
+                                span: swc_common::Span::default(),
+                                lit: swc_ecma_ast::TsLit::Number(swc_ecma_ast::Number {
+                                    span: swc_common::Span::default(),
+                                    value: match &*unary_expr.arg {
+                                        swc_ecma_ast::Expr::Lit(swc_ecma_ast::Lit::Num(num)) => {
+                                            num.value
+                                        }
+                                        _ => todo!(),
+                                    },
+                                    raw: None,
+                                }),
+                            },
+                        )),
+                    },
+                    swc_ecma_ast::UnaryOp::Plus => todo!(),
+                    swc_ecma_ast::UnaryOp::Bang => todo!(),
+                    swc_ecma_ast::UnaryOp::Tilde => todo!(),
+                    swc_ecma_ast::UnaryOp::TypeOf => todo!(),
+                    swc_ecma_ast::UnaryOp::Void => todo!(),
+                    swc_ecma_ast::UnaryOp::Delete => todo!(),
+                },
+                _ => todo!(),
+            },
+            None => todo!(),
+        })),
+        type_params: None,
+        init: None,
+    })
 }

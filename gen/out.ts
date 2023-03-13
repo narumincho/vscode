@@ -71,6 +71,96 @@ Returns VSCodeApi only within the vscode extension.
 		 */ new(anchorLine: number, anchorCharacter: number, activeLine: number, activeCharacter: number): Selection;
     };
     /**
+	 * Represents sources that can cause {@link window.onDidChangeTextEditorSelection selection change events}.
+	*/ readonly TextEditorSelectionChangeKind: {
+        /**
+		 * Selection changed due to typing in the editor.
+		 */ readonly Keyboard: 1;
+        /**
+		 * Selection change due to clicking in the editor.
+		 */ readonly Mouse: 2;
+        /**
+		 * Selection changed because a command ran.
+		 */ readonly Command: 3;
+    };
+    /**
+	 * Rendering style of the cursor.
+	 */ readonly TextEditorCursorStyle: {
+        /**
+		 * Render the cursor as a vertical thick line.
+		 */ readonly Line: 1;
+        /**
+		 * Render the cursor as a block filled.
+		 */ readonly Block: 2;
+        /**
+		 * Render the cursor as a thick horizontal line.
+		 */ readonly Underline: 3;
+        /**
+		 * Render the cursor as a vertical thin line.
+		 */ readonly LineThin: 4;
+        /**
+		 * Render the cursor as a block outlined.
+		 */ readonly BlockOutline: 5;
+        /**
+		 * Render the cursor as a thin horizontal line.
+		 */ readonly UnderlineThin: 6;
+    };
+    /**
+	 * Rendering style of the line numbers.
+	 */ readonly TextEditorLineNumbersStyle: {
+        /**
+		 * Do not render the line numbers.
+		 */ readonly Off: 0;
+        /**
+		 * Render the line numbers.
+		 */ readonly On: 1;
+        /**
+		 * Render the line numbers with values relative to the primary cursor location.
+		 */ readonly Relative: 2;
+    };
+    /**
+	 * Represents different {@link TextEditor.revealRange reveal} strategies in a text editor.
+	 */ readonly TextEditorRevealType: {
+        /**
+		 * The range will be revealed with as little scrolling as possible.
+		 */ readonly Default: 0;
+        /**
+		 * The range will always be revealed in the center of the viewport.
+		 */ readonly InCenter: 1;
+        /**
+		 * If the range is outside the viewport, it will be revealed in the center of the viewport.
+		 * Otherwise, it will be revealed with as little scrolling as possible.
+		 */ readonly InCenterIfOutsideViewport: 2;
+        /**
+		 * The range will always be revealed at the top of the viewport.
+		 */ readonly AtTop: 3;
+    };
+    /**
+	 * Represents different positions for rendering a decoration in an {@link DecorationRenderOptions.overviewRulerLane overview ruler}.
+	 * The overview ruler supports three lanes.
+	 */ readonly OverviewRulerLane: {
+        readonly Left: 1;
+        readonly Center: 2;
+        readonly Right: 4;
+        readonly Full: 7;
+    };
+    /**
+	 * Describes the behavior of decorations when typing/editing at their edges.
+	 */ readonly DecorationRangeBehavior: {
+        /**
+		 * The decoration's range will widen when edits occur at the start or end.
+		 */ readonly OpenOpen: 0;
+        /**
+		 * The decoration's range will not widen when edits occur at the start of end.
+		 */ readonly ClosedClosed: 1;
+        /**
+		 * The decoration's range will widen when edits occur at the start, but not at the end.
+		 */ readonly OpenClosed: 2;
+        /**
+		 * The decoration's range will widen when edits occur at the end, but not at the start.
+		 */ readonly ClosedOpen: 3;
+    };
+    /**
 	 * A reference to one of the workbench colors as defined in https://code.visualstudio.com/docs/getstarted/theme-color-reference.
 	 * Using a theme color is preferred over a custom color as it gives theme authors and users the possibility to change the color.
 	 */ readonly ThemeColor: {
@@ -98,6 +188,16 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param id id of the icon. The available icons are listed in https://code.visualstudio.com/api/references/icons-in-labels#icon-listing.
 		 * @param color optional `ThemeColor` for the icon. The color is currently only used in {@link TreeItem}.
 		 */ new(id: string, color?: ThemeColor): ThemeIcon;
+    };
+    /**
+	 * Represents an end of line character sequence in a {@link TextDocument document}.
+	 */ readonly EndOfLine: {
+        /**
+		 * The line feed `\n` character.
+		 */ readonly LF: 1;
+        /**
+		 * The carriage return line feed `\r\n` sequence.
+		 */ readonly CRLF: 2;
     };
     /**
 	 * A universal resource identifier representing either a file on disk
@@ -225,6 +325,24 @@ Returns VSCodeApi only within the vscode extension.
 	 */ readonly EventEmitter: {
     };
     /**
+	 * The kind of {@link QuickPickItem quick pick item}.
+	 */ readonly QuickPickItemKind: {
+        /**
+		 * When a {@link QuickPickItem} has a kind of {@link Separator}, the item is just a visual separator and does not represent a real item.
+		 * The only property that applies is {@link QuickPickItem.label label }. All other properties on {@link QuickPickItem} will be ignored and have no effect.
+		 */ readonly Separator: 1;
+        /**
+		 * The default {@link QuickPickItem.kind} is an item that can be selected in the quick pick.
+		 */ readonly Default: 0;
+    };
+    /**
+	 * Impacts the behavior and appearance of the validation message.
+	 */ readonly InputBoxValidationSeverity: {
+        readonly Info: 1;
+        readonly Warning: 2;
+        readonly Error: 3;
+    };
+    /**
 	 * A relative pattern is a helper to construct glob patterns that are matched
 	 * relatively to a base file path. The base path can either be an absolute file
 	 * path as string or uri or a {@link WorkspaceFolder workspace folder}, which is the
@@ -335,6 +453,19 @@ Returns VSCodeApi only within the vscode extension.
         new(value: string): CodeActionKind;
     };
     /**
+	 * The reason why code actions were requested.
+	 */ readonly CodeActionTriggerKind: {
+        /**
+		 * Code actions were explicitly requested by the user or by an extension.
+		 */ readonly Invoke: 1;
+        /**
+		 * Code actions were requested automatically.
+		 *
+		 * This typically happens when current selection in a file changes, but can
+		 * also be triggered when file content changes.
+		 */ readonly Automatic: 2;
+    };
+    /**
 	 * A code action represents a change that can be performed in code, e.g. to fix a problem or
 	 * to refactor code.
 	 *
@@ -443,6 +574,19 @@ Returns VSCodeApi only within the vscode extension.
 		 */ new(range: Range, expression?: string): InlineValueEvaluatableExpression;
     };
     /**
+	 * A document highlight kind.
+	 */ readonly DocumentHighlightKind: {
+        /**
+		 * A textual occurrence.
+		 */ readonly Text: 0;
+        /**
+		 * Read-access of a symbol, like reading a variable.
+		 */ readonly Read: 1;
+        /**
+		 * Write-access of a symbol, like writing to a variable.
+		 */ readonly Write: 2;
+    };
+    /**
 	 * A document highlight is a range inside a text document which deserves
 	 * special attention. Usually a document highlight is visualized by changing
 	 * the background color of its range.
@@ -453,6 +597,43 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param range The range the highlight applies to.
 		 * @param kind The highlight kind, default is {@link DocumentHighlightKind.Text text}.
 		 */ new(range: Range, kind?: DocumentHighlightKind): DocumentHighlight;
+    };
+    /**
+	 * A symbol kind.
+	 */ readonly SymbolKind: {
+        readonly File: 0;
+        readonly Module: 1;
+        readonly Namespace: 2;
+        readonly Package: 3;
+        readonly Class: 4;
+        readonly Method: 5;
+        readonly Property: 6;
+        readonly Field: 7;
+        readonly Constructor: 8;
+        readonly Enum: 9;
+        readonly Interface: 10;
+        readonly Function: 11;
+        readonly Variable: 12;
+        readonly Constant: 13;
+        readonly String: 14;
+        readonly Number: 15;
+        readonly Boolean: 16;
+        readonly Array: 17;
+        readonly Object: 18;
+        readonly Key: 19;
+        readonly Null: 20;
+        readonly EnumMember: 21;
+        readonly Struct: 22;
+        readonly Event: 23;
+        readonly Operator: 24;
+        readonly TypeParameter: 25;
+    };
+    /**
+	 * Symbol tags are extra annotations that tweak the rendering of a symbol.
+	 */ readonly SymbolTag: {
+        /**
+		 * Render a symbol as obsolete, usually using a strike-out.
+		 */ readonly Deprecated: 1;
     };
     /**
 	 * Represents information about programming constructs like variables, classes,
@@ -677,6 +858,58 @@ Returns VSCodeApi only within the vscode extension.
 	 */ readonly SignatureHelp: {
     };
     /**
+	 * How a {@linkcode SignatureHelpProvider} was triggered.
+	 */ readonly SignatureHelpTriggerKind: {
+        /**
+		 * Signature help was invoked manually by the user or by a command.
+		 */ readonly Invoke: 1;
+        /**
+		 * Signature help was triggered by a trigger character.
+		 */ readonly TriggerCharacter: 2;
+        /**
+		 * Signature help was triggered by the cursor moving or by the document content changing.
+		 */ readonly ContentChange: 3;
+    };
+    /**
+	 * Completion item kinds.
+	 */ readonly CompletionItemKind: {
+        readonly Text: 0;
+        readonly Method: 1;
+        readonly Function: 2;
+        readonly Constructor: 3;
+        readonly Field: 4;
+        readonly Variable: 5;
+        readonly Class: 6;
+        readonly Interface: 7;
+        readonly Module: 8;
+        readonly Property: 9;
+        readonly Unit: 10;
+        readonly Value: 11;
+        readonly Enum: 12;
+        readonly Keyword: 13;
+        readonly Snippet: 14;
+        readonly Color: 15;
+        readonly Reference: 17;
+        readonly File: 16;
+        readonly Folder: 18;
+        readonly EnumMember: 19;
+        readonly Constant: 20;
+        readonly Struct: 21;
+        readonly Event: 22;
+        readonly Operator: 23;
+        readonly TypeParameter: 24;
+        readonly User: 25;
+        readonly Issue: 26;
+    };
+    /**
+	 * Completion item tags are extra annotations that tweak the rendering of a completion
+	 * item.
+	 */ readonly CompletionItemTag: {
+        /**
+		 * Render a completion as obsolete, usually using a strike-out.
+		 */ readonly Deprecated: 1;
+    };
+    /**
 	 * A completion item represents a text snippet that is proposed to complete text that is being typed.
 	 *
 	 * It is sufficient to create a completion item from just a {@link CompletionItem.label label}. In that
@@ -713,12 +946,37 @@ Returns VSCodeApi only within the vscode extension.
 		 */ new(items?: T[], isIncomplete?: boolean): CompletionList;
     };
     /**
+	 * How a {@link CompletionItemProvider completion provider} was triggered
+	 */ readonly CompletionTriggerKind: {
+        /**
+		 * Completion was triggered normally.
+		 */ readonly Invoke: 0;
+        /**
+		 * Completion was triggered by a trigger character.
+		 */ readonly TriggerCharacter: 1;
+        /**
+		 * Completion was re-triggered as current completion list is incomplete
+		 */ readonly TriggerForIncompleteCompletions: 2;
+    };
+    /**
 	 * Represents a collection of {@link InlineCompletionItem inline completion items} to be presented
 	 * in the editor.
 	 */ readonly InlineCompletionList: {
         /**
 		 * Creates a new list of inline completion items.
 		*/ new(items: InlineCompletionItem[]): InlineCompletionList;
+    };
+    /**
+	 * Describes how an {@link InlineCompletionItemProvider inline completion provider} was triggered.
+	 */ readonly InlineCompletionTriggerKind: {
+        /**
+		 * Completion was triggered explicitly by a user gesture.
+		 * Return multiple completion items to enable cycling through them.
+		 */ readonly Invoke: 0;
+        /**
+		 * Completion was triggered automatically while editing.
+		 * It is sufficient to return a single completion item in this case.
+		 */ readonly Automatic: 1;
     };
     /**
 	 * An inline completion item represents a text snippet that is proposed inline to complete text that is being typed.
@@ -781,6 +1039,19 @@ Returns VSCodeApi only within the vscode extension.
 		 */ new(label: string): ColorPresentation;
     };
     /**
+	 * Inlay hint kinds.
+	 *
+	 * The kind of an inline hint defines its appearance, e.g the corresponding foreground and background colors are being
+	 * used.
+	 */ readonly InlayHintKind: {
+        /**
+		 * An inlay hint that for a type annotation.
+		 */ readonly Type: 1;
+        /**
+		 * An inlay hint that is for a parameter.
+		 */ readonly Parameter: 2;
+    };
+    /**
 	 * An inlay hint label part allows for interactive and composite labels of inlay hints.
 	 */ readonly InlayHintLabelPart: {
         /**
@@ -811,6 +1082,22 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param end The end line of the folded range.
 		 * @param kind The kind of the folding range.
 		 */ new(start: number, end: number, kind?: FoldingRangeKind): FoldingRange;
+    };
+    /**
+	 * An enumeration of specific folding range kinds. The kind is an optional field of a {@link FoldingRange}
+	 * and is used to distinguish specific folding ranges such as ranges originated from comments. The kind is used by commands like
+	 * `Fold all comments` or `Fold all regions`.
+	 * If the kind is not set on the range, the range originated from a syntax element other than comments, imports or region markers.
+	 */ readonly FoldingRangeKind: {
+        /**
+		 * Kind for folding range representing a comment.
+		 */ readonly Comment: 1;
+        /**
+		 * Kind for folding range representing a import.
+		 */ readonly Imports: 2;
+        /**
+		 * Kind for folding range representing regions originating from folding markers like `#region` and `#endregion`.
+		 */ readonly Region: 3;
     };
     /**
 	 * A selection range represents a part of a selection hierarchy. A selection range
@@ -883,6 +1170,37 @@ Returns VSCodeApi only within the vscode extension.
 		 */ new(insertText: string | SnippetString): DocumentDropEdit;
     };
     /**
+	 * Describes what to do with the indentation when pressing Enter.
+	 */ readonly IndentAction: {
+        /**
+		 * Insert new line and copy the previous line's indentation.
+		 */ readonly None: 0;
+        /**
+		 * Insert new line and indent once (relative to the previous line's indentation).
+		 */ readonly Indent: 1;
+        /**
+		 * Insert two new lines:
+		 *  - the first one indented which will hold the cursor
+		 *  - the second one at the same indentation level
+		 */ readonly IndentOutdent: 2;
+        /**
+		 * Insert new line and outdent once (relative to the previous line's indentation).
+		 */ readonly Outdent: 3;
+    };
+    /**
+	 * The configuration target
+	 */ readonly ConfigurationTarget: {
+        /**
+		 * Global configuration
+		*/ readonly Global: 1;
+        /**
+		 * Workspace configuration
+		 */ readonly Workspace: 2;
+        /**
+		 * Workspace folder configuration
+		 */ readonly WorkspaceFolder: 3;
+    };
+    /**
 	 * Represents a location inside a resource, such as a line
 	 * inside a text file.
 	 */ readonly Location: {
@@ -892,6 +1210,23 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param uri The resource identifier.
 		 * @param rangeOrPosition The range or position. Positions will be converted to an empty range.
 		 */ new(uri: Uri, rangeOrPosition: Range | Position): Location;
+    };
+    /**
+	 * Represents the severity of diagnostics.
+	 */ readonly DiagnosticSeverity: {
+        /**
+		 * Something not allowed by the rules of a language or other means.
+		 */ readonly Error: 0;
+        /**
+		 * Something suspicious but allowed.
+		 */ readonly Warning: 1;
+        /**
+		 * Something to inform about but not a problem.
+		 */ readonly Information: 2;
+        /**
+		 * Something to hint to a better way of doing it, like proposing
+		 * a refactoring.
+		 */ readonly Hint: 3;
     };
     /**
 	 * Represents a related message and source code location for a diagnostic. This should be
@@ -906,6 +1241,25 @@ Returns VSCodeApi only within the vscode extension.
 		 */ new(location: Location, message: string): DiagnosticRelatedInformation;
     };
     /**
+	 * Additional metadata about the type of a diagnostic.
+	 */ readonly DiagnosticTag: {
+        /**
+		 * Unused or unnecessary code.
+		 *
+		 * Diagnostics with this tag are rendered faded out. The amount of fading
+		 * is controlled by the `"editorUnnecessaryCode.opacity"` theme color. For
+		 * example, `"editorUnnecessaryCode.opacity": "#000000c0"` will render the
+		 * code with 75% opacity. For high contrast themes, use the
+		 * `"editorUnnecessaryCode.border"` theme color to underline unnecessary code
+		 * instead of fading it out.
+		 */ readonly Unnecessary: 1;
+        /**
+		 * Deprecated or obsolete code.
+		 *
+		 * Diagnostics with this tag are rendered with a strike through.
+		 */ readonly Deprecated: 2;
+    };
+    /**
 	 * Represents a diagnostic, such as a compiler error or warning. Diagnostic objects
 	 * are only valid in the scope of a file.
 	 */ readonly Diagnostic: {
@@ -916,6 +1270,76 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param message The human-readable message.
 		 * @param severity The severity, default is {@link DiagnosticSeverity.Error error}.
 		 */ new(range: Range, message: string, severity?: DiagnosticSeverity): Diagnostic;
+    };
+    /**
+	 * Represents the severity of a language status item.
+	 */ readonly LanguageStatusSeverity: {
+        readonly Information: 0;
+        readonly Warning: 1;
+        readonly Error: 2;
+    };
+    /**
+	 * Denotes a location of an editor in the window. Editors can be arranged in a grid
+	 * and each column represents one editor location in that grid by counting the editors
+	 * in order of their appearance.
+	 */ readonly ViewColumn: {
+        /**
+		 * A *symbolic* editor column representing the currently active column. This value
+		 * can be used when opening editors, but the *resolved* {@link TextEditor.viewColumn viewColumn}-value
+		 * of editors will always be `One`, `Two`, `Three`,... or `undefined` but never `Active`.
+		 */ readonly Active: 1;
+        /**
+		 * A *symbolic* editor column representing the column to the side of the active one. This value
+		 * can be used when opening editors, but the *resolved* {@link TextEditor.viewColumn viewColumn}-value
+		 * of editors will always be `One`, `Two`, `Three`,... or `undefined` but never `Beside`.
+		 */ readonly Beside: 2;
+        /**
+		 * The first editor column.
+		 */ readonly One: 1;
+        /**
+		 * The second editor column.
+		 */ readonly Two: 2;
+        /**
+		 * The third editor column.
+		 */ readonly Three: 3;
+        /**
+		 * The fourth editor column.
+		 */ readonly Four: 4;
+        /**
+		 * The fifth editor column.
+		 */ readonly Five: 5;
+        /**
+		 * The sixth editor column.
+		 */ readonly Six: 6;
+        /**
+		 * The seventh editor column.
+		 */ readonly Seven: 7;
+        /**
+		 * The eighth editor column.
+		 */ readonly Eight: 8;
+        /**
+		 * The ninth editor column.
+		 */ readonly Nine: 9;
+    };
+    /**
+	 * Represents the alignment of status bar items.
+	 */ readonly StatusBarAlignment: {
+        /**
+		 * Aligned to the left side.
+		 */ readonly Left: 1;
+        /**
+		 * Aligned to the right side.
+		 */ readonly Right: 2;
+    };
+    /**
+	 * The location of the terminal.
+	 */ readonly TerminalLocation: {
+        /**
+		 * In the terminal view
+		 */ readonly Panel: 1;
+        /**
+		 * In the editor area
+		 */ readonly Editor: 2;
     };
     /**
 	 * A link on a terminal line.
@@ -949,6 +1373,70 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param tooltip The tooltip of the decoration.
 		 * @param color The color of the decoration.
 		 */ new(badge?: string, tooltip?: string, color?: ThemeColor): FileDecoration;
+    };
+    /**
+	 * In a remote window the extension kind describes if an extension
+	 * runs where the UI (window) runs or if an extension runs remotely.
+	 */ readonly ExtensionKind: {
+        /**
+		 * Extension runs where the UI runs.
+		 */ readonly UI: 1;
+        /**
+		 * Extension runs where the remote extension host runs.
+		 */ readonly Workspace: 2;
+    };
+    /**
+	 * The ExtensionMode is provided on the `ExtensionContext` and indicates the
+	 * mode the specific extension is running in.
+	 */ readonly ExtensionMode: {
+        /**
+		 * The extension is installed normally (for example, from the marketplace
+		 * or VSIX) in the editor.
+		 */ readonly Production: 1;
+        /**
+		 * The extension is running from an `--extensionDevelopmentPath` provided
+		 * when launching the editor.
+		 */ readonly Development: 2;
+        /**
+		 * The extension is running from an `--extensionTestsPath` and
+		 * the extension host is running unit tests.
+		 */ readonly Test: 3;
+    };
+    /**
+	 * Represents a color theme kind.
+	 */ readonly ColorThemeKind: {
+        readonly Light: 1;
+        readonly Dark: 2;
+        readonly HighContrast: 3;
+        readonly HighContrastLight: 4;
+    };
+    /**
+	 * Controls the behaviour of the terminal's visibility.
+	 */ readonly TaskRevealKind: {
+        /**
+		 * Always brings the terminal to front if the task is executed.
+		 */ readonly Always: 1;
+        /**
+		 * Only brings the terminal to front if a problem is detected executing the task
+		 * (e.g. the task couldn't be started because).
+		 */ readonly Silent: 2;
+        /**
+		 * The terminal never comes to front when the task is executed.
+		 */ readonly Never: 3;
+    };
+    /**
+	 * Controls how the task channel is used between tasks
+	 */ readonly TaskPanelKind: {
+        /**
+		 * Shares a panel with other tasks. This is the default.
+		 */ readonly Shared: 1;
+        /**
+		 * Uses a dedicated panel for this tasks. The panel is not
+		 * shared with other tasks.
+		 */ readonly Dedicated: 2;
+        /**
+		 * Creates a new panel whenever this task is executed.
+		 */ readonly New: 3;
     };
     /**
 	 * A grouping for tasks. The editor by default supports the
@@ -986,6 +1474,29 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param options Optional options for the started process.
 		 */ new(process: string, args: string[], options?: ProcessExecutionOptions): ProcessExecution;
     };
+    /**
+	 * Defines how an argument should be quoted if it contains
+	 * spaces or unsupported characters.
+	 */ readonly ShellQuoting: {
+        /**
+		 * Character escaping should be used. This for example
+		 * uses \ on bash and ` on PowerShell.
+		 */ readonly Escape: 1;
+        /**
+		 * Strong string quoting should be used. This for example
+		 * uses " for Windows cmd and ' for bash and PowerShell.
+		 * Strong quoting treats arguments as literal strings.
+		 * Under PowerShell echo 'The value is $(2 * 3)' will
+		 * print `The value is $(2 * 3)`
+		 */ readonly Strong: 2;
+        /**
+		 * Weak string quoting should be used. This for example
+		 * uses " for Windows cmd, bash and PowerShell. Weak quoting
+		 * still performs some kind of evaluation inside the quoted
+		 * string.  Under PowerShell echo "The value is $(2 * 3)"
+		 * will print `The value is 6`
+		 */ readonly Weak: 3;
+    };
     readonly ShellExecution: {
         /**
 		 * Creates a shell execution with a full command line.
@@ -1018,6 +1529,16 @@ Returns VSCodeApi only within the vscode extension.
 		 */ new(callback: (resolvedDefinition: TaskDefinition) => Thenable<Pseudoterminal>): CustomExecution;
     };
     /**
+	 * The scope of a task.
+	 */ readonly TaskScope: {
+        /**
+		 * The task is a global task. Global tasks are currently not supported.
+		 */ readonly Global: 1;
+        /**
+		 * The task is a workspace task
+		 */ readonly Workspace: 2;
+    };
+    /**
 	 * A task to execute
 	 */ readonly Task: {
         /**
@@ -1045,6 +1566,34 @@ Returns VSCodeApi only within the vscode extension.
 		 *  or '$eslint'. Problem matchers can be contributed by an extension using
 		 *  the `problemMatchers` extension point.
 		 */ new(taskDefinition: TaskDefinition, name: string, source: string, execution?: ProcessExecution | ShellExecution, problemMatchers?: string | string[]): Task;
+    };
+    /**
+	 * Enumeration of file types. The types `File` and `Directory` can also be
+	 * a symbolic links, in that case use `FileType.File | FileType.SymbolicLink` and
+	 * `FileType.Directory | FileType.SymbolicLink`.
+	 */ readonly FileType: {
+        /**
+		 * The file type is unknown.
+		 */ readonly Unknown: 0;
+        /**
+		 * A regular file.
+		 */ readonly File: 1;
+        /**
+		 * A directory.
+		 */ readonly Directory: 2;
+        /**
+		 * A symbolic link to a file.
+		 */ readonly SymbolicLink: 64;
+    };
+    readonly FilePermission: {
+        /**
+		 * The file is readonly.
+		 *
+		 * *Note:* All `FileStat` from a `FileSystemProvider` that is registered with
+		 * the option `isReadonly: true` will be implicitly handled as if `FilePermission.Readonly`
+		 * is set. As a consequence, it is not possible to have a readonly file system provider
+		 * registered where some `FileStat` are not readonly.
+		 */ readonly Readonly: 1;
     };
     /**
 	 * A type that filesystem providers should use to signal errors.
@@ -1085,6 +1634,51 @@ Returns VSCodeApi only within the vscode extension.
 		 */ new(messageOrUri?: string | Uri): FileSystemError;
     };
     /**
+	 * Enumeration of file change types.
+	 */ readonly FileChangeType: {
+        /**
+		 * The contents or metadata of a file have changed.
+		 */ readonly Changed: 1;
+        /**
+		 * A file has been created.
+		 */ readonly Created: 2;
+        /**
+		 * A file has been deleted.
+		 */ readonly Deleted: 3;
+    };
+    /**
+	 * Possible kinds of UI that can use extensions.
+	 */ readonly UIKind: {
+        /**
+		 * Extensions are accessed from a desktop application.
+		 */ readonly Desktop: 1;
+        /**
+		 * Extensions are accessed from a web browser.
+		 */ readonly Web: 2;
+    };
+    /**
+	 * Log levels
+	 */ readonly LogLevel: {
+        /**
+		 * No messages are logged with this level.
+		 */ readonly Off: 0;
+        /**
+		 * All messages are logged with this level.
+		 */ readonly Trace: 1;
+        /**
+		 * Messages with debug and higher log level are logged with this level.
+		 */ readonly Debug: 2;
+        /**
+		 * Messages with info and higher log level are logged with this level.
+		 */ readonly Info: 3;
+        /**
+		 * Messages with warning and higher log level are logged with this level.
+		 */ readonly Warning: 4;
+        /**
+		 * Only error messages are logged with this level.
+		 */ readonly Error: 5;
+    };
+    /**
 	 * Encapsulates data transferred during drag and drop operations.
 	 */ readonly DataTransferItem: {
         /**
@@ -1110,6 +1704,69 @@ Returns VSCodeApi only within the vscode extension.
 		 */ new(resourceUri: Uri, collapsibleState?: TreeItemCollapsibleState): TreeItem;
     };
     /**
+	 * Collapsible state of the tree item
+	 */ readonly TreeItemCollapsibleState: {
+        /**
+		 * Determines an item can be neither collapsed nor expanded. Implies it has no children.
+		 */ readonly None: 0;
+        /**
+		 * Determines an item is collapsed
+		 */ readonly Collapsed: 1;
+        /**
+		 * Determines an item is expanded
+		 */ readonly Expanded: 2;
+    };
+    /**
+	 * Terminal exit reason kind.
+	 */ readonly TerminalExitReason: {
+        /**
+		 * Unknown reason.
+		 */ readonly Unknown: 0;
+        /**
+		 * The window closed/reloaded.
+		 */ readonly Shutdown: 1;
+        /**
+		 * The shell process exited.
+		 */ readonly Process: 2;
+        /**
+		 * The user closed the terminal.
+		 */ readonly User: 3;
+        /**
+		 * An extension disposed the terminal.
+		 */ readonly Extension: 4;
+    };
+    /**
+	 * A type of mutation that can be applied to an environment variable.
+	 */ readonly EnvironmentVariableMutatorType: {
+        /**
+		 * Replace the variable's existing value.
+		 */ readonly Replace: 1;
+        /**
+		 * Append to the end of the variable's existing value.
+		 */ readonly Append: 2;
+        /**
+		 * Prepend to the start of the variable's existing value.
+		 */ readonly Prepend: 3;
+    };
+    /**
+	 * A location in the editor at which progress information can be shown. It depends on the
+	 * location how progress is visually represented.
+	 */ readonly ProgressLocation: {
+        /**
+		 * Show progress for the source control viewlet, as overlay for the icon and as progress bar
+		 * inside the viewlet (when visible). Neither supports cancellation nor discrete progress nor
+		 * a label to describe the operation.
+		 */ readonly SourceControl: 1;
+        /**
+		 * Show progress in the status bar of the editor. Neither supports cancellation nor discrete progress.
+		 * Supports rendering of {@link ThemeIcon theme icons} via the `$(<name>)`-syntax in the progress label.
+		 */ readonly Window: 10;
+        /**
+		 * Show progress as notification with an optional cancel button. Supports to show infinite and discrete
+		 * progress but does not support rendering of icons.
+		 */ readonly Notification: 15;
+    };
+    /**
 	 * Predefined buttons for {@link QuickPick} and {@link InputBox}.
 	 */ readonly QuickInputButtons: {
         /**
@@ -1121,6 +1778,52 @@ Returns VSCodeApi only within the vscode extension.
         /**
 		 * @hidden
 		 */ new(): QuickInputButtons;
+    };
+    readonly TextDocumentChangeReason: {
+        /** The text change is caused by an undo operation. */ readonly Undo: 1;
+        /** The text change is caused by an redo operation. */ readonly Redo: 2;
+    };
+    /**
+	 * Represents reasons why a text document is saved.
+	 */ readonly TextDocumentSaveReason: {
+        /**
+		 * Manually triggered, e.g. by the user pressing save, by starting debugging,
+		 * or by an API call.
+		 */ readonly Manual: 1;
+        /**
+		 * Automatic after a delay.
+		 */ readonly AfterDelay: 2;
+        /**
+		 * When the editor lost focus.
+		 */ readonly FocusOut: 3;
+    };
+    /**
+	 * Represents a notebook editor that is attached to a {@link NotebookDocument notebook}.
+	 */ readonly NotebookEditorRevealType: {
+        /**
+		 * The range will be revealed with as little scrolling as possible.
+		 */ readonly Default: 0;
+        /**
+		 * The range will always be revealed in the center of the viewport.
+		 */ readonly InCenter: 1;
+        /**
+		 * If the range is outside the viewport, it will be revealed in the center of the viewport.
+		 * Otherwise, it will be revealed with as little scrolling as possible.
+		 */ readonly InCenterIfOutsideViewport: 2;
+        /**
+		 * The range will always be revealed at the top of the viewport.
+		 */ readonly AtTop: 3;
+    };
+    /**
+	 * A notebook cell kind.
+	 */ readonly NotebookCellKind: {
+        /**
+		 * A markup-cell is formatted source that is used for display.
+		 */ readonly Markup: 1;
+        /**
+		 * A code-cell is source that can be {@link NotebookController executed} and that
+		 * produces {@link NotebookCellOutput output}.
+		 */ readonly Code: 2;
     };
     /**
 	 * A notebook range represents an ordered pair of two cell indices.
@@ -1227,6 +1930,28 @@ Returns VSCodeApi only within the vscode extension.
 		 */ new(cells: NotebookCellData[]): NotebookData;
     };
     /**
+	 * Notebook controller affinity for notebook documents.
+	 *
+	 * @see {@link NotebookController.updateNotebookAffinity}
+	 */ readonly NotebookControllerAffinity: {
+        /**
+		 * Default affinity.
+		 */ readonly Default: 1;
+        /**
+		 * A controller is preferred for a notebook.
+		 */ readonly Preferred: 2;
+    };
+    /**
+	 * Represents the alignment of status bar items.
+	 */ readonly NotebookCellStatusBarAlignment: {
+        /**
+		 * Aligned to the left side.
+		 */ readonly Left: 1;
+        /**
+		 * Aligned to the right side.
+		 */ readonly Right: 2;
+    };
+    /**
 	 * A contribution to a cell's status bar
 	 */ readonly NotebookCellStatusBarItem: {
         /**
@@ -1285,6 +2010,63 @@ Returns VSCodeApi only within the vscode extension.
         /**
 		 * Create a new function breakpoint.
 		 */ new(functionName: string, enabled?: boolean, condition?: string, hitCondition?: string, logMessage?: string): FunctionBreakpoint;
+    };
+    /**
+	 * Debug console mode used by debug session, see {@link DebugSessionOptions options}.
+	 */ readonly DebugConsoleMode: {
+        /**
+		 * Debug session should have a separate debug console.
+		 */ readonly Separate: 0;
+        /**
+		 * Debug session should share debug console with its parent session.
+		 * This value has no effect for sessions which do not have a parent session.
+		 */ readonly MergeWithParent: 1;
+    };
+    /**
+	 * A DebugConfigurationProviderTriggerKind specifies when the `provideDebugConfigurations` method of a `DebugConfigurationProvider` is triggered.
+	 * Currently there are two situations: to provide the initial debug configurations for a newly created launch.json or
+	 * to provide dynamically generated debug configurations when the user asks for them through the UI (e.g. via the "Select and Start Debugging" command).
+	 * A trigger kind is used when registering a `DebugConfigurationProvider` with {@link debug.registerDebugConfigurationProvider}.
+	 */ readonly DebugConfigurationProviderTriggerKind: {
+        /**
+		 *	`DebugConfigurationProvider.provideDebugConfigurations` is called to provide the initial debug configurations for a newly created launch.json.
+		 */ readonly Initial: 1;
+        /**
+		 * `DebugConfigurationProvider.provideDebugConfigurations` is called to provide dynamically generated debug configurations when the user asks for them through the UI (e.g. via the "Select and Start Debugging" command).
+		 */ readonly Dynamic: 2;
+    };
+    /**
+	 * Collapsible state of a {@link CommentThread comment thread}
+	 */ readonly CommentThreadCollapsibleState: {
+        /**
+		 * Determines an item is collapsed
+		 */ readonly Collapsed: 0;
+        /**
+		 * Determines an item is expanded
+		 */ readonly Expanded: 1;
+    };
+    /**
+	 * Comment mode of a {@link Comment}
+	 */ readonly CommentMode: {
+        /**
+		 * Displays the comment editor
+		 */ readonly Editing: 0;
+        /**
+		 * Displays the preview of the comment
+		 */ readonly Preview: 1;
+    };
+    /**
+	 * The state of a comment thread.
+	 */ readonly CommentThreadState: {
+        readonly Unresolved: 0;
+        readonly Resolved: 1;
+    };
+    /**
+	 * The kind of executions that {@link TestRunProfile TestRunProfiles} control.
+	 */ readonly TestRunProfileKind: {
+        readonly Run: 1;
+        readonly Debug: 2;
+        readonly Coverage: 3;
     };
     /**
 	 * Tags can be associated with {@link TestItem TestItems} and
@@ -1599,18 +2381,10 @@ export type Selection = Range & {
 		 * A selection is reversed if its {@link Selection.anchor anchor} is the {@link Selection.end end} position.
 		 */ isReversed: boolean;
 };
-/**
-	 * Represents sources that can cause {@link window.onDidChangeTextEditorSelection selection change events}.
-	*/ export enum TextEditorSelectionChangeKind {
-    /**
-		 * Selection changed due to typing in the editor.
-		 */ Keyboard = 1,
-    /**
-		 * Selection change due to clicking in the editor.
-		 */ Mouse = 2,
-    /**
-		 * Selection changed because a command ran.
-		 */ Command = 3
+export enum TextEditorSelectionChangeKind {
+    Keyboard = 1,
+    Mouse = 2,
+    Command = 3
 }
 /**
 	 * Represents an event describing the change in a {@link TextEditor.selections text editor's selections}.
@@ -1656,40 +2430,18 @@ export type Selection = Range & {
 		 * The new value for the {@link TextEditor.viewColumn text editor's view column}.
 		 */ readonly viewColumn: ViewColumn;
 }
-/**
-	 * Rendering style of the cursor.
-	 */ export enum TextEditorCursorStyle {
-    /**
-		 * Render the cursor as a vertical thick line.
-		 */ Line = 1,
-    /**
-		 * Render the cursor as a block filled.
-		 */ Block = 2,
-    /**
-		 * Render the cursor as a thick horizontal line.
-		 */ Underline = 3,
-    /**
-		 * Render the cursor as a vertical thin line.
-		 */ LineThin = 4,
-    /**
-		 * Render the cursor as a block outlined.
-		 */ BlockOutline = 5,
-    /**
-		 * Render the cursor as a thin horizontal line.
-		 */ UnderlineThin = 6
+export enum TextEditorCursorStyle {
+    Line = 1,
+    Block = 2,
+    Underline = 3,
+    LineThin = 4,
+    BlockOutline = 5,
+    UnderlineThin = 6
 }
-/**
-	 * Rendering style of the line numbers.
-	 */ export enum TextEditorLineNumbersStyle {
-    /**
-		 * Do not render the line numbers.
-		 */ Off = 0,
-    /**
-		 * Render the line numbers.
-		 */ On = 1,
-    /**
-		 * Render the line numbers with values relative to the primary cursor location.
-		 */ Relative = 2
+export enum TextEditorLineNumbersStyle {
+    Off = 0,
+    On = 1,
+    Relative = 2
 }
 /**
 	 * Represents a {@link TextEditor text editor}'s {@link TextEditor.options options}.
@@ -1732,47 +2484,23 @@ export type Selection = Range & {
 		 * Remove this decoration type and all decorations on all text editors using it.
 		 */ dispose(): void;
 }
-/**
-	 * Represents different {@link TextEditor.revealRange reveal} strategies in a text editor.
-	 */ export enum TextEditorRevealType {
-    /**
-		 * The range will be revealed with as little scrolling as possible.
-		 */ Default = 0,
-    /**
-		 * The range will always be revealed in the center of the viewport.
-		 */ InCenter = 1,
-    /**
-		 * If the range is outside the viewport, it will be revealed in the center of the viewport.
-		 * Otherwise, it will be revealed with as little scrolling as possible.
-		 */ InCenterIfOutsideViewport = 2,
-    /**
-		 * The range will always be revealed at the top of the viewport.
-		 */ AtTop = 3
+export enum TextEditorRevealType {
+    Default = 0,
+    InCenter = 1,
+    InCenterIfOutsideViewport = 2,
+    AtTop = 3
 }
-/**
-	 * Represents different positions for rendering a decoration in an {@link DecorationRenderOptions.overviewRulerLane overview ruler}.
-	 * The overview ruler supports three lanes.
-	 */ export enum OverviewRulerLane {
+export enum OverviewRulerLane {
     Left = 1,
     Center = 2,
     Right = 4,
     Full = 7
 }
-/**
-	 * Describes the behavior of decorations when typing/editing at their edges.
-	 */ export enum DecorationRangeBehavior {
-    /**
-		 * The decoration's range will widen when edits occur at the start or end.
-		 */ OpenOpen = 0,
-    /**
-		 * The decoration's range will not widen when edits occur at the start of end.
-		 */ ClosedClosed = 1,
-    /**
-		 * The decoration's range will widen when edits occur at the start, but not at the end.
-		 */ OpenClosed = 2,
-    /**
-		 * The decoration's range will widen when edits occur at the end, but not at the start.
-		 */ ClosedOpen = 3
+export enum DecorationRangeBehavior {
+    OpenOpen = 0,
+    ClosedClosed = 1,
+    OpenClosed = 2,
+    ClosedOpen = 3
 }
 /**
 	 * Represents options to configure the behavior of showing a {@link TextDocument document} in an {@link TextEditor editor}.
@@ -2107,15 +2835,9 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * This method shows unexpected behavior and will be removed in the next major update.
 		 */ hide(): void;
 }
-/**
-	 * Represents an end of line character sequence in a {@link TextDocument document}.
-	 */ export enum EndOfLine {
-    /**
-		 * The line feed `\n` character.
-		 */ LF = 1,
-    /**
-		 * The carriage return line feed `\r\n` sequence.
-		 */ CRLF = 2
+export enum EndOfLine {
+    LF = 1,
+    CRLF = 2
 }
 /**
 	 * A complex edit that will be applied in one transaction on a TextEditor.
@@ -2291,16 +3013,9 @@ export type EventEmitter = {
 		 * @return A string or a thenable that resolves to such.
 		 */ provideTextDocumentContent(uri: Uri, token: CancellationToken): ProviderResult<string>;
 }
-/**
-	 * The kind of {@link QuickPickItem quick pick item}.
-	 */ export enum QuickPickItemKind {
-    /**
-		 * When a {@link QuickPickItem} has a kind of {@link Separator}, the item is just a visual separator and does not represent a real item.
-		 * The only property that applies is {@link QuickPickItem.label label }. All other properties on {@link QuickPickItem} will be ignored and have no effect.
-		 */ Separator = -1,
-    /**
-		 * The default {@link QuickPickItem.kind} is an item that can be selected in the quick pick.
-		 */ Default = 0
+export enum QuickPickItemKind {
+    Separator = -1,
+    Default = 0
 }
 /**
 	 * Represents an item that can be selected from
@@ -2492,9 +3207,7 @@ export type EventEmitter = {
 		 * is only shown for {@link MessageOptions.modal modal} messages.
 		 */ detail?: string;
 }
-/**
-	 * Impacts the behavior and appearance of the validation message.
-	 */ export enum InputBoxValidationSeverity {
+export enum InputBoxValidationSeverity {
     Info = 1,
     Warning = 2,
     Error = 3
@@ -2668,18 +3381,9 @@ export type CodeActionKind = {
 		 * String value of the kind, e.g. `"refactor.extract.function"`.
 		 */ readonly value: string;
 };
-/**
-	 * The reason why code actions were requested.
-	 */ export enum CodeActionTriggerKind {
-    /**
-		 * Code actions were explicitly requested by the user or by an extension.
-		 */ Invoke = 1,
-    /**
-		 * Code actions were requested automatically.
-		 *
-		 * This typically happens when current selection in a file changes, but can
-		 * also be triggered when file content changes.
-		 */ Automatic = 2
+export enum CodeActionTriggerKind {
+    Invoke = 1,
+    Automatic = 2
 }
 /**
 	 * Contains additional diagnostic information about the context in which
@@ -3121,18 +3825,10 @@ export type InlineValueEvaluatableExpression = {
 		 * signaled by returning `undefined` or `null`.
 		 */ provideInlineValues(document: TextDocument, viewPort: Range, context: InlineValueContext, token: CancellationToken): ProviderResult<InlineValue[]>;
 }
-/**
-	 * A document highlight kind.
-	 */ export enum DocumentHighlightKind {
-    /**
-		 * A textual occurrence.
-		 */ Text = 0,
-    /**
-		 * Read-access of a symbol, like reading a variable.
-		 */ Read = 1,
-    /**
-		 * Write-access of a symbol, like writing to a variable.
-		 */ Write = 2
+export enum DocumentHighlightKind {
+    Text = 0,
+    Read = 1,
+    Write = 2
 }
 export type DocumentHighlight = {
     /**
@@ -3157,9 +3853,7 @@ export type DocumentHighlight = {
 		 * signaled by returning `undefined`, `null`, or an empty array.
 		 */ provideDocumentHighlights(document: TextDocument, position: Position, token: CancellationToken): ProviderResult<DocumentHighlight[]>;
 }
-/**
-	 * A symbol kind.
-	 */ export enum SymbolKind {
+export enum SymbolKind {
     File = 0,
     Module = 1,
     Namespace = 2,
@@ -3187,12 +3881,8 @@ export type DocumentHighlight = {
     Operator = 24,
     TypeParameter = 25
 }
-/**
-	 * Symbol tags are extra annotations that tweak the rendering of a symbol.
-	 */ export enum SymbolTag {
-    /**
-		 * Render a symbol as obsolete, usually using a strike-out.
-		 */ Deprecated = 1
+export enum SymbolTag {
+    Deprecated = 1
 }
 export type SymbolInformation = {
     /**
@@ -3677,18 +4367,10 @@ export type SignatureHelp = {
 		 * The active parameter of the active signature.
 		 */ activeParameter: number;
 };
-/**
-	 * How a {@linkcode SignatureHelpProvider} was triggered.
-	 */ export enum SignatureHelpTriggerKind {
-    /**
-		 * Signature help was invoked manually by the user or by a command.
-		 */ Invoke = 1,
-    /**
-		 * Signature help was triggered by a trigger character.
-		 */ TriggerCharacter = 2,
-    /**
-		 * Signature help was triggered by the cursor moving or by the document content changing.
-		 */ ContentChange = 3
+export enum SignatureHelpTriggerKind {
+    Invoke = 1,
+    TriggerCharacter = 2,
+    ContentChange = 3
 }
 /**
 	 * Additional information about the context in which a
@@ -3762,9 +4444,7 @@ export type SignatureHelp = {
 		 * for fully qualified names or file path.
 		 */ description?: string;
 }
-/**
-	 * Completion item kinds.
-	 */ export enum CompletionItemKind {
+export enum CompletionItemKind {
     Text = 0,
     Method = 1,
     Function = 2,
@@ -3793,13 +4473,8 @@ export type SignatureHelp = {
     User = 25,
     Issue = 26
 }
-/**
-	 * Completion item tags are extra annotations that tweak the rendering of a completion
-	 * item.
-	 */ export enum CompletionItemTag {
-    /**
-		 * Render a completion as obsolete, usually using a strike-out.
-		 */ Deprecated = 1
+export enum CompletionItemTag {
+    Deprecated = 1
 }
 export type CompletionItem = {
     /**
@@ -3905,18 +4580,10 @@ export type CompletionList = {
 		 * The completion items.
 		 */ items: T[];
 };
-/**
-	 * How a {@link CompletionItemProvider completion provider} was triggered
-	 */ export enum CompletionTriggerKind {
-    /**
-		 * Completion was triggered normally.
-		 */ Invoke = 0,
-    /**
-		 * Completion was triggered by a trigger character.
-		 */ TriggerCharacter = 1,
-    /**
-		 * Completion was re-triggered as current completion list is incomplete
-		 */ TriggerForIncompleteCompletions = 2
+export enum CompletionTriggerKind {
+    Invoke = 0,
+    TriggerCharacter = 1,
+    TriggerForIncompleteCompletions = 2
 }
 /**
 	 * Contains additional information about the context in which
@@ -4029,17 +4696,9 @@ export type InlineCompletionList = {
 		 * The text the range will be replaced with if this completion is accepted.
 		 */ readonly text: string;
 }
-/**
-	 * Describes how an {@link InlineCompletionItemProvider inline completion provider} was triggered.
-	 */ export enum InlineCompletionTriggerKind {
-    /**
-		 * Completion was triggered explicitly by a user gesture.
-		 * Return multiple completion items to enable cycling through them.
-		 */ Invoke = 0,
-    /**
-		 * Completion was triggered automatically while editing.
-		 * It is sufficient to return a single completion item in this case.
-		 */ Automatic = 1
+export enum InlineCompletionTriggerKind {
+    Invoke = 0,
+    Automatic = 1
 }
 export type InlineCompletionItem = {
     /**
@@ -4163,18 +4822,9 @@ export type ColorPresentation = {
         readonly range: Range;
     }, token: CancellationToken): ProviderResult<ColorPresentation[]>;
 }
-/**
-	 * Inlay hint kinds.
-	 *
-	 * The kind of an inline hint defines its appearance, e.g the corresponding foreground and background colors are being
-	 * used.
-	 */ export enum InlayHintKind {
-    /**
-		 * An inlay hint that for a type annotation.
-		 */ Type = 1,
-    /**
-		 * An inlay hint that is for a parameter.
-		 */ Parameter = 2
+export enum InlayHintKind {
+    Type = 1,
+    Parameter = 2
 }
 export type InlayHintLabelPart = {
     /**
@@ -4292,21 +4942,10 @@ export type FoldingRange = {
 		 * If not set, the range is originated from a syntax element.
 		 */ kind?: FoldingRangeKind;
 };
-/**
-	 * An enumeration of specific folding range kinds. The kind is an optional field of a {@link FoldingRange}
-	 * and is used to distinguish specific folding ranges such as ranges originated from comments. The kind is used by commands like
-	 * `Fold all comments` or `Fold all regions`.
-	 * If the kind is not set on the range, the range originated from a syntax element other than comments, imports or region markers.
-	 */ export enum FoldingRangeKind {
-    /**
-		 * Kind for folding range representing a comment.
-		 */ Comment = 1,
-    /**
-		 * Kind for folding range representing a import.
-		 */ Imports = 2,
-    /**
-		 * Kind for folding range representing regions originating from folding markers like `#region` and `#endregion`.
-		 */ Region = 3
+export enum FoldingRangeKind {
+    Comment = 1,
+    Imports = 2,
+    Region = 3
 }
 /**
 	 * Folding context (for future use)
@@ -4574,23 +5213,11 @@ export type DocumentDropEdit = {
 		 * If a line matches this pattern, then its indentation should not be changed and it should not be evaluated against the other rules.
 		 */ unIndentedLinePattern?: RegExp;
 }
-/**
-	 * Describes what to do with the indentation when pressing Enter.
-	 */ export enum IndentAction {
-    /**
-		 * Insert new line and copy the previous line's indentation.
-		 */ None = 0,
-    /**
-		 * Insert new line and indent once (relative to the previous line's indentation).
-		 */ Indent = 1,
-    /**
-		 * Insert two new lines:
-		 *  - the first one indented which will hold the cursor
-		 *  - the second one at the same indentation level
-		 */ IndentOutdent = 2,
-    /**
-		 * Insert new line and outdent once (relative to the previous line's indentation).
-		 */ Outdent = 3
+export enum IndentAction {
+    None = 0,
+    Indent = 1,
+    IndentOutdent = 2,
+    Outdent = 3
 }
 /**
 	 * Describes what to do when pressing Enter.
@@ -4679,18 +5306,10 @@ export type DocumentDropEdit = {
         }[];
     };
 }
-/**
-	 * The configuration target
-	 */ export enum ConfigurationTarget {
-    /**
-		 * Global configuration
-		*/ Global = 1,
-    /**
-		 * Workspace configuration
-		 */ Workspace = 2,
-    /**
-		 * Workspace folder configuration
-		 */ WorkspaceFolder = 3
+export enum ConfigurationTarget {
+    Global = 1,
+    Workspace = 2,
+    WorkspaceFolder = 3
 }
 /**
 	 * Represents the configuration. It is a merged view of
@@ -4867,22 +5486,11 @@ export type Location = {
 		 * An array of resources for which diagnostics have changed.
 		 */ readonly uris: readonly Uri[];
 }
-/**
-	 * Represents the severity of diagnostics.
-	 */ export enum DiagnosticSeverity {
-    /**
-		 * Something not allowed by the rules of a language or other means.
-		 */ Error = 0,
-    /**
-		 * Something suspicious but allowed.
-		 */ Warning = 1,
-    /**
-		 * Something to inform about but not a problem.
-		 */ Information = 2,
-    /**
-		 * Something to hint to a better way of doing it, like proposing
-		 * a refactoring.
-		 */ Hint = 3
+export enum DiagnosticSeverity {
+    Error = 0,
+    Warning = 1,
+    Information = 2,
+    Hint = 3
 }
 export type DiagnosticRelatedInformation = {
     /**
@@ -4892,24 +5500,9 @@ export type DiagnosticRelatedInformation = {
 		 * The message of this related diagnostic information.
 		 */ message: string;
 };
-/**
-	 * Additional metadata about the type of a diagnostic.
-	 */ export enum DiagnosticTag {
-    /**
-		 * Unused or unnecessary code.
-		 *
-		 * Diagnostics with this tag are rendered faded out. The amount of fading
-		 * is controlled by the `"editorUnnecessaryCode.opacity"` theme color. For
-		 * example, `"editorUnnecessaryCode.opacity": "#000000c0"` will render the
-		 * code with 75% opacity. For high contrast themes, use the
-		 * `"editorUnnecessaryCode.border"` theme color to underline unnecessary code
-		 * instead of fading it out.
-		 */ Unnecessary = 1,
-    /**
-		 * Deprecated or obsolete code.
-		 *
-		 * Diagnostics with this tag are rendered with a strike through.
-		 */ Deprecated = 2
+export enum DiagnosticTag {
+    Unnecessary = 1,
+    Deprecated = 2
 }
 export type Diagnostic = {
     /**
@@ -5010,9 +5603,7 @@ export type Diagnostic = {
 		 * {@link DiagnosticCollection.clear clear}.
 		 */ dispose(): void;
 }
-/**
-	 * Represents the severity of a language status item.
-	 */ export enum LanguageStatusSeverity {
+export enum LanguageStatusSeverity {
     Information = 0,
     Warning = 1,
     Error = 2
@@ -5062,48 +5653,18 @@ export type Diagnostic = {
 		 * Dispose and free associated resources.
 		 */ dispose(): void;
 }
-/**
-	 * Denotes a location of an editor in the window. Editors can be arranged in a grid
-	 * and each column represents one editor location in that grid by counting the editors
-	 * in order of their appearance.
-	 */ export enum ViewColumn {
-    /**
-		 * A *symbolic* editor column representing the currently active column. This value
-		 * can be used when opening editors, but the *resolved* {@link TextEditor.viewColumn viewColumn}-value
-		 * of editors will always be `One`, `Two`, `Three`,... or `undefined` but never `Active`.
-		 */ Active = -1,
-    /**
-		 * A *symbolic* editor column representing the column to the side of the active one. This value
-		 * can be used when opening editors, but the *resolved* {@link TextEditor.viewColumn viewColumn}-value
-		 * of editors will always be `One`, `Two`, `Three`,... or `undefined` but never `Beside`.
-		 */ Beside = -2,
-    /**
-		 * The first editor column.
-		 */ One = 1,
-    /**
-		 * The second editor column.
-		 */ Two = 2,
-    /**
-		 * The third editor column.
-		 */ Three = 3,
-    /**
-		 * The fourth editor column.
-		 */ Four = 4,
-    /**
-		 * The fifth editor column.
-		 */ Five = 5,
-    /**
-		 * The sixth editor column.
-		 */ Six = 6,
-    /**
-		 * The seventh editor column.
-		 */ Seven = 7,
-    /**
-		 * The eighth editor column.
-		 */ Eight = 8,
-    /**
-		 * The ninth editor column.
-		 */ Nine = 9
+export enum ViewColumn {
+    Active = -1,
+    Beside = -2,
+    One = 1,
+    Two = 2,
+    Three = 3,
+    Four = 4,
+    Five = 5,
+    Six = 6,
+    Seven = 7,
+    Eight = 8,
+    Nine = 9
 }
 /**
 	 * An output channel is a container for readonly textual information.
@@ -5214,15 +5775,9 @@ export type Diagnostic = {
 		 * More about aria roles can be found here https://w3c.github.io/aria/#widget_roles
 		 */ readonly role?: string;
 }
-/**
-	 * Represents the alignment of status bar items.
-	 */ export enum StatusBarAlignment {
-    /**
-		 * Aligned to the left side.
-		 */ Left = 1,
-    /**
-		 * Aligned to the right side.
-		 */ Right = 2
+export enum StatusBarAlignment {
+    Left = 1,
+    Right = 2
 }
 /**
 	 * A status bar item is a status bar contribution that can
@@ -5354,15 +5909,9 @@ export type Diagnostic = {
 		 * Dispose and free associated resources.
 		 */ dispose(): void;
 }
-/**
-	 * The location of the terminal.
-	 */ export enum TerminalLocation {
-    /**
-		 * In the terminal view
-		 */ Panel = 1,
-    /**
-		 * In the editor area
-		 */ Editor = 2
+export enum TerminalLocation {
+    Panel = 1,
+    Editor = 2
 }
 /**
 	 * Assumes a {@link TerminalLocation} of editor and allows specifying a {@link ViewColumn} and
@@ -5499,16 +6048,9 @@ export type FileDecoration = {
 		 * @returns A decoration or a thenable that resolves to such.
 		 */ provideFileDecoration(uri: Uri, token: CancellationToken): ProviderResult<FileDecoration>;
 }
-/**
-	 * In a remote window the extension kind describes if an extension
-	 * runs where the UI (window) runs or if an extension runs remotely.
-	 */ export enum ExtensionKind {
-    /**
-		 * Extension runs where the UI runs.
-		 */ UI = 1,
-    /**
-		 * Extension runs where the remote extension host runs.
-		 */ Workspace = 2
+export enum ExtensionKind {
+    UI = 1,
+    Workspace = 2
 }
 /**
 	 * Represents an extension.
@@ -5548,22 +6090,10 @@ export type FileDecoration = {
 		 * @return A promise that will resolve when this extension has been activated.
 		 */ activate(): Thenable<T>;
 }
-/**
-	 * The ExtensionMode is provided on the `ExtensionContext` and indicates the
-	 * mode the specific extension is running in.
-	 */ export enum ExtensionMode {
-    /**
-		 * The extension is installed normally (for example, from the marketplace
-		 * or VSIX) in the editor.
-		 */ Production = 1,
-    /**
-		 * The extension is running from an `--extensionDevelopmentPath` provided
-		 * when launching the editor.
-		 */ Development = 2,
-    /**
-		 * The extension is running from an `--extensionTestsPath` and
-		 * the extension host is running unit tests.
-		 */ Test = 3
+export enum ExtensionMode {
+    Production = 1,
+    Development = 2,
+    Test = 3
 }
 /**
 	 * An extension context is a collection of utilities private to an
@@ -5754,9 +6284,7 @@ export type FileDecoration = {
 		 * Fires when a secret is stored or deleted.
 		 */ onDidChange: Event<SecretStorageChangeEvent>;
 }
-/**
-	 * Represents a color theme kind.
-	 */ export enum ColorThemeKind {
+export enum ColorThemeKind {
     Light = 1,
     Dark = 2,
     HighContrast = 3,
@@ -5769,33 +6297,15 @@ export type FileDecoration = {
 		 * The kind of this color theme: light, dark, high contrast dark and high contrast light.
 		 */ readonly kind: ColorThemeKind;
 }
-/**
-	 * Controls the behaviour of the terminal's visibility.
-	 */ export enum TaskRevealKind {
-    /**
-		 * Always brings the terminal to front if the task is executed.
-		 */ Always = 1,
-    /**
-		 * Only brings the terminal to front if a problem is detected executing the task
-		 * (e.g. the task couldn't be started because).
-		 */ Silent = 2,
-    /**
-		 * The terminal never comes to front when the task is executed.
-		 */ Never = 3
+export enum TaskRevealKind {
+    Always = 1,
+    Silent = 2,
+    Never = 3
 }
-/**
-	 * Controls how the task channel is used between tasks
-	 */ export enum TaskPanelKind {
-    /**
-		 * Shares a panel with other tasks. This is the default.
-		 */ Shared = 1,
-    /**
-		 * Uses a dedicated panel for this tasks. The panel is not
-		 * shared with other tasks.
-		 */ Dedicated = 2,
-    /**
-		 * Creates a new panel whenever this task is executed.
-		 */ New = 3
+export enum TaskPanelKind {
+    Shared = 1,
+    Dedicated = 2,
+    New = 3
 }
 /**
 	 * Controls how the task is presented in the UI.
@@ -5931,28 +6441,10 @@ export type ProcessExecution = {
         [key: string]: string;
     };
 }
-/**
-	 * Defines how an argument should be quoted if it contains
-	 * spaces or unsupported characters.
-	 */ export enum ShellQuoting {
-    /**
-		 * Character escaping should be used. This for example
-		 * uses \ on bash and ` on PowerShell.
-		 */ Escape = 1,
-    /**
-		 * Strong string quoting should be used. This for example
-		 * uses " for Windows cmd and ' for bash and PowerShell.
-		 * Strong quoting treats arguments as literal strings.
-		 * Under PowerShell echo 'The value is $(2 * 3)' will
-		 * print `The value is $(2 * 3)`
-		 */ Strong = 2,
-    /**
-		 * Weak string quoting should be used. This for example
-		 * uses " for Windows cmd, bash and PowerShell. Weak quoting
-		 * still performs some kind of evaluation inside the quoted
-		 * string.  Under PowerShell echo "The value is $(2 * 3)"
-		 * will print `The value is 6`
-		 */ Weak = 3
+export enum ShellQuoting {
+    Escape = 1,
+    Strong = 2,
+    Weak = 3
 }
 /**
 	 * A string that will be quoted depending on the used shell.
@@ -5981,15 +6473,9 @@ export type ShellExecution = {
 };
 export type CustomExecution = {
 };
-/**
-	 * The scope of a task.
-	 */ export enum TaskScope {
-    /**
-		 * The task is a global task. Global tasks are currently not supported.
-		 */ Global = 1,
-    /**
-		 * The task is a workspace task
-		 */ Workspace = 2
+export enum TaskScope {
+    Global = 1,
+    Workspace = 2
 }
 /**
 	 * Run options for a task.
@@ -6129,33 +6615,14 @@ export interface TaskFilter {
 		 * The task type to return;
 		 */ type?: string;
 }
-/**
-	 * Enumeration of file types. The types `File` and `Directory` can also be
-	 * a symbolic links, in that case use `FileType.File | FileType.SymbolicLink` and
-	 * `FileType.Directory | FileType.SymbolicLink`.
-	 */ export enum FileType {
-    /**
-		 * The file type is unknown.
-		 */ Unknown = 0,
-    /**
-		 * A regular file.
-		 */ File = 1,
-    /**
-		 * A directory.
-		 */ Directory = 2,
-    /**
-		 * A symbolic link to a file.
-		 */ SymbolicLink = 64
+export enum FileType {
+    Unknown = 0,
+    File = 1,
+    Directory = 2,
+    SymbolicLink = 64
 }
 export enum FilePermission {
-    /**
-		 * The file is readonly.
-		 *
-		 * *Note:* All `FileStat` from a `FileSystemProvider` that is registered with
-		 * the option `isReadonly: true` will be implicitly handled as if `FilePermission.Readonly`
-		 * is set. As a consequence, it is not possible to have a readonly file system provider
-		 * registered where some `FileStat` are not readonly.
-		 */ Readonly = 1
+    Readonly = 1
 }
 /**
 	 * The `FileStat`-type represents metadata about a file
@@ -6197,18 +6664,10 @@ export type FileSystemError = Error & {
 		 * or `Unknown` for unspecified errors.
 		 */ readonly code: string;
 };
-/**
-	 * Enumeration of file change types.
-	 */ export enum FileChangeType {
-    /**
-		 * The contents or metadata of a file have changed.
-		 */ Changed = 1,
-    /**
-		 * A file has been created.
-		 */ Created = 2,
-    /**
-		 * A file has been deleted.
-		 */ Deleted = 3
+export enum FileChangeType {
+    Changed = 1,
+    Created = 2,
+    Deleted = 3
 }
 /**
 	 * The event filesystem providers must use to signal a file change.
@@ -7091,37 +7550,17 @@ export type FileSystemError = Error & {
 		 * @returns A thenable that resolves when writing happened.
 		 */ writeText(value: string): Thenable<void>;
 }
-/**
-	 * Possible kinds of UI that can use extensions.
-	 */ export enum UIKind {
-    /**
-		 * Extensions are accessed from a desktop application.
-		 */ Desktop = 1,
-    /**
-		 * Extensions are accessed from a web browser.
-		 */ Web = 2
+export enum UIKind {
+    Desktop = 1,
+    Web = 2
 }
-/**
-	 * Log levels
-	 */ export enum LogLevel {
-    /**
-		 * No messages are logged with this level.
-		 */ Off = 0,
-    /**
-		 * All messages are logged with this level.
-		 */ Trace = 1,
-    /**
-		 * Messages with debug and higher log level are logged with this level.
-		 */ Debug = 2,
-    /**
-		 * Messages with info and higher log level are logged with this level.
-		 */ Info = 3,
-    /**
-		 * Messages with warning and higher log level are logged with this level.
-		 */ Warning = 4,
-    /**
-		 * Only error messages are logged with this level.
-		 */ Error = 5
+export enum LogLevel {
+    Off = 0,
+    Trace = 1,
+    Debug = 2,
+    Info = 3,
+    Warning = 4,
+    Error = 5
 }
 /**
 	 * Represents the state of a window.
@@ -7436,18 +7875,10 @@ export type TreeItem = {
 		 * however, there are cases where a TreeItem is not displayed in a tree-like way where setting the `role` may make sense.
 		 */ accessibilityInformation?: AccessibilityInformation;
 };
-/**
-	 * Collapsible state of the tree item
-	 */ export enum TreeItemCollapsibleState {
-    /**
-		 * Determines an item can be neither collapsed nor expanded. Implies it has no children.
-		 */ None = 0,
-    /**
-		 * Determines an item is collapsed
-		 */ Collapsed = 1,
-    /**
-		 * Determines an item is expanded
-		 */ Expanded = 2
+export enum TreeItemCollapsibleState {
+    None = 0,
+    Collapsed = 1,
+    Expanded = 2
 }
 /**
 	 * Label describing the {@link TreeItem Tree item}
@@ -7718,37 +8149,17 @@ export type TreeItem = {
 		 * The reason that triggered the exit of a terminal.
 		 */ readonly reason: TerminalExitReason;
 }
-/**
-	 * Terminal exit reason kind.
-	 */ export enum TerminalExitReason {
-    /**
-		 * Unknown reason.
-		 */ Unknown = 0,
-    /**
-		 * The window closed/reloaded.
-		 */ Shutdown = 1,
-    /**
-		 * The shell process exited.
-		 */ Process = 2,
-    /**
-		 * The user closed the terminal.
-		 */ User = 3,
-    /**
-		 * An extension disposed the terminal.
-		 */ Extension = 4
+export enum TerminalExitReason {
+    Unknown = 0,
+    Shutdown = 1,
+    Process = 2,
+    User = 3,
+    Extension = 4
 }
-/**
-	 * A type of mutation that can be applied to an environment variable.
-	 */ export enum EnvironmentVariableMutatorType {
-    /**
-		 * Replace the variable's existing value.
-		 */ Replace = 1,
-    /**
-		 * Append to the end of the variable's existing value.
-		 */ Append = 2,
-    /**
-		 * Prepend to the start of the variable's existing value.
-		 */ Prepend = 3
+export enum EnvironmentVariableMutatorType {
+    Replace = 1,
+    Append = 2,
+    Prepend = 3
 }
 /**
 	 * A type of mutation and its value to be applied to an environment variable.
@@ -7817,23 +8228,10 @@ export type TreeItem = {
 		 * Clears all mutators from this collection.
 		 */ clear(): void;
 }
-/**
-	 * A location in the editor at which progress information can be shown. It depends on the
-	 * location how progress is visually represented.
-	 */ export enum ProgressLocation {
-    /**
-		 * Show progress for the source control viewlet, as overlay for the icon and as progress bar
-		 * inside the viewlet (when visible). Neither supports cancellation nor discrete progress nor
-		 * a label to describe the operation.
-		 */ SourceControl = 1,
-    /**
-		 * Show progress in the status bar of the editor. Neither supports cancellation nor discrete progress.
-		 * Supports rendering of {@link ThemeIcon theme icons} via the `$(<name>)`-syntax in the progress label.
-		 */ Window = 10,
-    /**
-		 * Show progress as notification with an optional cancel button. Supports to show infinite and discrete
-		 * progress but does not support rendering of icons.
-		 */ Notification = 15
+export enum ProgressLocation {
+    SourceControl = 1,
+    Window = 10,
+    Notification = 15
 }
 /**
 	 * Value-object describing where and how progress should show.
@@ -8073,8 +8471,8 @@ export type QuickInputButtons = {
 		 */ readonly text: string;
 }
 export enum TextDocumentChangeReason {
-    /** The text change is caused by an undo operation. */ Undo = 1,
-    /** The text change is caused by an redo operation. */ Redo = 2
+    Undo = 1,
+    Redo = 2
 }
 /**
 	 * An event describing a transactional {@link TextDocument document} change.
@@ -8090,19 +8488,10 @@ export enum TextDocumentChangeReason {
 		 * Is `undefined` if the reason is not known.
 		*/ readonly reason: TextDocumentChangeReason | undefined;
 }
-/**
-	 * Represents reasons why a text document is saved.
-	 */ export enum TextDocumentSaveReason {
-    /**
-		 * Manually triggered, e.g. by the user pressing save, by starting debugging,
-		 * or by an API call.
-		 */ Manual = 1,
-    /**
-		 * Automatic after a delay.
-		 */ AfterDelay = 2,
-    /**
-		 * When the editor lost focus.
-		 */ FocusOut = 3
+export enum TextDocumentSaveReason {
+    Manual = 1,
+    AfterDelay = 2,
+    FocusOut = 3
 }
 /**
 	 * An event that is fired when a {@link TextDocument document} will be saved.
@@ -8338,22 +8727,11 @@ export enum TextDocumentChangeReason {
 		 * @return `true` if the given section has changed.
 		 */ affectsConfiguration(section: string, scope?: ConfigurationScope): boolean;
 }
-/**
-	 * Represents a notebook editor that is attached to a {@link NotebookDocument notebook}.
-	 */ export enum NotebookEditorRevealType {
-    /**
-		 * The range will be revealed with as little scrolling as possible.
-		 */ Default = 0,
-    /**
-		 * The range will always be revealed in the center of the viewport.
-		 */ InCenter = 1,
-    /**
-		 * If the range is outside the viewport, it will be revealed in the center of the viewport.
-		 * Otherwise, it will be revealed with as little scrolling as possible.
-		 */ InCenterIfOutsideViewport = 2,
-    /**
-		 * The range will always be revealed at the top of the viewport.
-		 */ AtTop = 3
+export enum NotebookEditorRevealType {
+    Default = 0,
+    InCenter = 1,
+    InCenterIfOutsideViewport = 2,
+    AtTop = 3
 }
 /**
 	 * Represents a notebook editor that is attached to a {@link NotebookDocument notebook}.
@@ -8403,16 +8781,9 @@ export enum TextDocumentChangeReason {
 		 * delivered to any renderer.
 		 */ postMessage(message: any, editor?: NotebookEditor): Thenable<boolean>;
 }
-/**
-	 * A notebook cell kind.
-	 */ export enum NotebookCellKind {
-    /**
-		 * A markup-cell is formatted source that is used for display.
-		 */ Markup = 1,
-    /**
-		 * A code-cell is source that can be {@link NotebookController executed} and that
-		 * produces {@link NotebookCellOutput output}.
-		 */ Code = 2
+export enum NotebookCellKind {
+    Markup = 1,
+    Code = 2
 }
 /**
 	 * Represents a cell of a {@link NotebookDocument notebook}, either a {@link NotebookCellKind.Code code}-cell
@@ -8708,17 +9079,9 @@ export type NotebookData = {
         [key: string]: boolean | undefined;
     };
 }
-/**
-	 * Notebook controller affinity for notebook documents.
-	 *
-	 * @see {@link NotebookController.updateNotebookAffinity}
-	 */ export enum NotebookControllerAffinity {
-    /**
-		 * Default affinity.
-		 */ Default = 1,
-    /**
-		 * A controller is preferred for a notebook.
-		 */ Preferred = 2
+export enum NotebookControllerAffinity {
+    Default = 1,
+    Preferred = 2
 }
 /**
 	 * A notebook controller represents an entity that can execute notebook cells. This is often referred to as a kernel.
@@ -8896,15 +9259,9 @@ export type NotebookData = {
 		 * @return A thenable that resolves when the operation finished.
 		 */ appendOutputItems(items: NotebookCellOutputItem | readonly NotebookCellOutputItem[], output: NotebookCellOutput): Thenable<void>;
 }
-/**
-	 * Represents the alignment of status bar items.
-	 */ export enum NotebookCellStatusBarAlignment {
-    /**
-		 * Aligned to the left side.
-		 */ Left = 1,
-    /**
-		 * Aligned to the right side.
-		 */ Right = 2
+export enum NotebookCellStatusBarAlignment {
+    Left = 1,
+    Right = 2
 }
 export type NotebookCellStatusBarItem = {
     /**
@@ -9388,16 +9745,9 @@ export type FunctionBreakpoint = Breakpoint & {
 		 * The name of the function to which this breakpoint is attached.
 		 */ readonly functionName: string;
 };
-/**
-	 * Debug console mode used by debug session, see {@link DebugSessionOptions options}.
-	 */ export enum DebugConsoleMode {
-    /**
-		 * Debug session should have a separate debug console.
-		 */ Separate = 0,
-    /**
-		 * Debug session should share debug console with its parent session.
-		 * This value has no effect for sessions which do not have a parent session.
-		 */ MergeWithParent = 1
+export enum DebugConsoleMode {
+    Separate = 0,
+    MergeWithParent = 1
 }
 /**
 	 * Options for {@link debug.startDebugging starting a debug session}.
@@ -9438,42 +9788,19 @@ export type FunctionBreakpoint = Breakpoint & {
 		 * When true, the debug viewlet will not be automatically revealed for this session.
 		 */ suppressDebugView?: boolean;
 }
-/**
-	 * A DebugConfigurationProviderTriggerKind specifies when the `provideDebugConfigurations` method of a `DebugConfigurationProvider` is triggered.
-	 * Currently there are two situations: to provide the initial debug configurations for a newly created launch.json or
-	 * to provide dynamically generated debug configurations when the user asks for them through the UI (e.g. via the "Select and Start Debugging" command).
-	 * A trigger kind is used when registering a `DebugConfigurationProvider` with {@link debug.registerDebugConfigurationProvider}.
-	 */ export enum DebugConfigurationProviderTriggerKind {
-    /**
-		 *	`DebugConfigurationProvider.provideDebugConfigurations` is called to provide the initial debug configurations for a newly created launch.json.
-		 */ Initial = 1,
-    /**
-		 * `DebugConfigurationProvider.provideDebugConfigurations` is called to provide dynamically generated debug configurations when the user asks for them through the UI (e.g. via the "Select and Start Debugging" command).
-		 */ Dynamic = 2
+export enum DebugConfigurationProviderTriggerKind {
+    Initial = 1,
+    Dynamic = 2
 }
-/**
-	 * Collapsible state of a {@link CommentThread comment thread}
-	 */ export enum CommentThreadCollapsibleState {
-    /**
-		 * Determines an item is collapsed
-		 */ Collapsed = 0,
-    /**
-		 * Determines an item is expanded
-		 */ Expanded = 1
+export enum CommentThreadCollapsibleState {
+    Collapsed = 0,
+    Expanded = 1
 }
-/**
-	 * Comment mode of a {@link Comment}
-	 */ export enum CommentMode {
-    /**
-		 * Displays the comment editor
-		 */ Editing = 0,
-    /**
-		 * Displays the preview of the comment
-		 */ Preview = 1
+export enum CommentMode {
+    Editing = 0,
+    Preview = 1
 }
-/**
-	 * The state of a comment thread.
-	 */ export enum CommentThreadState {
+export enum CommentThreadState {
     Unresolved = 0,
     Resolved = 1
 }
@@ -9811,9 +10138,7 @@ export type FunctionBreakpoint = Breakpoint & {
 		 * @param sessionId The id of the session to remove.
 		 */ removeSession(sessionId: string): Thenable<void>;
 }
-/**
-	 * The kind of executions that {@link TestRunProfile TestRunProfiles} control.
-	 */ export enum TestRunProfileKind {
+export enum TestRunProfileKind {
     Run = 1,
     Debug = 2,
     Coverage = 3
