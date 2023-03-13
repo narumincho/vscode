@@ -1,5 +1,6 @@
 mod ident;
 mod require_vs_code;
+mod vs_code_api_type;
 
 #[tokio::main]
 pub async fn main() -> anyhow::Result<()> {
@@ -29,26 +30,16 @@ pub async fn main() -> anyhow::Result<()> {
         .parse_typescript_module()
         .map_err(|_| Error::ParseModuleError)?;
 
-    let first_module_item = module.body.first().ok_or(Error::NotFoundModule)?;
-
-    let first_module_body = first_module_item
-        .clone()
-        .expect_stmt()
-        .expect_decl()
-        .expect_ts_module()
-        .body
-        .ok_or(Error::FirstModuleBodyNotFound)?;
-
-    let first_module_block = first_module_body.expect_ts_module_block();
+    let result = pick_module_item(&module.body);
 
     let mut module_map = Vec::<swc_ecma_ast::ModuleItem>::new();
 
     let result = swc_common::GLOBALS.set(&swc_common::Globals::default(), || {
         module_map.push(require_vs_code::module_item(&comments));
 
-        module_map.push(vs_code_api_module_item(&comments));
+        module_map.push(vs_code_api_type::module_item(&comments));
 
-        for module_item in first_module_block.body {
+        for module_item in result {
             if let Some(new_module_item) = module_item_transform(&module_item) {
                 module_map.push(new_module_item);
             }
@@ -67,42 +58,111 @@ pub async fn main() -> anyhow::Result<()> {
     Ok(())
 }
 
-fn vs_code_api_module_item(
-    comments: &swc_common::comments::SingleThreadedComments,
-) -> swc_ecma_ast::ModuleItem {
-    swc_ecma_ast::ModuleItem::ModuleDecl(swc_ecma_ast::ModuleDecl::ExportDecl(
-        swc_ecma_ast::ExportDecl {
-            span: {
-                let span = swc_common::Span::dummy_with_cmt();
-                swc_common::comments::Comments::add_leading(
-                    comments,
-                    span.lo,
-                    swc_common::comments::Comment {
-                        span: swc_common::DUMMY_SP,
-                        kind: swc_common::comments::CommentKind::Block,
-                        text: swc_atoms::Atom::from(
-                            "*
- * Type Definition for Visual Studio Code 1.75 Extension API
- * See https://code.visualstudio.com/api for more information
- ",
-                        ),
-                    },
-                );
-
-                span
+fn pick_module_item(module_items: &Vec<swc_ecma_ast::ModuleItem>) -> Vec<ResultDeclWithSpan> {
+    module_items
+        .iter()
+        .flat_map(|item| match item {
+            swc_ecma_ast::ModuleItem::ModuleDecl(module_decl) => match module_decl {
+                swc_ecma_ast::ModuleDecl::Import(_) => vec![],
+                swc_ecma_ast::ModuleDecl::ExportDecl(export_decl) => match &export_decl.decl {
+                    swc_ecma_ast::Decl::Class(decl) => vec![ResultDeclWithSpan {
+                        span: export_decl.span.clone(),
+                        decl: ResultDecl::Class(decl.clone()),
+                    }],
+                    swc_ecma_ast::Decl::Fn(decl) => vec![ResultDeclWithSpan {
+                        span: export_decl.span.clone(),
+                        decl: ResultDecl::Fn(decl.clone()),
+                    }],
+                    swc_ecma_ast::Decl::Var(decl) => vec![ResultDeclWithSpan {
+                        span: export_decl.span.clone(),
+                        decl: ResultDecl::Var(*decl.clone()),
+                    }],
+                    swc_ecma_ast::Decl::TsInterface(decl) => vec![ResultDeclWithSpan {
+                        span: export_decl.span.clone(),
+                        decl: ResultDecl::TsInterface(*decl.clone()),
+                    }],
+                    swc_ecma_ast::Decl::TsTypeAlias(decl) => vec![ResultDeclWithSpan {
+                        span: export_decl.span.clone(),
+                        decl: ResultDecl::TsTypeAlias(*decl.clone()),
+                    }],
+                    swc_ecma_ast::Decl::TsEnum(decl) => vec![ResultDeclWithSpan {
+                        span: export_decl.span.clone(),
+                        decl: ResultDecl::TsEnum(*decl.clone()),
+                    }],
+                    swc_ecma_ast::Decl::TsModule(ts_module) => {
+                        ts_module_decl_to_result_decl_vec(ts_module)
+                    }
+                },
+                swc_ecma_ast::ModuleDecl::ExportNamed(_) => vec![],
+                swc_ecma_ast::ModuleDecl::ExportDefaultDecl(_) => vec![],
+                swc_ecma_ast::ModuleDecl::ExportDefaultExpr(_) => vec![],
+                swc_ecma_ast::ModuleDecl::ExportAll(_) => vec![],
+                swc_ecma_ast::ModuleDecl::TsImportEquals(_) => vec![],
+                swc_ecma_ast::ModuleDecl::TsExportAssignment(_) => vec![],
+                swc_ecma_ast::ModuleDecl::TsNamespaceExport(_) => vec![],
             },
-            decl: swc_ecma_ast::Decl::TsTypeAlias(Box::new(swc_ecma_ast::TsTypeAliasDecl {
-                id: ident::vs_code_api_ident(),
-                declare: false,
-                span: swc_common::Span::default(),
-                type_ann: Box::new(swc_ecma_ast::TsType::TsLitType(swc_ecma_ast::TsLitType {
-                    span: swc_common::Span::default(),
-                    lit: swc_ecma_ast::TsLit::Str(swc_ecma_ast::Str::from("aa")),
-                })),
-                type_params: None,
-            })),
+            swc_ecma_ast::ModuleItem::Stmt(statement) => statement_to_result_decl_vec(statement),
+        })
+        .collect()
+}
+
+fn statement_to_result_decl_vec(statement: &swc_ecma_ast::Stmt) -> Vec<ResultDeclWithSpan> {
+    match statement {
+        swc_ecma_ast::Stmt::Block(block) => block
+            .stmts
+            .iter()
+            .flat_map(|stmt| statement_to_result_decl_vec(stmt))
+            .collect::<Vec<_>>(),
+        swc_ecma_ast::Stmt::Empty(_) => vec![],
+        swc_ecma_ast::Stmt::Debugger(_) => vec![],
+        swc_ecma_ast::Stmt::With(_) => vec![],
+        swc_ecma_ast::Stmt::Return(_) => vec![],
+        swc_ecma_ast::Stmt::Labeled(_) => vec![],
+        swc_ecma_ast::Stmt::Break(_) => vec![],
+        swc_ecma_ast::Stmt::Continue(_) => vec![],
+        swc_ecma_ast::Stmt::If(_) => vec![],
+        swc_ecma_ast::Stmt::Switch(_) => vec![],
+        swc_ecma_ast::Stmt::Throw(_) => vec![],
+        swc_ecma_ast::Stmt::Try(_) => vec![],
+        swc_ecma_ast::Stmt::While(_) => vec![],
+        swc_ecma_ast::Stmt::DoWhile(_) => vec![],
+        swc_ecma_ast::Stmt::For(_) => vec![],
+        swc_ecma_ast::Stmt::ForIn(_) => vec![],
+        swc_ecma_ast::Stmt::ForOf(_) => vec![],
+        swc_ecma_ast::Stmt::Decl(decl) => match decl {
+            swc_ecma_ast::Decl::TsModule(module_decl) => {
+                ts_module_decl_to_result_decl_vec(module_decl)
+            }
+            _ => vec![],
         },
-    ))
+        swc_ecma_ast::Stmt::Expr(_) => todo!(),
+    }
+}
+
+fn ts_module_decl_to_result_decl_vec(
+    ts_module_decl: &swc_ecma_ast::TsModuleDecl,
+) -> Vec<ResultDeclWithSpan> {
+    match &ts_module_decl.body {
+        Some(body) => match body {
+            swc_ecma_ast::TsNamespaceBody::TsModuleBlock(block) => pick_module_item(&block.body),
+            swc_ecma_ast::TsNamespaceBody::TsNamespaceDecl(_) => vec![],
+        },
+        None => vec![],
+    }
+}
+
+struct ResultDeclWithSpan {
+    span: swc_common::Span,
+    decl: ResultDecl,
+}
+
+enum ResultDecl {
+    Class(swc_ecma_ast::ClassDecl),
+    Fn(swc_ecma_ast::FnDecl),
+    Var(swc_ecma_ast::VarDecl),
+    TsInterface(swc_ecma_ast::TsInterfaceDecl),
+    TsTypeAlias(swc_ecma_ast::TsTypeAliasDecl),
+    TsEnum(swc_ecma_ast::TsEnumDecl),
 }
 
 fn node_to_code_string<Node: swc_ecma_codegen::Node>(
@@ -138,15 +198,11 @@ pub enum Error {
     FirstModuleBodyNotFound,
 }
 
-fn module_item_transform(
-    module_item: &swc_ecma_ast::ModuleItem,
-) -> Option<swc_ecma_ast::ModuleItem> {
-    let module_declaration = module_item.as_module_decl()?;
-    let export_declaration = module_declaration.as_export_decl()?;
-    match &export_declaration.decl {
-        swc_ecma_ast::Decl::Class(class) => Some(swc_ecma_ast::ModuleItem::ModuleDecl(
+fn module_item_transform(module_item: &ResultDeclWithSpan) -> Option<swc_ecma_ast::ModuleItem> {
+    match &module_item.decl {
+        ResultDecl::Class(class) => Some(swc_ecma_ast::ModuleItem::ModuleDecl(
             swc_ecma_ast::ModuleDecl::ExportDecl(swc_ecma_ast::ExportDecl {
-                span: export_declaration.span,
+                span: module_item.span,
                 decl: swc_ecma_ast::Decl::TsTypeAlias(Box::new(swc_ecma_ast::TsTypeAliasDecl {
                     span: swc_common::Span::default(),
                     declare: false,
@@ -196,10 +252,10 @@ fn module_item_transform(
                 })),
             }),
         )),
-        swc_ecma_ast::Decl::TsInterface(interface) => Some(swc_ecma_ast::ModuleItem::ModuleDecl(
+        ResultDecl::TsInterface(interface) => Some(swc_ecma_ast::ModuleItem::ModuleDecl(
             swc_ecma_ast::ModuleDecl::ExportDecl(swc_ecma_ast::ExportDecl {
-                span: export_declaration.span,
-                decl: swc_ecma_ast::Decl::TsInterface(interface.clone()),
+                span: module_item.span,
+                decl: swc_ecma_ast::Decl::TsInterface(Box::new(interface.clone())),
             }),
         )),
         _ => None,

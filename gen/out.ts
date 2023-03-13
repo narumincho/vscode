@@ -1,16 +1,20 @@
-/*import VS Code API
+/** import VS Code API
 ```ts
 require("vscode")
 ```
-*/ export function requireVsCode(): VSCodeApi | undefined {
+
+Returns VSCodeApi only within the vscode extension.
+*/ export function importVsCodeApi(): VSCodeAPI | undefined {
     const requireFunc = ((globalThis as unknown) as {
-        require?: undefined | ((path: "vscode") => requireVsCode);
+        require?: undefined | ((path: "vscode") => VSCodeAPI);
     }).require;
+    return requireFunc === undefined ? undefined : requireFunc("vscode");
 }
 /**
  * Type Definition for Visual Studio Code 1.75 Extension API
  * See https://code.visualstudio.com/api for more information
- */ export type requireVsCode = "aa";
+ */ export type VSCodeAPI = {
+};
 /**
 	 * Represents a reference to a command. Provides a title which
 	 * will be used to represent a command in the UI and, optionally,

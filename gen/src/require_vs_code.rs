@@ -12,10 +12,12 @@ pub fn module_item(
                         span: swc_common::DUMMY_SP,
                         kind: swc_common::comments::CommentKind::Block,
                         text: swc_atoms::Atom::from(
-                            "import VS Code API
+                            "* import VS Code API
 ```ts
 require(\"vscode\")
 ```
+
+Returns VSCodeApi only within the vscode extension.
 ",
                         ),
                     },
@@ -24,7 +26,10 @@ require(\"vscode\")
                 span
             },
             decl: swc_ecma_ast::Decl::Fn(swc_ecma_ast::FnDecl {
-                ident: crate::ident::vs_code_api_ident(),
+                ident: swc_ecma_ast::Ident::new(
+                    string_cache::Atom::from("importVsCodeApi"),
+                    swc_common::Span::default(),
+                ),
                 declare: false,
                 function: Box::new(func()),
             }),
@@ -49,11 +54,9 @@ fn func() -> swc_ecma_ast::Function {
                     types: vec![
                         Box::new(swc_ecma_ast::TsType::TsTypeRef(swc_ecma_ast::TsTypeRef {
                             span: swc_common::Span::default(),
-                            type_name: swc_ecma_ast::TsEntityName::Ident(swc_ecma_ast::Ident {
-                                optional: false,
-                                span: swc_common::Span::default(),
-                                sym: string_cache::Atom::from("VSCodeApi"),
-                            }),
+                            type_name: swc_ecma_ast::TsEntityName::Ident(
+                                crate::ident::vs_code_api_ident(),
+                            ),
                             type_params: None,
                         })),
                         Box::new(swc_ecma_ast::TsType::TsKeywordType(
@@ -72,8 +75,8 @@ fn func() -> swc_ecma_ast::Function {
 fn func_body() -> swc_ecma_ast::BlockStmt {
     swc_ecma_ast::BlockStmt {
         span: swc_common::Span::default(),
-        stmts: vec![swc_ecma_ast::Stmt::Decl(swc_ecma_ast::Decl::Var(Box::new(
-            swc_ecma_ast::VarDecl {
+        stmts: vec![
+            swc_ecma_ast::Stmt::Decl(swc_ecma_ast::Decl::Var(Box::new(swc_ecma_ast::VarDecl {
                 span: swc_common::Span::default(),
                 declare: false,
                 kind: swc_ecma_ast::VarDeclKind::Const,
@@ -86,8 +89,38 @@ fn func_body() -> swc_ecma_ast::BlockStmt {
                     }),
                     init: Some(Box::new(require_expr())),
                 }],
-            },
-        )))],
+            }))),
+            swc_ecma_ast::Stmt::Return(swc_ecma_ast::ReturnStmt {
+                span: swc_common::Span::default(),
+                arg: Some(Box::new(swc_ecma_ast::Expr::Cond(swc_ecma_ast::CondExpr {
+                    span: swc_common::Span::default(),
+                    test: Box::new(swc_ecma_ast::Expr::Bin(swc_ecma_ast::BinExpr {
+                        span: swc_common::Span::default(),
+                        op: swc_ecma_ast::BinaryOp::EqEqEq,
+                        left: Box::new(swc_ecma_ast::Expr::Ident(require_func_ident())),
+                        right: Box::new(undefined_expr()),
+                    })),
+                    cons: Box::new(undefined_expr()),
+                    alt: Box::new(swc_ecma_ast::Expr::Call(swc_ecma_ast::CallExpr {
+                        span: swc_common::Span::default(),
+                        callee: swc_ecma_ast::Callee::Expr(Box::new(swc_ecma_ast::Expr::Ident(
+                            require_func_ident(),
+                        ))),
+                        args: vec![swc_ecma_ast::ExprOrSpread {
+                            spread: None,
+                            expr: Box::new(swc_ecma_ast::Expr::Lit(swc_ecma_ast::Lit::Str(
+                                swc_ecma_ast::Str {
+                                    span: swc_common::Span::default(),
+                                    value: string_cache::Atom::from("vscode"),
+                                    raw: None,
+                                },
+                            ))),
+                        }],
+                        type_args: None,
+                    })),
+                }))),
+            }),
+        ],
     }
 }
 
@@ -222,4 +255,11 @@ fn require_func_ident() -> swc_ecma_ast::Ident {
         string_cache::Atom::from("requireFunc"),
         swc_common::Span::default(),
     )
+}
+
+fn undefined_expr() -> swc_ecma_ast::Expr {
+    swc_ecma_ast::Expr::Ident(swc_ecma_ast::Ident::new(
+        string_cache::Atom::from("undefined"),
+        swc_common::Span::default(),
+    ))
 }
