@@ -18,7 +18,7 @@
  */
 export const requireVsCode = (): VSCodeApi | undefined => {
   const requireFunc = (globalThis as unknown as {
-    require: undefined | ((path: "vscode") => VSCodeApi);
+    require?: undefined | ((path: "vscode") => VSCodeApi);
   }).require;
   if (requireFunc === undefined) {
     return;

@@ -2,7 +2,11 @@
 ```ts
 require("vscode")
 ```
-*/ export function requireVsCode(): VSCodeApi | undefined {}
+*/ export function requireVsCode(): VSCodeApi | undefined {
+    const requireFunc = ((globalThis as unknown) as {
+        require?: undefined | undefined;
+    }).require;
+}
 /**
  * Type Definition for Visual Studio Code 1.75 Extension API
  * See https://code.visualstudio.com/api for more information

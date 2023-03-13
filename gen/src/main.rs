@@ -1,4 +1,5 @@
-use std::vec;
+mod ident;
+mod require_vs_code;
 
 #[tokio::main]
 pub async fn main() -> anyhow::Result<()> {
@@ -43,7 +44,7 @@ pub async fn main() -> anyhow::Result<()> {
     let mut module_map = Vec::<swc_ecma_ast::ModuleItem>::new();
 
     let result = swc_common::GLOBALS.set(&swc_common::Globals::default(), || {
-        module_map.push(require_vs_code_module_item(&comments));
+        module_map.push(require_vs_code::module_item(&comments));
 
         module_map.push(vs_code_api_module_item(&comments));
 
@@ -64,89 +65,6 @@ pub async fn main() -> anyhow::Result<()> {
     let _ = std::fs::write("./out.ts", code)?;
 
     Ok(())
-}
-
-fn vs_code_api_ident() -> swc_ecma_ast::Ident {
-    swc_ecma_ast::Ident::new(
-        string_cache::Atom::from("requireVsCode"),
-        swc_common::Span::default(),
-    )
-}
-
-fn require_vs_code_module_item(
-    comments: &swc_common::comments::SingleThreadedComments,
-) -> swc_ecma_ast::ModuleItem {
-    swc_ecma_ast::ModuleItem::ModuleDecl(swc_ecma_ast::ModuleDecl::ExportDecl(
-        swc_ecma_ast::ExportDecl {
-            span: {
-                let span = swc_common::Span::dummy_with_cmt();
-                swc_common::comments::Comments::add_leading(
-                    comments,
-                    span.lo,
-                    swc_common::comments::Comment {
-                        span: swc_common::DUMMY_SP,
-                        kind: swc_common::comments::CommentKind::Block,
-                        text: swc_atoms::Atom::from(
-                            "import VS Code API
-```ts
-require(\"vscode\")
-```
-",
-                        ),
-                    },
-                );
-
-                span
-            },
-            decl: swc_ecma_ast::Decl::Fn(swc_ecma_ast::FnDecl {
-                ident: vs_code_api_ident(),
-                declare: false,
-                function: Box::new(swc_ecma_ast::Function {
-                    params: vec![],
-                    decorators: vec![],
-                    span: swc_common::Span::default(),
-                    body: Some(swc_ecma_ast::BlockStmt {
-                        span: swc_common::Span::default(),
-                        stmts: vec![],
-                    }),
-                    is_async: false,
-                    is_generator: false,
-                    type_params: None,
-                    return_type: Some(Box::new(swc_ecma_ast::TsTypeAnn {
-                        span: swc_common::Span::default(),
-                        type_ann: Box::new(swc_ecma_ast::TsType::TsUnionOrIntersectionType(
-                            swc_ecma_ast::TsUnionOrIntersectionType::TsUnionType(
-                                swc_ecma_ast::TsUnionType {
-                                    span: swc_common::Span::default(),
-                                    types: vec![
-                                        Box::new(swc_ecma_ast::TsType::TsTypeRef(
-                                            swc_ecma_ast::TsTypeRef {
-                                                span: swc_common::Span::default(),
-                                                type_name: swc_ecma_ast::TsEntityName::Ident(
-                                                    swc_ecma_ast::Ident {
-                                                        optional: false,
-                                                        span: swc_common::Span::default(),
-                                                        sym: string_cache::Atom::from("VSCodeApi")
-                                                    },
-                                                ),
-                                                type_params: None,
-                                            },
-                                        )),
-                                        Box::new(swc_ecma_ast::TsType::TsKeywordType(
-                                            swc_ecma_ast::TsKeywordType {
-                                                span: swc_common::Span::default(),
-                                                kind: swc_ecma_ast::TsKeywordTypeKind::TsUndefinedKeyword,
-                                            },
-                                        )),
-                                    ],
-                                },
-                            ),
-                        )),
-                    })),
-                }),
-            }),
-        },
-    ))
 }
 
 fn vs_code_api_module_item(
@@ -174,7 +92,7 @@ fn vs_code_api_module_item(
                 span
             },
             decl: swc_ecma_ast::Decl::TsTypeAlias(Box::new(swc_ecma_ast::TsTypeAliasDecl {
-                id: vs_code_api_ident(),
+                id: ident::vs_code_api_ident(),
                 declare: false,
                 span: swc_common::Span::default(),
                 type_ann: Box::new(swc_ecma_ast::TsType::TsLitType(swc_ecma_ast::TsLitType {
