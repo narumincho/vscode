@@ -61,13 +61,14 @@ fn result_decl_to_ts_property_signature(
             params: vec![],
             type_ann: Some(Box::new(swc_ecma_ast::TsTypeAnn {
                 span: swc_common::Span::default(),
-                type_ann: Box::new(swc_ecma_ast::TsType::TsLitType(swc_ecma_ast::TsLitType {
+                type_ann: Box::new(swc_ecma_ast::TsType::TsTypeLit(swc_ecma_ast::TsTypeLit {
                     span: swc_common::Span::default(),
-                    lit: swc_ecma_ast::TsLit::Str(swc_ecma_ast::Str {
-                        span: swc_common::Span::default(),
-                        value: string_cache::Atom::from("__wip*__"),
-                        raw: None,
-                    }),
+                    members: class
+                        .class
+                        .body
+                        .iter()
+                        .filter_map(|item| class_member_to_ts_type_element(item, &class.ident))
+                        .collect(),
                 })),
             })),
             type_params: None,
@@ -77,5 +78,86 @@ fn result_decl_to_ts_property_signature(
         crate::pickup::ResultDecl::TsInterface(_) => None,
         crate::pickup::ResultDecl::TsTypeAlias(_) => None,
         crate::pickup::ResultDecl::TsEnum(_) => None,
+    }
+}
+
+fn class_member_to_ts_type_element(
+    class_member: &swc_ecma_ast::ClassMember,
+    class_name: &swc_ecma_ast::Ident,
+) -> Option<swc_ecma_ast::TsTypeElement> {
+    match class_member {
+        swc_ecma_ast::ClassMember::Constructor(constructor) => {
+            Some(swc_ecma_ast::TsTypeElement::TsConstructSignatureDecl(
+                swc_ecma_ast::TsConstructSignatureDecl {
+                    span: constructor.span.clone(),
+                    params: constructor
+                        .params
+                        .iter()
+                        .map(|param| {
+                            crate::fn_to_type::param_or_ts_param_prop_to_ts_fn_param(param)
+                        })
+                        .collect(),
+                    type_params: None,
+                    type_ann: Some(Box::new(swc_ecma_ast::TsTypeAnn {
+                        span: swc_common::Span::default(),
+                        type_ann: Box::new(swc_ecma_ast::TsType::TsTypeRef(
+                            swc_ecma_ast::TsTypeRef {
+                                span: swc_common::Span::default(),
+                                type_name: swc_ecma_ast::TsEntityName::Ident(class_name.clone()),
+                                type_params: None,
+                            },
+                        )),
+                    })),
+                },
+            ))
+        }
+        swc_ecma_ast::ClassMember::Method(method) => {
+            if method.is_static {
+                Some(swc_ecma_ast::TsTypeElement::TsMethodSignature(
+                    swc_ecma_ast::TsMethodSignature {
+                        span: method.span,
+                        readonly: true,
+                        key: Box::new(crate::fn_to_type::prop_name_to_expr(&method.key)),
+                        computed: false,
+                        optional: method.is_optional,
+                        params: method
+                            .function
+                            .params
+                            .iter()
+                            .map(|p| crate::fn_to_type::param_to_ts_fn_param(&p.pat))
+                            .collect(),
+                        type_ann: None,
+                        type_params: None,
+                    },
+                ))
+            } else {
+                None
+            }
+        }
+        swc_ecma_ast::ClassMember::PrivateMethod(_) => None,
+        swc_ecma_ast::ClassMember::ClassProp(prop) => {
+            if prop.is_static {
+                Some(swc_ecma_ast::TsTypeElement::TsPropertySignature(
+                    swc_ecma_ast::TsPropertySignature {
+                        span: prop.span,
+                        readonly: true,
+                        key: Box::new(crate::fn_to_type::prop_name_to_expr(&prop.key)),
+                        computed: false,
+                        optional: prop.is_optional,
+                        params: vec![],
+                        type_ann: None,
+                        type_params: None,
+                        init: None,
+                    },
+                ))
+            } else {
+                None
+            }
+        }
+        swc_ecma_ast::ClassMember::PrivateProp(_) => None,
+        swc_ecma_ast::ClassMember::TsIndexSignature(_) => None,
+        swc_ecma_ast::ClassMember::Empty(_) => None,
+        swc_ecma_ast::ClassMember::StaticBlock(_) => None,
+        swc_ecma_ast::ClassMember::AutoAccessor(_) => None,
     }
 }

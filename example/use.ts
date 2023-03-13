@@ -1,6 +1,6 @@
 import { importVsCodeApi } from "../gen/out.ts";
 
-const api = () => {
+const api = (() => {
   const api = importVsCodeApi();
   if (api === undefined) {
     throw new Error(
@@ -8,4 +8,8 @@ const api = () => {
     );
   }
   return api;
-};
+})();
+
+const pos = new api.Position(1, 3);
+pos.line;
+pos.caller;
