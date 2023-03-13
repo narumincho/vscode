@@ -270,6 +270,19 @@ Returns VSCodeApi only within the vscode extension.
 		 */ isReversed: boolean;
 };
 /**
+	 * Represents sources that can cause {@link window.onDidChangeTextEditorSelection selection change events}.
+	*/ export enum TextEditorSelectionChangeKind {
+    /**
+		 * Selection changed due to typing in the editor.
+		 */ Keyboard = 1,
+    /**
+		 * Selection change due to clicking in the editor.
+		 */ Mouse = 2,
+    /**
+		 * Selection changed because a command ran.
+		 */ Command = 3
+}
+/**
 	 * Represents an event describing the change in a {@link TextEditor.selections text editor's selections}.
 	 */ export interface TextEditorSelectionChangeEvent {
     /**
@@ -314,6 +327,41 @@ Returns VSCodeApi only within the vscode extension.
 		 */ readonly viewColumn: ViewColumn;
 }
 /**
+	 * Rendering style of the cursor.
+	 */ export enum TextEditorCursorStyle {
+    /**
+		 * Render the cursor as a vertical thick line.
+		 */ Line = 1,
+    /**
+		 * Render the cursor as a block filled.
+		 */ Block = 2,
+    /**
+		 * Render the cursor as a thick horizontal line.
+		 */ Underline = 3,
+    /**
+		 * Render the cursor as a vertical thin line.
+		 */ LineThin = 4,
+    /**
+		 * Render the cursor as a block outlined.
+		 */ BlockOutline = 5,
+    /**
+		 * Render the cursor as a thin horizontal line.
+		 */ UnderlineThin = 6
+}
+/**
+	 * Rendering style of the line numbers.
+	 */ export enum TextEditorLineNumbersStyle {
+    /**
+		 * Do not render the line numbers.
+		 */ Off = 0,
+    /**
+		 * Render the line numbers.
+		 */ On = 1,
+    /**
+		 * Render the line numbers with values relative to the primary cursor location.
+		 */ Relative = 2
+}
+/**
 	 * Represents a {@link TextEditor text editor}'s {@link TextEditor.options options}.
 	 */ export interface TextEditorOptions {
     /**
@@ -353,6 +401,48 @@ Returns VSCodeApi only within the vscode extension.
     /**
 		 * Remove this decoration type and all decorations on all text editors using it.
 		 */ dispose(): void;
+}
+/**
+	 * Represents different {@link TextEditor.revealRange reveal} strategies in a text editor.
+	 */ export enum TextEditorRevealType {
+    /**
+		 * The range will be revealed with as little scrolling as possible.
+		 */ Default = 0,
+    /**
+		 * The range will always be revealed in the center of the viewport.
+		 */ InCenter = 1,
+    /**
+		 * If the range is outside the viewport, it will be revealed in the center of the viewport.
+		 * Otherwise, it will be revealed with as little scrolling as possible.
+		 */ InCenterIfOutsideViewport = 2,
+    /**
+		 * The range will always be revealed at the top of the viewport.
+		 */ AtTop = 3
+}
+/**
+	 * Represents different positions for rendering a decoration in an {@link DecorationRenderOptions.overviewRulerLane overview ruler}.
+	 * The overview ruler supports three lanes.
+	 */ export enum OverviewRulerLane {
+    Left = 1,
+    Center = 2,
+    Right = 4,
+    Full = 7
+}
+/**
+	 * Describes the behavior of decorations when typing/editing at their edges.
+	 */ export enum DecorationRangeBehavior {
+    /**
+		 * The decoration's range will widen when edits occur at the start or end.
+		 */ OpenOpen = 0,
+    /**
+		 * The decoration's range will not widen when edits occur at the start of end.
+		 */ ClosedClosed = 1,
+    /**
+		 * The decoration's range will widen when edits occur at the start, but not at the end.
+		 */ OpenClosed = 2,
+    /**
+		 * The decoration's range will widen when edits occur at the end, but not at the start.
+		 */ ClosedOpen = 3
 }
 /**
 	 * Represents options to configure the behavior of showing a {@link TextDocument document} in an {@link TextEditor editor}.
@@ -707,6 +797,16 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 */ hide(): void;
 }
 /**
+	 * Represents an end of line character sequence in a {@link TextDocument document}.
+	 */ export enum EndOfLine {
+    /**
+		 * The line feed `\n` character.
+		 */ LF = 1,
+    /**
+		 * The carriage return line feed `\r\n` sequence.
+		 */ CRLF = 2
+}
+/**
 	 * A complex edit that will be applied in one transaction on a TextEditor.
 	 * This holds a description of the edits and if the edits are valid (i.e. no overlapping regions, document was not changed in the meantime, etc.)
 	 * they can be applied on a {@link TextDocument document} associated with a {@link TextEditor text editor}.
@@ -916,6 +1016,17 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 */ provideTextDocumentContent(uri: Uri, token: CancellationToken): ProviderResult<string>;
 }
 /**
+	 * The kind of {@link QuickPickItem quick pick item}.
+	 */ export enum QuickPickItemKind {
+    /**
+		 * When a {@link QuickPickItem} has a kind of {@link Separator}, the item is just a visual separator and does not represent a real item.
+		 * The only property that applies is {@link QuickPickItem.label label }. All other properties on {@link QuickPickItem} will be ignored and have no effect.
+		 */ Separator = -1,
+    /**
+		 * The default {@link QuickPickItem.kind} is an item that can be selected in the quick pick.
+		 */ Default = 0
+}
+/**
 	 * Represents an item that can be selected from
 	 * a list of items.
 	 */ export interface QuickPickItem {
@@ -1106,6 +1217,13 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 */ detail?: string;
 }
 /**
+	 * Impacts the behavior and appearance of the validation message.
+	 */ export enum InputBoxValidationSeverity {
+    Info = 1,
+    Warning = 2,
+    Error = 3
+}
+/**
 	 * Object to configure the behavior of the validation message.
 	 */ export interface InputBoxValidationMessage {
     /**
@@ -1206,6 +1324,23 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 */ new(base: WorkspaceFolder | Uri | string, pattern: string): RelativePattern;
 };
 /**
+	 * A file glob pattern to match file paths against. This can either be a glob pattern string
+	 * (like `**​/*.{ts,js}` or `*.{ts,js}`) or a {@link RelativePattern relative pattern}.
+	 *
+	 * Glob patterns can have the following syntax:
+	 * * `*` to match zero or more characters in a path segment
+	 * * `?` to match on one character in a path segment
+	 * * `**` to match any number of path segments, including none
+	 * * `{}` to group conditions (e.g. `**​/*.{ts,js}` matches all TypeScript and JavaScript files)
+	 * * `[]` to declare a range of characters to match in a path segment (e.g., `example.[0-9]` to match on `example.0`, `example.1`, …)
+	 * * `[!...]` to negate a range of characters to match in a path segment (e.g., `example.[!0-9]` to match on `example.a`, `example.b`, but not `example.0`)
+	 *
+	 * Note: a backslash (`\`) is not valid within a glob pattern. If you have an existing file
+	 * path to match against, consider to use the {@link RelativePattern relative pattern} support
+	 * that takes care of converting any backslash into slash. Otherwise, make sure to convert
+	 * any backslash to slash when creating the glob pattern.
+	 */ export type GlobPattern = string | RelativePattern;
+/**
 	 * A document filter denotes a document by different properties like
 	 * the {@link TextDocument.languageId language}, the {@link Uri.scheme scheme} of
 	 * its resource, or a glob-pattern that is applied to the {@link TextDocument.fileName path}.
@@ -1238,6 +1373,48 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 */ readonly pattern?: GlobPattern;
 }
 /**
+	 * A language selector is the combination of one or many language identifiers
+	 * and {@link DocumentFilter language filters}.
+	 *
+	 * *Note* that a document selector that is just a language identifier selects *all*
+	 * documents, even those that are not saved on disk. Only use such selectors when
+	 * a feature works without further context, e.g. without the need to resolve related
+	 * 'files'.
+	 *
+	 * @example
+	 * let sel:DocumentSelector = { scheme: 'file', language: 'typescript' };
+	 */ export type DocumentSelector = DocumentFilter | string | ReadonlyArray<DocumentFilter | string>;
+/**
+	 * A provider result represents the values a provider, like the {@linkcode HoverProvider},
+	 * may return. For once this is the actual result type `T`, like `Hover`, or a thenable that resolves
+	 * to that type `T`. In addition, `null` and `undefined` can be returned - either directly or from a
+	 * thenable.
+	 *
+	 * The snippets below are all valid implementations of the {@linkcode HoverProvider}:
+	 *
+	 * ```ts
+	 * let a: HoverProvider = {
+	 * 	provideHover(doc, pos, token): ProviderResult<Hover> {
+	 * 		return new Hover('Hello World');
+	 * 	}
+	 * }
+	 *
+	 * let b: HoverProvider = {
+	 * 	provideHover(doc, pos, token): ProviderResult<Hover> {
+	 * 		return new Promise(resolve => {
+	 * 			resolve(new Hover('Hello World'));
+	 * 	 	});
+	 * 	}
+	 * }
+	 *
+	 * let c: HoverProvider = {
+	 * 	provideHover(doc, pos, token): ProviderResult<Hover> {
+	 * 		return; // undefined
+	 * 	}
+	 * }
+	 * ```
+	 */ export type ProviderResult<T> = T | undefined | null | Thenable<T | undefined | null>;
+/**
 	 * Kind of a code action.
 	 *
 	 * Kinds are a hierarchical list of identifiers separated by `.`, e.g. `"refactor.extract.function"`.
@@ -1250,6 +1427,19 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * String value of the kind, e.g. `"refactor.extract.function"`.
 		 */ readonly value: string;
 };
+/**
+	 * The reason why code actions were requested.
+	 */ export enum CodeActionTriggerKind {
+    /**
+		 * Code actions were explicitly requested by the user or by an extension.
+		 */ Invoke = 1,
+    /**
+		 * Code actions were requested automatically.
+		 *
+		 * This typically happens when current selection in a file changes, but can
+		 * also be triggered when file content changes.
+		 */ Automatic = 2
+}
 /**
 	 * Contains additional diagnostic information about the context in which
 	 * a {@link CodeActionProvider.provideCodeActions code action} is run.
@@ -1471,6 +1661,17 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 */ resolveCodeLens?(codeLens: T, token: CancellationToken): ProviderResult<T>;
 }
 /**
+	 * Information about where a symbol is defined.
+	 *
+	 * Provides additional metadata over normal {@link Location} definitions, including the range of
+	 * the defining symbol
+	 */ export type DefinitionLink = LocationLink;
+/**
+	 * The definition of a symbol represented as one or many {@link Location locations}.
+	 * For most programming languages there is only one location at which a symbol is
+	 * defined.
+	 */ export type Definition = Location | Location[];
+/**
 	 * The definition provider interface defines the contract between extensions and
 	 * the [go to definition](https://code.visualstudio.com/docs/editor/editingevolved#_go-to-definition)
 	 * and peek definition features.
@@ -1513,6 +1714,10 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * signaled by returning `undefined` or `null`.
 		 */ provideTypeDefinition(document: TextDocument, position: Position, token: CancellationToken): ProviderResult<Definition | DefinitionLink[]>;
 }
+/**
+	 * The declaration of a symbol representation as one or many {@link Location locations}
+	 * or {@link LocationLink location links}.
+	 */ export type Declaration = Location | Location[] | LocationLink[];
 /**
 	 * The declaration provider interface defines the contract between extensions and
 	 * the go to declaration feature.
@@ -1586,6 +1791,16 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * @param value Optional, initial value.
 		 * @param supportThemeIcons Optional, Specifies whether {@link ThemeIcon ThemeIcons} are supported within the {@linkcode MarkdownString}.
 		 */ new(value?: string, supportThemeIcons?: boolean): MarkdownString;
+};
+/**
+	 * MarkedString can be used to render human-readable text. It is either a markdown string
+	 * or a code-block that provides a language and a code snippet. Note that
+	 * markdown strings will be sanitized - that means html will be escaped.
+	 *
+	 * @deprecated This type is deprecated, please use {@linkcode MarkdownString} instead.
+	 */ export type MarkedString = string | {
+    language: string;
+    value: string;
 };
 /**
 	 * A hover represents additional information for a symbol or word. Hovers are
@@ -1718,6 +1933,13 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 */ new(range: Range, expression?: string): InlineValueEvaluatableExpression;
 };
 /**
+	 * Inline value information can be provided by different means:
+	 * - directly as a text value (class InlineValueText).
+	 * - as a name to use for a variable lookup (class InlineValueVariableLookup)
+	 * - as an evaluatable expression (class InlineValueEvaluatableExpression)
+	 * The InlineValue types combines all inline value types into one type.
+	 */ export type InlineValue = InlineValueText | InlineValueVariableLookup | InlineValueEvaluatableExpression;
+/**
 	 * A value-object that contains contextual information when requesting inline values from a InlineValuesProvider.
 	 */ export interface InlineValueContext {
     /**
@@ -1751,6 +1973,19 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 */ provideInlineValues(document: TextDocument, viewPort: Range, context: InlineValueContext, token: CancellationToken): ProviderResult<InlineValue[]>;
 }
 /**
+	 * A document highlight kind.
+	 */ export enum DocumentHighlightKind {
+    /**
+		 * A textual occurrence.
+		 */ Text = 0,
+    /**
+		 * Read-access of a symbol, like reading a variable.
+		 */ Read = 1,
+    /**
+		 * Write-access of a symbol, like writing to a variable.
+		 */ Write = 2
+}
+/**
 	 * A document highlight is a range inside a text document which deserves
 	 * special attention. Usually a document highlight is visualized by changing
 	 * the background color of its range.
@@ -1782,6 +2017,43 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * @return An array of document highlights or a thenable that resolves to such. The lack of a result can be
 		 * signaled by returning `undefined`, `null`, or an empty array.
 		 */ provideDocumentHighlights(document: TextDocument, position: Position, token: CancellationToken): ProviderResult<DocumentHighlight[]>;
+}
+/**
+	 * A symbol kind.
+	 */ export enum SymbolKind {
+    File = 0,
+    Module = 1,
+    Namespace = 2,
+    Package = 3,
+    Class = 4,
+    Method = 5,
+    Property = 6,
+    Field = 7,
+    Constructor = 8,
+    Enum = 9,
+    Interface = 10,
+    Function = 11,
+    Variable = 12,
+    Constant = 13,
+    String = 14,
+    Number = 15,
+    Boolean = 16,
+    Array = 17,
+    Object = 18,
+    Key = 19,
+    Null = 20,
+    EnumMember = 21,
+    Struct = 22,
+    Event = 23,
+    Operator = 24,
+    TypeParameter = 25
+}
+/**
+	 * Symbol tags are extra annotations that tweak the rendering of a symbol.
+	 */ export enum SymbolTag {
+    /**
+		 * Render a symbol as obsolete, usually using a strike-out.
+		 */ Deprecated = 1
 }
 /**
 	 * Represents information about programming constructs like variables, classes,
@@ -2387,6 +2659,19 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 */ activeParameter: number;
 };
 /**
+	 * How a {@linkcode SignatureHelpProvider} was triggered.
+	 */ export enum SignatureHelpTriggerKind {
+    /**
+		 * Signature help was invoked manually by the user or by a command.
+		 */ Invoke = 1,
+    /**
+		 * Signature help was triggered by a trigger character.
+		 */ TriggerCharacter = 2,
+    /**
+		 * Signature help was triggered by the cursor moving or by the document content changing.
+		 */ ContentChange = 3
+}
+/**
 	 * Additional information about the context in which a
 	 * {@linkcode SignatureHelpProvider.provideSignatureHelp SignatureHelpProvider} was triggered.
 	 */ export interface SignatureHelpContext {
@@ -2457,6 +2742,45 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * An optional string which is rendered less prominently after {@link CompletionItemLabel.detail}. Should be used
 		 * for fully qualified names or file path.
 		 */ description?: string;
+}
+/**
+	 * Completion item kinds.
+	 */ export enum CompletionItemKind {
+    Text = 0,
+    Method = 1,
+    Function = 2,
+    Constructor = 3,
+    Field = 4,
+    Variable = 5,
+    Class = 6,
+    Interface = 7,
+    Module = 8,
+    Property = 9,
+    Unit = 10,
+    Value = 11,
+    Enum = 12,
+    Keyword = 13,
+    Snippet = 14,
+    Color = 15,
+    Reference = 17,
+    File = 16,
+    Folder = 18,
+    EnumMember = 19,
+    Constant = 20,
+    Struct = 21,
+    Event = 22,
+    Operator = 23,
+    TypeParameter = 24,
+    User = 25,
+    Issue = 26
+}
+/**
+	 * Completion item tags are extra annotations that tweak the rendering of a completion
+	 * item.
+	 */ export enum CompletionItemTag {
+    /**
+		 * Render a completion as obsolete, usually using a strike-out.
+		 */ Deprecated = 1
 }
 /**
 	 * A completion item represents a text snippet that is proposed to complete text that is being typed.
@@ -2595,6 +2919,19 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 */ new(items?: T[], isIncomplete?: boolean): CompletionList;
 };
 /**
+	 * How a {@link CompletionItemProvider completion provider} was triggered
+	 */ export enum CompletionTriggerKind {
+    /**
+		 * Completion was triggered normally.
+		 */ Invoke = 0,
+    /**
+		 * Completion was triggered by a trigger character.
+		 */ TriggerCharacter = 1,
+    /**
+		 * Completion was re-triggered as current completion list is incomplete
+		 */ TriggerForIncompleteCompletions = 2
+}
+/**
 	 * Contains additional information about the context in which
 	 * {@link CompletionItemProvider.provideCompletionItems completion provider} is triggered.
 	 */ export interface CompletionContext {
@@ -2710,6 +3047,18 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
     /**
 		 * The text the range will be replaced with if this completion is accepted.
 		 */ readonly text: string;
+}
+/**
+	 * Describes how an {@link InlineCompletionItemProvider inline completion provider} was triggered.
+	 */ export enum InlineCompletionTriggerKind {
+    /**
+		 * Completion was triggered explicitly by a user gesture.
+		 * Return multiple completion items to enable cycling through them.
+		 */ Invoke = 0,
+    /**
+		 * Completion was triggered automatically while editing.
+		 * It is sufficient to return a single completion item in this case.
+		 */ Automatic = 1
 }
 /**
 	 * An inline completion item represents a text snippet that is proposed inline to complete text that is being typed.
@@ -2884,6 +3233,19 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
     }, token: CancellationToken): ProviderResult<ColorPresentation[]>;
 }
 /**
+	 * Inlay hint kinds.
+	 *
+	 * The kind of an inline hint defines its appearance, e.g the corresponding foreground and background colors are being
+	 * used.
+	 */ export enum InlayHintKind {
+    /**
+		 * An inlay hint that for a type annotation.
+		 */ Type = 1,
+    /**
+		 * An inlay hint that is for a parameter.
+		 */ Parameter = 2
+}
+/**
 	 * An inlay hint label part allows for interactive and composite labels of inlay hints.
 	 */ export type InlayHintLabelPart = {
     /**
@@ -3025,6 +3387,22 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * @param kind The kind of the folding range.
 		 */ new(start: number, end: number, kind?: FoldingRangeKind): FoldingRange;
 };
+/**
+	 * An enumeration of specific folding range kinds. The kind is an optional field of a {@link FoldingRange}
+	 * and is used to distinguish specific folding ranges such as ranges originated from comments. The kind is used by commands like
+	 * `Fold all comments` or `Fold all regions`.
+	 * If the kind is not set on the range, the range originated from a syntax element other than comments, imports or region markers.
+	 */ export enum FoldingRangeKind {
+    /**
+		 * Kind for folding range representing a comment.
+		 */ Comment = 1,
+    /**
+		 * Kind for folding range representing a import.
+		 */ Imports = 2,
+    /**
+		 * Kind for folding range representing regions originating from folding markers like `#region` and `#endregion`.
+		 */ Region = 3
+}
 /**
 	 * Folding context (for future use)
 	 */ export interface FoldingContext {
@@ -3318,6 +3696,10 @@ export interface SelectionRangeProvider {
 		 */ provideDocumentDropEdits(document: TextDocument, position: Position, dataTransfer: DataTransfer, token: CancellationToken): ProviderResult<DocumentDropEdit>;
 }
 /**
+	 * A tuple of two characters, like a pair of
+	 * opening and closing brackets.
+	 */ export type CharacterPair = [string, string];
+/**
 	 * Describes how comments for a language work.
 	 */ export interface CommentRule {
     /**
@@ -3342,6 +3724,24 @@ export interface SelectionRangeProvider {
     /**
 		 * If a line matches this pattern, then its indentation should not be changed and it should not be evaluated against the other rules.
 		 */ unIndentedLinePattern?: RegExp;
+}
+/**
+	 * Describes what to do with the indentation when pressing Enter.
+	 */ export enum IndentAction {
+    /**
+		 * Insert new line and copy the previous line's indentation.
+		 */ None = 0,
+    /**
+		 * Insert new line and indent once (relative to the previous line's indentation).
+		 */ Indent = 1,
+    /**
+		 * Insert two new lines:
+		 *  - the first one indented which will hold the cursor
+		 *  - the second one at the same indentation level
+		 */ IndentOutdent = 2,
+    /**
+		 * Insert new line and outdent once (relative to the previous line's indentation).
+		 */ Outdent = 3
 }
 /**
 	 * Describes what to do when pressing Enter.
@@ -3429,6 +3829,19 @@ export interface SelectionRangeProvider {
             notIn?: string[];
         }[];
     };
+}
+/**
+	 * The configuration target
+	 */ export enum ConfigurationTarget {
+    /**
+		 * Global configuration
+		*/ Global = 1,
+    /**
+		 * Workspace configuration
+		 */ Workspace = 2,
+    /**
+		 * Workspace folder configuration
+		 */ WorkspaceFolder = 3
 }
 /**
 	 * Represents the configuration. It is a merged view of
@@ -3615,6 +4028,23 @@ export interface SelectionRangeProvider {
 		 */ readonly uris: readonly Uri[];
 }
 /**
+	 * Represents the severity of diagnostics.
+	 */ export enum DiagnosticSeverity {
+    /**
+		 * Something not allowed by the rules of a language or other means.
+		 */ Error = 0,
+    /**
+		 * Something suspicious but allowed.
+		 */ Warning = 1,
+    /**
+		 * Something to inform about but not a problem.
+		 */ Information = 2,
+    /**
+		 * Something to hint to a better way of doing it, like proposing
+		 * a refactoring.
+		 */ Hint = 3
+}
+/**
 	 * Represents a related message and source code location for a diagnostic. This should be
 	 * used to point to code locations that cause or related to a diagnostics, e.g. when duplicating
 	 * a symbol in a scope.
@@ -3632,6 +4062,25 @@ export interface SelectionRangeProvider {
 		 * @param message The message.
 		 */ new(location: Location, message: string): DiagnosticRelatedInformation;
 };
+/**
+	 * Additional metadata about the type of a diagnostic.
+	 */ export enum DiagnosticTag {
+    /**
+		 * Unused or unnecessary code.
+		 *
+		 * Diagnostics with this tag are rendered faded out. The amount of fading
+		 * is controlled by the `"editorUnnecessaryCode.opacity"` theme color. For
+		 * example, `"editorUnnecessaryCode.opacity": "#000000c0"` will render the
+		 * code with 75% opacity. For high contrast themes, use the
+		 * `"editorUnnecessaryCode.border"` theme color to underline unnecessary code
+		 * instead of fading it out.
+		 */ Unnecessary = 1,
+    /**
+		 * Deprecated or obsolete code.
+		 *
+		 * Diagnostics with this tag are rendered with a strike through.
+		 */ Deprecated = 2
+}
 /**
 	 * Represents a diagnostic, such as a compiler error or warning. Diagnostic objects
 	 * are only valid in the scope of a file.
@@ -3742,6 +4191,13 @@ export interface SelectionRangeProvider {
 		 */ dispose(): void;
 }
 /**
+	 * Represents the severity of a language status item.
+	 */ export enum LanguageStatusSeverity {
+    Information = 0,
+    Warning = 1,
+    Error = 2
+}
+/**
 	 * A language status item is the preferred way to present language status reports for the active text editors,
 	 * such as selected linter or notifying about a configuration problem.
 	 */ export interface LanguageStatusItem {
@@ -3785,6 +4241,49 @@ export interface SelectionRangeProvider {
     /**
 		 * Dispose and free associated resources.
 		 */ dispose(): void;
+}
+/**
+	 * Denotes a location of an editor in the window. Editors can be arranged in a grid
+	 * and each column represents one editor location in that grid by counting the editors
+	 * in order of their appearance.
+	 */ export enum ViewColumn {
+    /**
+		 * A *symbolic* editor column representing the currently active column. This value
+		 * can be used when opening editors, but the *resolved* {@link TextEditor.viewColumn viewColumn}-value
+		 * of editors will always be `One`, `Two`, `Three`,... or `undefined` but never `Active`.
+		 */ Active = -1,
+    /**
+		 * A *symbolic* editor column representing the column to the side of the active one. This value
+		 * can be used when opening editors, but the *resolved* {@link TextEditor.viewColumn viewColumn}-value
+		 * of editors will always be `One`, `Two`, `Three`,... or `undefined` but never `Beside`.
+		 */ Beside = -2,
+    /**
+		 * The first editor column.
+		 */ One = 1,
+    /**
+		 * The second editor column.
+		 */ Two = 2,
+    /**
+		 * The third editor column.
+		 */ Three = 3,
+    /**
+		 * The fourth editor column.
+		 */ Four = 4,
+    /**
+		 * The fifth editor column.
+		 */ Five = 5,
+    /**
+		 * The sixth editor column.
+		 */ Six = 6,
+    /**
+		 * The seventh editor column.
+		 */ Seven = 7,
+    /**
+		 * The eighth editor column.
+		 */ Eight = 8,
+    /**
+		 * The ninth editor column.
+		 */ Nine = 9
 }
 /**
 	 * An output channel is a container for readonly textual information.
@@ -3894,6 +4393,16 @@ export interface SelectionRangeProvider {
 		 * If role is not specified the editor will pick the appropriate role automatically.
 		 * More about aria roles can be found here https://w3c.github.io/aria/#widget_roles
 		 */ readonly role?: string;
+}
+/**
+	 * Represents the alignment of status bar items.
+	 */ export enum StatusBarAlignment {
+    /**
+		 * Aligned to the left side.
+		 */ Left = 1,
+    /**
+		 * Aligned to the right side.
+		 */ Right = 2
 }
 /**
 	 * A status bar item is a status bar contribution that can
@@ -4024,6 +4533,16 @@ export interface SelectionRangeProvider {
     /**
 		 * Dispose and free associated resources.
 		 */ dispose(): void;
+}
+/**
+	 * The location of the terminal.
+	 */ export enum TerminalLocation {
+    /**
+		 * In the terminal view
+		 */ Panel = 1,
+    /**
+		 * In the editor area
+		 */ Editor = 2
 }
 /**
 	 * Assumes a {@link TerminalLocation} of editor and allows specifying a {@link ViewColumn} and
@@ -4188,6 +4707,17 @@ export interface SelectionRangeProvider {
 		 */ provideFileDecoration(uri: Uri, token: CancellationToken): ProviderResult<FileDecoration>;
 }
 /**
+	 * In a remote window the extension kind describes if an extension
+	 * runs where the UI (window) runs or if an extension runs remotely.
+	 */ export enum ExtensionKind {
+    /**
+		 * Extension runs where the UI runs.
+		 */ UI = 1,
+    /**
+		 * Extension runs where the remote extension host runs.
+		 */ Workspace = 2
+}
+/**
 	 * Represents an extension.
 	 *
 	 * To get an instance of an `Extension` use {@link extensions.getExtension getExtension}.
@@ -4224,6 +4754,23 @@ export interface SelectionRangeProvider {
 		 *
 		 * @return A promise that will resolve when this extension has been activated.
 		 */ activate(): Thenable<T>;
+}
+/**
+	 * The ExtensionMode is provided on the `ExtensionContext` and indicates the
+	 * mode the specific extension is running in.
+	 */ export enum ExtensionMode {
+    /**
+		 * The extension is installed normally (for example, from the marketplace
+		 * or VSIX) in the editor.
+		 */ Production = 1,
+    /**
+		 * The extension is running from an `--extensionDevelopmentPath` provided
+		 * when launching the editor.
+		 */ Development = 2,
+    /**
+		 * The extension is running from an `--extensionTestsPath` and
+		 * the extension host is running unit tests.
+		 */ Test = 3
 }
 /**
 	 * An extension context is a collection of utilities private to an
@@ -4415,11 +4962,47 @@ export interface SelectionRangeProvider {
 		 */ onDidChange: Event<SecretStorageChangeEvent>;
 }
 /**
+	 * Represents a color theme kind.
+	 */ export enum ColorThemeKind {
+    Light = 1,
+    Dark = 2,
+    HighContrast = 3,
+    HighContrastLight = 4
+}
+/**
 	 * Represents a color theme.
 	 */ export interface ColorTheme {
     /**
 		 * The kind of this color theme: light, dark, high contrast dark and high contrast light.
 		 */ readonly kind: ColorThemeKind;
+}
+/**
+	 * Controls the behaviour of the terminal's visibility.
+	 */ export enum TaskRevealKind {
+    /**
+		 * Always brings the terminal to front if the task is executed.
+		 */ Always = 1,
+    /**
+		 * Only brings the terminal to front if a problem is detected executing the task
+		 * (e.g. the task couldn't be started because).
+		 */ Silent = 2,
+    /**
+		 * The terminal never comes to front when the task is executed.
+		 */ Never = 3
+}
+/**
+	 * Controls how the task channel is used between tasks
+	 */ export enum TaskPanelKind {
+    /**
+		 * Shares a panel with other tasks. This is the default.
+		 */ Shared = 1,
+    /**
+		 * Uses a dedicated panel for this tasks. The panel is not
+		 * shared with other tasks.
+		 */ Dedicated = 2,
+    /**
+		 * Creates a new panel whenever this task is executed.
+		 */ New = 3
 }
 /**
 	 * Controls how the task is presented in the UI.
@@ -4576,6 +5159,29 @@ export interface SelectionRangeProvider {
     };
 }
 /**
+	 * Defines how an argument should be quoted if it contains
+	 * spaces or unsupported characters.
+	 */ export enum ShellQuoting {
+    /**
+		 * Character escaping should be used. This for example
+		 * uses \ on bash and ` on PowerShell.
+		 */ Escape = 1,
+    /**
+		 * Strong string quoting should be used. This for example
+		 * uses " for Windows cmd and ' for bash and PowerShell.
+		 * Strong quoting treats arguments as literal strings.
+		 * Under PowerShell echo 'The value is $(2 * 3)' will
+		 * print `The value is $(2 * 3)`
+		 */ Strong = 2,
+    /**
+		 * Weak string quoting should be used. This for example
+		 * uses " for Windows cmd, bash and PowerShell. Weak quoting
+		 * still performs some kind of evaluation inside the quoted
+		 * string.  Under PowerShell echo "The value is $(2 * 3)"
+		 * will print `The value is 6`
+		 */ Weak = 3
+}
+/**
 	 * A string that will be quoted depending on the used shell.
 	 */ export interface ShellQuotedString {
     /**
@@ -4629,6 +5235,16 @@ export type ShellExecution = {
 		 * were in the task definition will be resolved and passed into the callback as `resolvedDefinition`.
 		 */ new(callback: (resolvedDefinition: TaskDefinition) => Thenable<Pseudoterminal>): CustomExecution;
 };
+/**
+	 * The scope of a task.
+	 */ export enum TaskScope {
+    /**
+		 * The task is a global task. Global tasks are currently not supported.
+		 */ Global = 1,
+    /**
+		 * The task is a workspace task
+		 */ Workspace = 2
+}
 /**
 	 * Run options for a task.
 	 */ export interface RunOptions {
@@ -4777,6 +5393,34 @@ export interface TaskFilter {
 		 */ type?: string;
 }
 /**
+	 * Enumeration of file types. The types `File` and `Directory` can also be
+	 * a symbolic links, in that case use `FileType.File | FileType.SymbolicLink` and
+	 * `FileType.Directory | FileType.SymbolicLink`.
+	 */ export enum FileType {
+    /**
+		 * The file type is unknown.
+		 */ Unknown = 0,
+    /**
+		 * A regular file.
+		 */ File = 1,
+    /**
+		 * A directory.
+		 */ Directory = 2,
+    /**
+		 * A symbolic link to a file.
+		 */ SymbolicLink = 64
+}
+export enum FilePermission {
+    /**
+		 * The file is readonly.
+		 *
+		 * *Note:* All `FileStat` from a `FileSystemProvider` that is registered with
+		 * the option `isReadonly: true` will be implicitly handled as if `FilePermission.Readonly`
+		 * is set. As a consequence, it is not possible to have a readonly file system provider
+		 * registered where some `FileStat` are not readonly.
+		 */ Readonly = 1
+}
+/**
 	 * The `FileStat`-type represents metadata about a file
 	 */ export interface FileStat {
     /**
@@ -4826,6 +5470,19 @@ export interface TaskFilter {
 		 * or `Unknown` for unspecified errors.
 		 */ readonly code: string;
 };
+/**
+	 * Enumeration of file change types.
+	 */ export enum FileChangeType {
+    /**
+		 * The contents or metadata of a file have changed.
+		 */ Changed = 1,
+    /**
+		 * A file has been created.
+		 */ Created = 2,
+    /**
+		 * A file has been deleted.
+		 */ Deleted = 3
+}
 /**
 	 * The event filesystem providers must use to signal a file change.
 	 */ export interface FileChangeEvent {
@@ -5472,6 +6129,38 @@ export interface TaskFilter {
 		 */ writeText(value: string): Thenable<void>;
 }
 /**
+	 * Possible kinds of UI that can use extensions.
+	 */ export enum UIKind {
+    /**
+		 * Extensions are accessed from a desktop application.
+		 */ Desktop = 1,
+    /**
+		 * Extensions are accessed from a web browser.
+		 */ Web = 2
+}
+/**
+	 * Log levels
+	 */ export enum LogLevel {
+    /**
+		 * No messages are logged with this level.
+		 */ Off = 0,
+    /**
+		 * All messages are logged with this level.
+		 */ Trace = 1,
+    /**
+		 * Messages with debug and higher log level are logged with this level.
+		 */ Debug = 2,
+    /**
+		 * Messages with info and higher log level are logged with this level.
+		 */ Info = 3,
+    /**
+		 * Messages with warning and higher log level are logged with this level.
+		 */ Warning = 4,
+    /**
+		 * Only error messages are logged with this level.
+		 */ Error = 5
+}
+/**
 	 * Represents the state of a window.
 	 */ export interface WindowState {
     /**
@@ -5804,6 +6493,19 @@ export type TreeItem = {
 		 */ new(resourceUri: Uri, collapsibleState?: TreeItemCollapsibleState): TreeItem;
 };
 /**
+	 * Collapsible state of the tree item
+	 */ export enum TreeItemCollapsibleState {
+    /**
+		 * Determines an item can be neither collapsed nor expanded. Implies it has no children.
+		 */ None = 0,
+    /**
+		 * Determines an item is collapsed
+		 */ Collapsed = 1,
+    /**
+		 * Determines an item is expanded
+		 */ Expanded = 2
+}
+/**
 	 * Label describing the {@link TreeItem Tree item}
 	 */ export interface TreeItemLabel {
     /**
@@ -5927,6 +6629,38 @@ export type TreeItem = {
 		 */ readonly reason: TerminalExitReason;
 }
 /**
+	 * Terminal exit reason kind.
+	 */ export enum TerminalExitReason {
+    /**
+		 * Unknown reason.
+		 */ Unknown = 0,
+    /**
+		 * The window closed/reloaded.
+		 */ Shutdown = 1,
+    /**
+		 * The shell process exited.
+		 */ Process = 2,
+    /**
+		 * The user closed the terminal.
+		 */ User = 3,
+    /**
+		 * An extension disposed the terminal.
+		 */ Extension = 4
+}
+/**
+	 * A type of mutation that can be applied to an environment variable.
+	 */ export enum EnvironmentVariableMutatorType {
+    /**
+		 * Replace the variable's existing value.
+		 */ Replace = 1,
+    /**
+		 * Append to the end of the variable's existing value.
+		 */ Append = 2,
+    /**
+		 * Prepend to the start of the variable's existing value.
+		 */ Prepend = 3
+}
+/**
 	 * A type of mutation and its value to be applied to an environment variable.
 	 */ export interface EnvironmentVariableMutator {
     /**
@@ -5992,6 +6726,24 @@ export type TreeItem = {
     /**
 		 * Clears all mutators from this collection.
 		 */ clear(): void;
+}
+/**
+	 * A location in the editor at which progress information can be shown. It depends on the
+	 * location how progress is visually represented.
+	 */ export enum ProgressLocation {
+    /**
+		 * Show progress for the source control viewlet, as overlay for the icon and as progress bar
+		 * inside the viewlet (when visible). Neither supports cancellation nor discrete progress nor
+		 * a label to describe the operation.
+		 */ SourceControl = 1,
+    /**
+		 * Show progress in the status bar of the editor. Neither supports cancellation nor discrete progress.
+		 * Supports rendering of {@link ThemeIcon theme icons} via the `$(<name>)`-syntax in the progress label.
+		 */ Window = 10,
+    /**
+		 * Show progress as notification with an optional cancel button. Supports to show infinite and discrete
+		 * progress but does not support rendering of icons.
+		 */ Notification = 15
 }
 /**
 	 * Value-object describing where and how progress should show.
@@ -6235,6 +6987,10 @@ export type TreeItem = {
 		 * The new text for the range.
 		 */ readonly text: string;
 }
+export enum TextDocumentChangeReason {
+    /** The text change is caused by an undo operation. */ Undo = 1,
+    /** The text change is caused by an redo operation. */ Redo = 2
+}
 /**
 	 * An event describing a transactional {@link TextDocument document} change.
 	 */ export interface TextDocumentChangeEvent {
@@ -6248,6 +7004,20 @@ export type TreeItem = {
 		 * The reason why the document was changed.
 		 * Is `undefined` if the reason is not known.
 		*/ readonly reason: TextDocumentChangeReason | undefined;
+}
+/**
+	 * Represents reasons why a text document is saved.
+	 */ export enum TextDocumentSaveReason {
+    /**
+		 * Manually triggered, e.g. by the user pressing save, by starting debugging,
+		 * or by an API call.
+		 */ Manual = 1,
+    /**
+		 * Automatic after a delay.
+		 */ AfterDelay = 2,
+    /**
+		 * When the editor lost focus.
+		 */ FocusOut = 3
 }
 /**
 	 * An event that is fired when a {@link TextDocument document} will be saved.
@@ -6463,6 +7233,15 @@ export type TreeItem = {
 		 */ readonly index: number;
 }
 /**
+	 * The configuration scope which can be a
+	 * a 'resource' or a languageId or both or
+	 * a '{@link TextDocument}' or
+	 * a '{@link WorkspaceFolder}'
+	 */ export type ConfigurationScope = Uri | TextDocument | WorkspaceFolder | {
+    uri?: Uri;
+    languageId: string;
+};
+/**
 	 * An event describing the change in Configuration
 	 */ export interface ConfigurationChangeEvent {
     /**
@@ -6473,6 +7252,23 @@ export type TreeItem = {
 		 * @param scope A scope in which to check.
 		 * @return `true` if the given section has changed.
 		 */ affectsConfiguration(section: string, scope?: ConfigurationScope): boolean;
+}
+/**
+	 * Represents a notebook editor that is attached to a {@link NotebookDocument notebook}.
+	 */ export enum NotebookEditorRevealType {
+    /**
+		 * The range will be revealed with as little scrolling as possible.
+		 */ Default = 0,
+    /**
+		 * The range will always be revealed in the center of the viewport.
+		 */ InCenter = 1,
+    /**
+		 * If the range is outside the viewport, it will be revealed in the center of the viewport.
+		 * Otherwise, it will be revealed with as little scrolling as possible.
+		 */ InCenterIfOutsideViewport = 2,
+    /**
+		 * The range will always be revealed at the top of the viewport.
+		 */ AtTop = 3
 }
 /**
 	 * Represents a notebook editor that is attached to a {@link NotebookDocument notebook}.
@@ -6521,6 +7317,17 @@ export type TreeItem = {
 		 * @returns a boolean indicating whether the message was successfully
 		 * delivered to any renderer.
 		 */ postMessage(message: any, editor?: NotebookEditor): Thenable<boolean>;
+}
+/**
+	 * A notebook cell kind.
+	 */ export enum NotebookCellKind {
+    /**
+		 * A markup-cell is formatted source that is used for display.
+		 */ Markup = 1,
+    /**
+		 * A code-cell is source that can be {@link NotebookController executed} and that
+		 * produces {@link NotebookCellOutput output}.
+		 */ Code = 2
 }
 /**
 	 * Represents a cell of a {@link NotebookDocument notebook}, either a {@link NotebookCellKind.Code code}-cell
@@ -6869,6 +7676,18 @@ export type TreeItem = {
     };
 }
 /**
+	 * Notebook controller affinity for notebook documents.
+	 *
+	 * @see {@link NotebookController.updateNotebookAffinity}
+	 */ export enum NotebookControllerAffinity {
+    /**
+		 * Default affinity.
+		 */ Default = 1,
+    /**
+		 * A controller is preferred for a notebook.
+		 */ Preferred = 2
+}
+/**
 	 * A notebook controller represents an entity that can execute notebook cells. This is often referred to as a kernel.
 	 *
 	 * There can be multiple controllers and the editor will let users choose which controller to use for a certain notebook. The
@@ -7043,6 +7862,16 @@ export type TreeItem = {
 		 * @param output Output object that already exists.
 		 * @return A thenable that resolves when the operation finished.
 		 */ appendOutputItems(items: NotebookCellOutputItem | readonly NotebookCellOutputItem[], output: NotebookCellOutput): Thenable<void>;
+}
+/**
+	 * Represents the alignment of status bar items.
+	 */ export enum NotebookCellStatusBarAlignment {
+    /**
+		 * Aligned to the left side.
+		 */ Left = 1,
+    /**
+		 * Aligned to the right side.
+		 */ Right = 2
 }
 /**
 	 * A contribution to a cell's status bar
@@ -7442,6 +8271,7 @@ export type TreeItem = {
 		 * Create a descriptor for an inline implementation of a debug adapter.
 		 */ new(implementation: DebugAdapter): DebugAdapterInlineImplementation;
 };
+export type DebugAdapterDescriptor = DebugAdapterExecutable | DebugAdapterServer | DebugAdapterNamedPipeServer | DebugAdapterInlineImplementation;
 export interface DebugAdapterDescriptorFactory {
     /**
 		 * 'createDebugAdapterDescriptor' is called at the start of a debug session to provide details about the debug adapter to use.
@@ -7561,6 +8391,17 @@ export interface DebugAdapterTrackerFactory {
 		 */ new(functionName: string, enabled?: boolean, condition?: string, hitCondition?: string, logMessage?: string): FunctionBreakpoint;
 };
 /**
+	 * Debug console mode used by debug session, see {@link DebugSessionOptions options}.
+	 */ export enum DebugConsoleMode {
+    /**
+		 * Debug session should have a separate debug console.
+		 */ Separate = 0,
+    /**
+		 * Debug session should share debug console with its parent session.
+		 * This value has no effect for sessions which do not have a parent session.
+		 */ MergeWithParent = 1
+}
+/**
 	 * Options for {@link debug.startDebugging starting a debug session}.
 	 */ export interface DebugSessionOptions {
     /**
@@ -7598,6 +8439,45 @@ export interface DebugAdapterTrackerFactory {
     /**
 		 * When true, the debug viewlet will not be automatically revealed for this session.
 		 */ suppressDebugView?: boolean;
+}
+/**
+	 * A DebugConfigurationProviderTriggerKind specifies when the `provideDebugConfigurations` method of a `DebugConfigurationProvider` is triggered.
+	 * Currently there are two situations: to provide the initial debug configurations for a newly created launch.json or
+	 * to provide dynamically generated debug configurations when the user asks for them through the UI (e.g. via the "Select and Start Debugging" command).
+	 * A trigger kind is used when registering a `DebugConfigurationProvider` with {@link debug.registerDebugConfigurationProvider}.
+	 */ export enum DebugConfigurationProviderTriggerKind {
+    /**
+		 *	`DebugConfigurationProvider.provideDebugConfigurations` is called to provide the initial debug configurations for a newly created launch.json.
+		 */ Initial = 1,
+    /**
+		 * `DebugConfigurationProvider.provideDebugConfigurations` is called to provide dynamically generated debug configurations when the user asks for them through the UI (e.g. via the "Select and Start Debugging" command).
+		 */ Dynamic = 2
+}
+/**
+	 * Collapsible state of a {@link CommentThread comment thread}
+	 */ export enum CommentThreadCollapsibleState {
+    /**
+		 * Determines an item is collapsed
+		 */ Collapsed = 0,
+    /**
+		 * Determines an item is expanded
+		 */ Expanded = 1
+}
+/**
+	 * Comment mode of a {@link Comment}
+	 */ export enum CommentMode {
+    /**
+		 * Displays the comment editor
+		 */ Editing = 0,
+    /**
+		 * Displays the preview of the comment
+		 */ Preview = 1
+}
+/**
+	 * The state of a comment thread.
+	 */ export enum CommentThreadState {
+    Unresolved = 0,
+    Resolved = 1
 }
 /**
 	 * A collection of {@link Comment comments} representing a conversation at a particular range in a document.
@@ -7932,6 +8812,13 @@ export interface DebugAdapterTrackerFactory {
 		 * If a session cannot be removed, the provider should reject with an error message.
 		 * @param sessionId The id of the session to remove.
 		 */ removeSession(sessionId: string): Thenable<void>;
+}
+/**
+	 * The kind of executions that {@link TestRunProfile TestRunProfiles} control.
+	 */ export enum TestRunProfileKind {
+    Run = 1,
+    Debug = 2,
+    Coverage = 3
 }
 /**
 	 * Tags can be associated with {@link TestItem TestItems} and

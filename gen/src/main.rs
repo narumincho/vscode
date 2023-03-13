@@ -258,6 +258,18 @@ fn module_item_transform(module_item: &ResultDeclWithSpan) -> Option<swc_ecma_as
                 decl: swc_ecma_ast::Decl::TsInterface(Box::new(interface.clone())),
             }),
         )),
+        ResultDecl::TsTypeAlias(alias) => Some(swc_ecma_ast::ModuleItem::ModuleDecl(
+            swc_ecma_ast::ModuleDecl::ExportDecl(swc_ecma_ast::ExportDecl {
+                span: module_item.span,
+                decl: swc_ecma_ast::Decl::TsTypeAlias(Box::new(alias.clone())),
+            }),
+        )),
+        ResultDecl::TsEnum(enum_decl) => Some(swc_ecma_ast::ModuleItem::ModuleDecl(
+            swc_ecma_ast::ModuleDecl::ExportDecl(swc_ecma_ast::ExportDecl {
+                span: module_item.span,
+                decl: swc_ecma_ast::Decl::TsEnum(Box::new(enum_decl.clone())),
+            }),
+        )),
         _ => None,
     }
 }
