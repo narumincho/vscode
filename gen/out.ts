@@ -1,8 +1,12 @@
-/*サンプルコメント*/ export function requireVsCode() {}
 /*import VS Code API
 ```ts
- require("vscode")
-```*/ export type requireVsCode = "aa";
+require("vscode")
+```
+*/ export function requireVsCode(): VSCodeApi | undefined {}
+/**
+ * Type Definition for Visual Studio Code 1.75 Extension API
+ * See https://code.visualstudio.com/api for more information
+ */ export type requireVsCode = "aa";
 /**
 	 * Represents a reference to a command. Provides a title which
 	 * will be used to represent a command in the UI and, optionally,
