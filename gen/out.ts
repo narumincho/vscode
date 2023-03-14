@@ -215,7 +215,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param value The string value of an Uri.
 		 * @param strict Throw an error when `value` is empty or when no `scheme` can be parsed.
 		 * @return A new Uri instance.
-		 */ readonlyparse(value: string, strict?: boolean);
+		 */ parse(value: string, strict?: boolean): Uri;
         /**
 		 * Create an URI from a file system path. The {@link Uri.scheme scheme}
 		 * will be `file`.
@@ -238,7 +238,7 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * @param path A file system or UNC path.
 		 * @return A new Uri instance.
-		 */ readonlyfile(path: string);
+		 */ file(path: string): Uri;
         /**
 		 * Create a new uri which path is the result of joining
 		 * the path of the base uri with the provided path segments.
@@ -258,20 +258,20 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param base An uri. Must have a path.
 		 * @param pathSegments One more more path fragments
 		 * @returns A new uri which path is joined with the given fragments
-		 */ readonlyjoinPath(base: Uri, ...pathSegments: string[]);
+		 */ joinPath(base: Uri, ...pathSegments: string[]): Uri;
         /**
 		 * Create an URI from its component parts
 		 *
 		 * @see {@link Uri.toString}
 		 * @param components The component parts of an Uri.
 		 * @return A new Uri instance.
-		 */ readonlyfrom(components: {
+		 */ from(components: {
             readonly scheme: string;
             readonly authority?: string;
             readonly path?: string;
             readonly query?: string;
             readonly fragment?: string;
-        });
+        }): Uri;
         /**
 		 * Use the `file` and `parse` factory functions to create new `Uri` objects.
 		 */ new(scheme: string, authority: string, path: string, query: string, fragment: string): Uri;
@@ -303,9 +303,9 @@ Returns VSCodeApi only within the vscode extension.
 		 * dispose-functions aren't awaited.
 		 * @return Returns a new disposable which, upon dispose, will
 		 * dispose all provided disposables.
-		 */ readonlyfrom(...disposableLikes: {
+		 */ from(...disposableLikes: {
             dispose: () => any;
-        }[]);
+        }[]): Disposable;
         /**
 		 * Creates a new disposable that calls the provided function
 		 * on dispose.
@@ -684,26 +684,26 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param range A range.
 		 * @param newText A string.
 		 * @return A new text edit object.
-		 */ readonlyreplace(range: Range, newText: string);
+		 */ replace(range: Range, newText: string): TextEdit;
         /**
 		 * Utility to create an insert edit.
 		 *
 		 * @param position A position, will become an empty range.
 		 * @param newText A string.
 		 * @return A new text edit object.
-		 */ readonlyinsert(position: Position, newText: string);
+		 */ insert(position: Position, newText: string): TextEdit;
         /**
 		 * Utility to create a delete edit.
 		 *
 		 * @param range A range.
 		 * @return A new text edit object.
-		 */ readonlydelete(range: Range);
+		 */ delete(range: Range): TextEdit;
         /**
 		 * Utility to create an eol-edit.
 		 *
 		 * @param eol An eol-sequence
 		 * @return A new text edit object.
-		 */ readonlysetEndOfLine(eol: EndOfLine);
+		 */ setEndOfLine(eol: EndOfLine): TextEdit;
         /**
 		 * Create a new TextEdit.
 		 *
@@ -726,14 +726,14 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param range A range.
 		 * @param snippet A snippet string.
 		 * @return A new snippet edit object.
-		 */ readonlyreplace(range: Range, snippet: SnippetString);
+		 */ replace(range: Range, snippet: SnippetString): SnippetTextEdit;
         /**
 		 * Utility to create an insert snippet edit.
 		 *
 		 * @param position A position, will become an empty range.
 		 * @param snippet A snippet string.
 		 * @return A new snippet edit object.
-		 */ readonlyinsert(position: Position, snippet: SnippetString);
+		 */ insert(position: Position, snippet: SnippetString): SnippetTextEdit;
         /**
 		 * Create a new snippet edit.
 		 *
@@ -749,33 +749,33 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * @param range The range of cells to replace
 		 * @param newCells The new notebook cells.
-		 */ readonlyreplaceCells(range: NotebookRange, newCells: NotebookCellData[]);
+		 */ replaceCells(range: NotebookRange, newCells: NotebookCellData[]): NotebookEdit;
         /**
 		 * Utility to create an edit that replaces cells in a notebook.
 		 *
 		 * @param index The index to insert cells at.
 		 * @param newCells The new notebook cells.
-		 */ readonlyinsertCells(index: number, newCells: NotebookCellData[]);
+		 */ insertCells(index: number, newCells: NotebookCellData[]): NotebookEdit;
         /**
 		 * Utility to create an edit that deletes cells in a notebook.
 		 *
 		 * @param range The range of cells to delete.
-		 */ readonlydeleteCells(range: NotebookRange);
+		 */ deleteCells(range: NotebookRange): NotebookEdit;
         /**
 		 * Utility to create an edit that update a cell's metadata.
 		 *
 		 * @param index The index of the cell to update.
 		 * @param newCellMetadata The new metadata for the cell.
-		 */ readonlyupdateCellMetadata(index: number, newCellMetadata: {
+		 */ updateCellMetadata(index: number, newCellMetadata: {
             [key: string]: any;
-        });
+        }): NotebookEdit;
         /**
 		 * Utility to create an edit that updates the notebook's metadata.
 		 *
 		 * @param newNotebookMetadata The new metadata for the notebook.
-		 */ readonlyupdateNotebookMetadata(newNotebookMetadata: {
+		 */ updateNotebookMetadata(newNotebookMetadata: {
             [key: string]: any;
-        });
+        }): NotebookEdit;
         new(range: NotebookRange, newCells: NotebookCellData[]): NotebookEdit;
     };
     /**
@@ -1604,29 +1604,29 @@ Returns VSCodeApi only within the vscode extension.
         /**
 		 * Create an error to signal that a file or folder wasn't found.
 		 * @param messageOrUri Message or uri.
-		 */ readonlyFileNotFound(messageOrUri?: string | Uri);
+		 */ FileNotFound(messageOrUri?: string | Uri): FileSystemError;
         /**
 		 * Create an error to signal that a file or folder already exists, e.g. when
 		 * creating but not overwriting a file.
 		 * @param messageOrUri Message or uri.
-		 */ readonlyFileExists(messageOrUri?: string | Uri);
+		 */ FileExists(messageOrUri?: string | Uri): FileSystemError;
         /**
 		 * Create an error to signal that a file is not a folder.
 		 * @param messageOrUri Message or uri.
-		 */ readonlyFileNotADirectory(messageOrUri?: string | Uri);
+		 */ FileNotADirectory(messageOrUri?: string | Uri): FileSystemError;
         /**
 		 * Create an error to signal that a file is a folder.
 		 * @param messageOrUri Message or uri.
-		 */ readonlyFileIsADirectory(messageOrUri?: string | Uri);
+		 */ FileIsADirectory(messageOrUri?: string | Uri): FileSystemError;
         /**
 		 * Create an error to signal that an operation lacks required permissions.
 		 * @param messageOrUri Message or uri.
-		 */ readonlyNoPermissions(messageOrUri?: string | Uri);
+		 */ NoPermissions(messageOrUri?: string | Uri): FileSystemError;
         /**
 		 * Create an error to signal that the file system is unavailable or too busy to
 		 * complete a request.
 		 * @param messageOrUri Message or uri.
-		 */ readonlyUnavailable(messageOrUri?: string | Uri);
+		 */ Unavailable(messageOrUri?: string | Uri): FileSystemError;
         /**
 		 * Creates a new filesystem error.
 		 *
@@ -1848,7 +1848,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param value A string.
 		 * @param mime Optional MIME type, defaults to `text/plain`.
 		 * @returns A new output item object.
-		 */ readonlytext(value: string, mime?: string);
+		 */ text(value: string, mime?: string): NotebookCellOutputItem;
         /**
 		 * Factory function to create a `NotebookCellOutputItem` from
 		 * a JSON object.
@@ -1860,28 +1860,28 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param value A JSON-stringifyable value.
 		 * @param mime Optional MIME type, defaults to `application/json`
 		 * @returns A new output item object.
-		 */ readonlyjson(value: any, mime?: string);
+		 */ json(value: any, mime?: string): NotebookCellOutputItem;
         /**
 		 * Factory function to create a `NotebookCellOutputItem` that uses
 		 * uses the `application/vnd.code.notebook.stdout` mime type.
 		 *
 		 * @param value A string.
 		 * @returns A new output item object.
-		 */ readonlystdout(value: string);
+		 */ stdout(value: string): NotebookCellOutputItem;
         /**
 		 * Factory function to create a `NotebookCellOutputItem` that uses
 		 * uses the `application/vnd.code.notebook.stderr` mime type.
 		 *
 		 * @param value A string.
 		 * @returns A new output item object.
-		 */ readonlystderr(value: string);
+		 */ stderr(value: string): NotebookCellOutputItem;
         /**
 		 * Factory function to create a `NotebookCellOutputItem` that uses
 		 * uses the `application/vnd.code.notebook.error` mime type.
 		 *
 		 * @param value An error object.
 		 * @returns A new output item object.
-		 */ readonlyerror(value: Error);
+		 */ error(value: Error): NotebookCellOutputItem;
         /**
 		 * Create a new notebook cell output item.
 		 *
@@ -2103,7 +2103,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param message Message to display to the user.
 		 * @param expected Expected output.
 		 * @param actual Actual output.
-		 */ readonlydiff(message: string | MarkdownString, expected: string, actual: string);
+		 */ diff(message: string | MarkdownString, expected: string, actual: string): TestMessage;
         /**
 		 * Creates a new TestMessage instance.
 		 * @param message The message to show to the user.

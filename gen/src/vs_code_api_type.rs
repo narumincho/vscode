@@ -136,7 +136,7 @@ fn class_member_to_ts_type_element(
                 Some(swc_ecma_ast::TsTypeElement::TsMethodSignature(
                     swc_ecma_ast::TsMethodSignature {
                         span: method.span,
-                        readonly: true,
+                        readonly: false,
                         key: Box::new(crate::fn_to_type::prop_name_to_expr(&method.key)),
                         computed: false,
                         optional: method.is_optional,
@@ -146,8 +146,8 @@ fn class_member_to_ts_type_element(
                             .iter()
                             .map(|p| crate::fn_to_type::param_to_ts_fn_param(&p.pat))
                             .collect(),
-                        type_ann: None,
-                        type_params: None,
+                        type_ann: method.function.return_type.clone(),
+                        type_params: method.function.type_params.clone(),
                     },
                 ))
             } else {
