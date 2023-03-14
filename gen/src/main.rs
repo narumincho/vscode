@@ -95,12 +95,13 @@ pub enum Error {
     FirstModuleBodyNotFound,
 }
 
-fn value_of_ident() -> swc_ecma_ast::Ident {
-    swc_ecma_ast::Ident::new(
-        string_cache::Atom::from("ValueOf"),
-        swc_common::Span::default(),
-    )
-}
+const VALUE_OF_IDENT: once_cell::sync::Lazy<swc_ecma_ast::Ident> =
+    once_cell::sync::Lazy::new(|| {
+        swc_ecma_ast::Ident::new(
+            string_cache::Atom::from("ValueOf"),
+            swc_common::Span::default(),
+        )
+    });
 
 fn value_of_type() -> swc_ecma_ast::ModuleItem {
     let t_ident =
@@ -115,7 +116,7 @@ fn value_of_type() -> swc_ecma_ast::ModuleItem {
         Box::new(swc_ecma_ast::TsTypeAliasDecl {
             span: swc_common::Span::default(),
             declare: false,
-            id: value_of_ident(),
+            id: (*VALUE_OF_IDENT).clone(),
             type_params: Some(Box::new(swc_ecma_ast::TsTypeParamDecl {
                 span: swc_common::Span::default(),
                 params: vec![swc_ecma_ast::TsTypeParam {
@@ -266,7 +267,7 @@ fn module_item_transform(
                     type_params: None,
                     type_ann: Box::new(swc_ecma_ast::TsType::TsTypeRef(swc_ecma_ast::TsTypeRef {
                         span: swc_common::Span::default(),
-                        type_name: swc_ecma_ast::TsEntityName::Ident(value_of_ident()),
+                        type_name: swc_ecma_ast::TsEntityName::Ident((*VALUE_OF_IDENT).clone()),
                         type_params: Some(Box::new(swc_ecma_ast::TsTypeParamInstantiation {
                             span: swc_common::Span::default(),
                             params: vec![Box::new(swc_ecma_ast::TsType::TsIndexedAccessType(
@@ -277,7 +278,7 @@ fn module_item_transform(
                                         swc_ecma_ast::TsTypeRef {
                                             span: swc_common::Span::default(),
                                             type_name: swc_ecma_ast::TsEntityName::Ident(
-                                                ident::vs_code_api_ident(),
+                                                (*ident::VS_CODE_API_IDENT).clone(),
                                             ),
                                             type_params: None,
                                         },

@@ -55,7 +55,7 @@ fn func() -> swc_ecma_ast::Function {
                         Box::new(swc_ecma_ast::TsType::TsTypeRef(swc_ecma_ast::TsTypeRef {
                             span: swc_common::Span::default(),
                             type_name: swc_ecma_ast::TsEntityName::Ident(
-                                crate::ident::vs_code_api_ident(),
+                                (*crate::ident::VS_CODE_API_IDENT).clone(),
                             ),
                             type_params: None,
                         })),
@@ -235,7 +235,7 @@ fn require_function_type() -> swc_ecma_ast::TsType {
                                         swc_ecma_ast::TsTypeRef {
                                             span: swc_common::Span::default(),
                                             type_name: swc_ecma_ast::TsEntityName::Ident(
-                                                crate::ident::vs_code_api_ident(),
+                                                (*crate::ident::VS_CODE_API_IDENT).clone(),
                                             ),
                                             type_params: None,
                                         },

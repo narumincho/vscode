@@ -24,7 +24,7 @@ pub fn module_item(
                 span
             },
             decl: swc_ecma_ast::Decl::TsTypeAlias(Box::new(swc_ecma_ast::TsTypeAliasDecl {
-                id: crate::ident::vs_code_api_ident(),
+                id: (*crate::ident::VS_CODE_API_IDENT).clone(),
                 declare: false,
                 span: swc_common::Span::default(),
                 type_ann: Box::new(swc_ecma_ast::TsType::TsTypeLit(swc_ecma_ast::TsTypeLit {

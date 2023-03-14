@@ -9,27 +9,27 @@ pub fn pick_module_item(
                 swc_ecma_ast::ModuleDecl::Import(_) => vec![],
                 swc_ecma_ast::ModuleDecl::ExportDecl(export_decl) => match &export_decl.decl {
                     swc_ecma_ast::Decl::Class(decl) => vec![ResultDeclWithComments {
-                        comments: get_comment_in_span(comments, &export_decl.span),
+                        comments: comments.get_leading(export_decl.span.lo),
                         decl: ResultDecl::Class(decl.clone()),
                     }],
                     swc_ecma_ast::Decl::Fn(decl) => vec![ResultDeclWithComments {
-                        comments: get_comment_in_span(comments, &export_decl.span),
+                        comments: comments.get_leading(export_decl.span.lo),
                         decl: ResultDecl::Fn(decl.clone()),
                     }],
                     swc_ecma_ast::Decl::Var(decl) => vec![ResultDeclWithComments {
-                        comments: get_comment_in_span(comments, &export_decl.span),
+                        comments: comments.get_leading(export_decl.span.lo),
                         decl: ResultDecl::Var(*decl.clone()),
                     }],
                     swc_ecma_ast::Decl::TsInterface(decl) => vec![ResultDeclWithComments {
-                        comments: get_comment_in_span(comments, &export_decl.span),
+                        comments: comments.get_leading(export_decl.span.lo),
                         decl: ResultDecl::TsInterface(*decl.clone()),
                     }],
                     swc_ecma_ast::Decl::TsTypeAlias(decl) => vec![ResultDeclWithComments {
-                        comments: get_comment_in_span(comments, &export_decl.span),
+                        comments: comments.get_leading(export_decl.span.lo),
                         decl: ResultDecl::TsTypeAlias(*decl.clone()),
                     }],
                     swc_ecma_ast::Decl::TsEnum(decl) => vec![ResultDeclWithComments {
-                        comments: get_comment_in_span(comments, &export_decl.span),
+                        comments: comments.get_leading(export_decl.span.lo),
                         decl: ResultDecl::TsEnum(*decl.clone()),
                     }],
                     swc_ecma_ast::Decl::TsModule(ts_module) => {
@@ -79,27 +79,27 @@ fn statement_to_result_decl_vec(
         swc_ecma_ast::Stmt::ForOf(_) => vec![],
         swc_ecma_ast::Stmt::Decl(decl) => match decl {
             swc_ecma_ast::Decl::Class(decl) => vec![ResultDeclWithComments {
-                comments: get_comment_in_span(comments, &decl.class.span),
+                comments: comments.get_leading(decl.class.span.lo),
                 decl: ResultDecl::Class(decl.clone()),
             }],
             swc_ecma_ast::Decl::Fn(decl) => vec![ResultDeclWithComments {
-                comments: get_comment_in_span(comments, &decl.function.span),
+                comments: comments.get_leading(decl.function.span.lo),
                 decl: ResultDecl::Fn(decl.clone()),
             }],
             swc_ecma_ast::Decl::Var(decl) => vec![ResultDeclWithComments {
-                comments: get_comment_in_span(comments, &decl.span),
+                comments: comments.get_leading(decl.span.lo),
                 decl: ResultDecl::Var(*decl.clone()),
             }],
             swc_ecma_ast::Decl::TsInterface(decl) => vec![ResultDeclWithComments {
-                comments: get_comment_in_span(comments, &decl.span),
+                comments: comments.get_leading(decl.span.lo),
                 decl: ResultDecl::TsInterface(*decl.clone()),
             }],
             swc_ecma_ast::Decl::TsTypeAlias(decl) => vec![ResultDeclWithComments {
-                comments: get_comment_in_span(comments, &decl.span),
+                comments: comments.get_leading(decl.span.lo),
                 decl: ResultDecl::TsTypeAlias(*decl.clone()),
             }],
             swc_ecma_ast::Decl::TsEnum(decl) => vec![ResultDeclWithComments {
-                comments: get_comment_in_span(comments, &decl.span),
+                comments: comments.get_leading(decl.span.lo),
                 decl: ResultDecl::TsEnum(*decl.clone()),
             }],
             swc_ecma_ast::Decl::TsModule(module_decl) => {
@@ -137,11 +137,4 @@ pub enum ResultDecl {
     TsInterface(swc_ecma_ast::TsInterfaceDecl),
     TsTypeAlias(swc_ecma_ast::TsTypeAliasDecl),
     TsEnum(swc_ecma_ast::TsEnumDecl),
-}
-
-fn get_comment_in_span(
-    comments: &dyn swc_common::comments::Comments,
-    span: &swc_common::Span,
-) -> Option<Vec<swc_common::comments::Comment>> {
-    comments.get_leading(span.lo)
 }
