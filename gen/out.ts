@@ -2177,6 +2177,7 @@ Returns VSCodeApi only within the vscode extension.
         new(value: T): TelemetryTrustedValue;
     };
 };
+type ValueOf<T> = T[keyof T];
 /**
 	 * Represents a reference to a command. Provides a title which
 	 * will be used to represent a command in the UI and, optionally,
@@ -2381,11 +2382,7 @@ export type Selection = Range & {
 		 * A selection is reversed if its {@link Selection.anchor anchor} is the {@link Selection.end end} position.
 		 */ isReversed: boolean;
 };
-export enum TextEditorSelectionChangeKind {
-    Keyboard = 1,
-    Mouse = 2,
-    Command = 3
-}
+export type TextEditorSelectionChangeKind = ValueOf<VSCodeAPI["TextEditorSelectionChangeKind"]>;
 /**
 	 * Represents an event describing the change in a {@link TextEditor.selections text editor's selections}.
 	 */ export interface TextEditorSelectionChangeEvent {
@@ -2430,19 +2427,8 @@ export enum TextEditorSelectionChangeKind {
 		 * The new value for the {@link TextEditor.viewColumn text editor's view column}.
 		 */ readonly viewColumn: ViewColumn;
 }
-export enum TextEditorCursorStyle {
-    Line = 1,
-    Block = 2,
-    Underline = 3,
-    LineThin = 4,
-    BlockOutline = 5,
-    UnderlineThin = 6
-}
-export enum TextEditorLineNumbersStyle {
-    Off = 0,
-    On = 1,
-    Relative = 2
-}
+export type TextEditorCursorStyle = ValueOf<VSCodeAPI["TextEditorCursorStyle"]>;
+export type TextEditorLineNumbersStyle = ValueOf<VSCodeAPI["TextEditorLineNumbersStyle"]>;
 /**
 	 * Represents a {@link TextEditor text editor}'s {@link TextEditor.options options}.
 	 */ export interface TextEditorOptions {
@@ -2484,24 +2470,9 @@ export enum TextEditorLineNumbersStyle {
 		 * Remove this decoration type and all decorations on all text editors using it.
 		 */ dispose(): void;
 }
-export enum TextEditorRevealType {
-    Default = 0,
-    InCenter = 1,
-    InCenterIfOutsideViewport = 2,
-    AtTop = 3
-}
-export enum OverviewRulerLane {
-    Left = 1,
-    Center = 2,
-    Right = 4,
-    Full = 7
-}
-export enum DecorationRangeBehavior {
-    OpenOpen = 0,
-    ClosedClosed = 1,
-    OpenClosed = 2,
-    ClosedOpen = 3
-}
+export type TextEditorRevealType = ValueOf<VSCodeAPI["TextEditorRevealType"]>;
+export type OverviewRulerLane = ValueOf<VSCodeAPI["OverviewRulerLane"]>;
+export type DecorationRangeBehavior = ValueOf<VSCodeAPI["DecorationRangeBehavior"]>;
 /**
 	 * Represents options to configure the behavior of showing a {@link TextDocument document} in an {@link TextEditor editor}.
 	 */ export interface TextDocumentShowOptions {
@@ -2835,10 +2806,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * This method shows unexpected behavior and will be removed in the next major update.
 		 */ hide(): void;
 }
-export enum EndOfLine {
-    LF = 1,
-    CRLF = 2
-}
+export type EndOfLine = ValueOf<VSCodeAPI["EndOfLine"]>;
 /**
 	 * A complex edit that will be applied in one transaction on a TextEditor.
 	 * This holds a description of the edits and if the edits are valid (i.e. no overlapping regions, document was not changed in the meantime, etc.)
@@ -3013,10 +2981,7 @@ export type EventEmitter = {
 		 * @return A string or a thenable that resolves to such.
 		 */ provideTextDocumentContent(uri: Uri, token: CancellationToken): ProviderResult<string>;
 }
-export enum QuickPickItemKind {
-    Separator = -1,
-    Default = 0
-}
+export type QuickPickItemKind = ValueOf<VSCodeAPI["QuickPickItemKind"]>;
 /**
 	 * Represents an item that can be selected from
 	 * a list of items.
@@ -3207,11 +3172,7 @@ export enum QuickPickItemKind {
 		 * is only shown for {@link MessageOptions.modal modal} messages.
 		 */ detail?: string;
 }
-export enum InputBoxValidationSeverity {
-    Info = 1,
-    Warning = 2,
-    Error = 3
-}
+export type InputBoxValidationSeverity = ValueOf<VSCodeAPI["InputBoxValidationSeverity"]>;
 /**
 	 * Object to configure the behavior of the validation message.
 	 */ export interface InputBoxValidationMessage {
@@ -3381,10 +3342,7 @@ export type CodeActionKind = {
 		 * String value of the kind, e.g. `"refactor.extract.function"`.
 		 */ readonly value: string;
 };
-export enum CodeActionTriggerKind {
-    Invoke = 1,
-    Automatic = 2
-}
+export type CodeActionTriggerKind = ValueOf<VSCodeAPI["CodeActionTriggerKind"]>;
 /**
 	 * Contains additional diagnostic information about the context in which
 	 * a {@link CodeActionProvider.provideCodeActions code action} is run.
@@ -3825,11 +3783,7 @@ export type InlineValueEvaluatableExpression = {
 		 * signaled by returning `undefined` or `null`.
 		 */ provideInlineValues(document: TextDocument, viewPort: Range, context: InlineValueContext, token: CancellationToken): ProviderResult<InlineValue[]>;
 }
-export enum DocumentHighlightKind {
-    Text = 0,
-    Read = 1,
-    Write = 2
-}
+export type DocumentHighlightKind = ValueOf<VSCodeAPI["DocumentHighlightKind"]>;
 export type DocumentHighlight = {
     /**
 		 * The range this highlight applies to.
@@ -3853,37 +3807,8 @@ export type DocumentHighlight = {
 		 * signaled by returning `undefined`, `null`, or an empty array.
 		 */ provideDocumentHighlights(document: TextDocument, position: Position, token: CancellationToken): ProviderResult<DocumentHighlight[]>;
 }
-export enum SymbolKind {
-    File = 0,
-    Module = 1,
-    Namespace = 2,
-    Package = 3,
-    Class = 4,
-    Method = 5,
-    Property = 6,
-    Field = 7,
-    Constructor = 8,
-    Enum = 9,
-    Interface = 10,
-    Function = 11,
-    Variable = 12,
-    Constant = 13,
-    String = 14,
-    Number = 15,
-    Boolean = 16,
-    Array = 17,
-    Object = 18,
-    Key = 19,
-    Null = 20,
-    EnumMember = 21,
-    Struct = 22,
-    Event = 23,
-    Operator = 24,
-    TypeParameter = 25
-}
-export enum SymbolTag {
-    Deprecated = 1
-}
+export type SymbolKind = ValueOf<VSCodeAPI["SymbolKind"]>;
+export type SymbolTag = ValueOf<VSCodeAPI["SymbolTag"]>;
 export type SymbolInformation = {
     /**
 		 * The name of this symbol.
@@ -4367,11 +4292,7 @@ export type SignatureHelp = {
 		 * The active parameter of the active signature.
 		 */ activeParameter: number;
 };
-export enum SignatureHelpTriggerKind {
-    Invoke = 1,
-    TriggerCharacter = 2,
-    ContentChange = 3
-}
+export type SignatureHelpTriggerKind = ValueOf<VSCodeAPI["SignatureHelpTriggerKind"]>;
 /**
 	 * Additional information about the context in which a
 	 * {@linkcode SignatureHelpProvider.provideSignatureHelp SignatureHelpProvider} was triggered.
@@ -4444,38 +4365,8 @@ export enum SignatureHelpTriggerKind {
 		 * for fully qualified names or file path.
 		 */ description?: string;
 }
-export enum CompletionItemKind {
-    Text = 0,
-    Method = 1,
-    Function = 2,
-    Constructor = 3,
-    Field = 4,
-    Variable = 5,
-    Class = 6,
-    Interface = 7,
-    Module = 8,
-    Property = 9,
-    Unit = 10,
-    Value = 11,
-    Enum = 12,
-    Keyword = 13,
-    Snippet = 14,
-    Color = 15,
-    Reference = 17,
-    File = 16,
-    Folder = 18,
-    EnumMember = 19,
-    Constant = 20,
-    Struct = 21,
-    Event = 22,
-    Operator = 23,
-    TypeParameter = 24,
-    User = 25,
-    Issue = 26
-}
-export enum CompletionItemTag {
-    Deprecated = 1
-}
+export type CompletionItemKind = ValueOf<VSCodeAPI["CompletionItemKind"]>;
+export type CompletionItemTag = ValueOf<VSCodeAPI["CompletionItemTag"]>;
 export type CompletionItem = {
     /**
 		 * The label of this completion item. By default
@@ -4580,11 +4471,7 @@ export type CompletionList = {
 		 * The completion items.
 		 */ items: T[];
 };
-export enum CompletionTriggerKind {
-    Invoke = 0,
-    TriggerCharacter = 1,
-    TriggerForIncompleteCompletions = 2
-}
+export type CompletionTriggerKind = ValueOf<VSCodeAPI["CompletionTriggerKind"]>;
 /**
 	 * Contains additional information about the context in which
 	 * {@link CompletionItemProvider.provideCompletionItems completion provider} is triggered.
@@ -4696,10 +4583,7 @@ export type InlineCompletionList = {
 		 * The text the range will be replaced with if this completion is accepted.
 		 */ readonly text: string;
 }
-export enum InlineCompletionTriggerKind {
-    Invoke = 0,
-    Automatic = 1
-}
+export type InlineCompletionTriggerKind = ValueOf<VSCodeAPI["InlineCompletionTriggerKind"]>;
 export type InlineCompletionItem = {
     /**
 		 * The text to replace the range with. Must be set.
@@ -4822,10 +4706,7 @@ export type ColorPresentation = {
         readonly range: Range;
     }, token: CancellationToken): ProviderResult<ColorPresentation[]>;
 }
-export enum InlayHintKind {
-    Type = 1,
-    Parameter = 2
-}
+export type InlayHintKind = ValueOf<VSCodeAPI["InlayHintKind"]>;
 export type InlayHintLabelPart = {
     /**
 		 * The value of this label part.
@@ -4942,11 +4823,7 @@ export type FoldingRange = {
 		 * If not set, the range is originated from a syntax element.
 		 */ kind?: FoldingRangeKind;
 };
-export enum FoldingRangeKind {
-    Comment = 1,
-    Imports = 2,
-    Region = 3
-}
+export type FoldingRangeKind = ValueOf<VSCodeAPI["FoldingRangeKind"]>;
 /**
 	 * Folding context (for future use)
 	 */ export interface FoldingContext {
@@ -5213,12 +5090,7 @@ export type DocumentDropEdit = {
 		 * If a line matches this pattern, then its indentation should not be changed and it should not be evaluated against the other rules.
 		 */ unIndentedLinePattern?: RegExp;
 }
-export enum IndentAction {
-    None = 0,
-    Indent = 1,
-    IndentOutdent = 2,
-    Outdent = 3
-}
+export type IndentAction = ValueOf<VSCodeAPI["IndentAction"]>;
 /**
 	 * Describes what to do when pressing Enter.
 	 */ export interface EnterAction {
@@ -5306,11 +5178,7 @@ export enum IndentAction {
         }[];
     };
 }
-export enum ConfigurationTarget {
-    Global = 1,
-    Workspace = 2,
-    WorkspaceFolder = 3
-}
+export type ConfigurationTarget = ValueOf<VSCodeAPI["ConfigurationTarget"]>;
 /**
 	 * Represents the configuration. It is a merged view of
 	 *
@@ -5486,12 +5354,7 @@ export type Location = {
 		 * An array of resources for which diagnostics have changed.
 		 */ readonly uris: readonly Uri[];
 }
-export enum DiagnosticSeverity {
-    Error = 0,
-    Warning = 1,
-    Information = 2,
-    Hint = 3
-}
+export type DiagnosticSeverity = ValueOf<VSCodeAPI["DiagnosticSeverity"]>;
 export type DiagnosticRelatedInformation = {
     /**
 		 * The location of this related diagnostic information.
@@ -5500,10 +5363,7 @@ export type DiagnosticRelatedInformation = {
 		 * The message of this related diagnostic information.
 		 */ message: string;
 };
-export enum DiagnosticTag {
-    Unnecessary = 1,
-    Deprecated = 2
-}
+export type DiagnosticTag = ValueOf<VSCodeAPI["DiagnosticTag"]>;
 export type Diagnostic = {
     /**
 		 * The range to which this diagnostic applies.
@@ -5603,11 +5463,7 @@ export type Diagnostic = {
 		 * {@link DiagnosticCollection.clear clear}.
 		 */ dispose(): void;
 }
-export enum LanguageStatusSeverity {
-    Information = 0,
-    Warning = 1,
-    Error = 2
-}
+export type LanguageStatusSeverity = ValueOf<VSCodeAPI["LanguageStatusSeverity"]>;
 /**
 	 * A language status item is the preferred way to present language status reports for the active text editors,
 	 * such as selected linter or notifying about a configuration problem.
@@ -5653,19 +5509,7 @@ export enum LanguageStatusSeverity {
 		 * Dispose and free associated resources.
 		 */ dispose(): void;
 }
-export enum ViewColumn {
-    Active = -1,
-    Beside = -2,
-    One = 1,
-    Two = 2,
-    Three = 3,
-    Four = 4,
-    Five = 5,
-    Six = 6,
-    Seven = 7,
-    Eight = 8,
-    Nine = 9
-}
+export type ViewColumn = ValueOf<VSCodeAPI["ViewColumn"]>;
 /**
 	 * An output channel is a container for readonly textual information.
 	 *
@@ -5775,10 +5619,7 @@ export enum ViewColumn {
 		 * More about aria roles can be found here https://w3c.github.io/aria/#widget_roles
 		 */ readonly role?: string;
 }
-export enum StatusBarAlignment {
-    Left = 1,
-    Right = 2
-}
+export type StatusBarAlignment = ValueOf<VSCodeAPI["StatusBarAlignment"]>;
 /**
 	 * A status bar item is a status bar contribution that can
 	 * show text and icons and run a command on click.
@@ -5909,10 +5750,7 @@ export enum StatusBarAlignment {
 		 * Dispose and free associated resources.
 		 */ dispose(): void;
 }
-export enum TerminalLocation {
-    Panel = 1,
-    Editor = 2
-}
+export type TerminalLocation = ValueOf<VSCodeAPI["TerminalLocation"]>;
 /**
 	 * Assumes a {@link TerminalLocation} of editor and allows specifying a {@link ViewColumn} and
 	 * {@link TerminalEditorLocationOptions.preserveFocus preserveFocus } property
@@ -6048,10 +5886,7 @@ export type FileDecoration = {
 		 * @returns A decoration or a thenable that resolves to such.
 		 */ provideFileDecoration(uri: Uri, token: CancellationToken): ProviderResult<FileDecoration>;
 }
-export enum ExtensionKind {
-    UI = 1,
-    Workspace = 2
-}
+export type ExtensionKind = ValueOf<VSCodeAPI["ExtensionKind"]>;
 /**
 	 * Represents an extension.
 	 *
@@ -6090,11 +5925,7 @@ export enum ExtensionKind {
 		 * @return A promise that will resolve when this extension has been activated.
 		 */ activate(): Thenable<T>;
 }
-export enum ExtensionMode {
-    Production = 1,
-    Development = 2,
-    Test = 3
-}
+export type ExtensionMode = ValueOf<VSCodeAPI["ExtensionMode"]>;
 /**
 	 * An extension context is a collection of utilities private to an
 	 * extension.
@@ -6284,12 +6115,7 @@ export enum ExtensionMode {
 		 * Fires when a secret is stored or deleted.
 		 */ onDidChange: Event<SecretStorageChangeEvent>;
 }
-export enum ColorThemeKind {
-    Light = 1,
-    Dark = 2,
-    HighContrast = 3,
-    HighContrastLight = 4
-}
+export type ColorThemeKind = ValueOf<VSCodeAPI["ColorThemeKind"]>;
 /**
 	 * Represents a color theme.
 	 */ export interface ColorTheme {
@@ -6297,16 +6123,8 @@ export enum ColorThemeKind {
 		 * The kind of this color theme: light, dark, high contrast dark and high contrast light.
 		 */ readonly kind: ColorThemeKind;
 }
-export enum TaskRevealKind {
-    Always = 1,
-    Silent = 2,
-    Never = 3
-}
-export enum TaskPanelKind {
-    Shared = 1,
-    Dedicated = 2,
-    New = 3
-}
+export type TaskRevealKind = ValueOf<VSCodeAPI["TaskRevealKind"]>;
+export type TaskPanelKind = ValueOf<VSCodeAPI["TaskPanelKind"]>;
 /**
 	 * Controls how the task is presented in the UI.
 	 */ export interface TaskPresentationOptions {
@@ -6441,11 +6259,7 @@ export type ProcessExecution = {
         [key: string]: string;
     };
 }
-export enum ShellQuoting {
-    Escape = 1,
-    Strong = 2,
-    Weak = 3
-}
+export type ShellQuoting = ValueOf<VSCodeAPI["ShellQuoting"]>;
 /**
 	 * A string that will be quoted depending on the used shell.
 	 */ export interface ShellQuotedString {
@@ -6473,10 +6287,7 @@ export type ShellExecution = {
 };
 export type CustomExecution = {
 };
-export enum TaskScope {
-    Global = 1,
-    Workspace = 2
-}
+export type TaskScope = ValueOf<VSCodeAPI["TaskScope"]>;
 /**
 	 * Run options for a task.
 	 */ export interface RunOptions {
@@ -6615,15 +6426,8 @@ export interface TaskFilter {
 		 * The task type to return;
 		 */ type?: string;
 }
-export enum FileType {
-    Unknown = 0,
-    File = 1,
-    Directory = 2,
-    SymbolicLink = 64
-}
-export enum FilePermission {
-    Readonly = 1
-}
+export type FileType = ValueOf<VSCodeAPI["FileType"]>;
+export type FilePermission = ValueOf<VSCodeAPI["FilePermission"]>;
 /**
 	 * The `FileStat`-type represents metadata about a file
 	 */ export interface FileStat {
@@ -6664,11 +6468,7 @@ export type FileSystemError = Error & {
 		 * or `Unknown` for unspecified errors.
 		 */ readonly code: string;
 };
-export enum FileChangeType {
-    Changed = 1,
-    Created = 2,
-    Deleted = 3
-}
+export type FileChangeType = ValueOf<VSCodeAPI["FileChangeType"]>;
 /**
 	 * The event filesystem providers must use to signal a file change.
 	 */ export interface FileChangeEvent {
@@ -7550,18 +7350,8 @@ export enum FileChangeType {
 		 * @returns A thenable that resolves when writing happened.
 		 */ writeText(value: string): Thenable<void>;
 }
-export enum UIKind {
-    Desktop = 1,
-    Web = 2
-}
-export enum LogLevel {
-    Off = 0,
-    Trace = 1,
-    Debug = 2,
-    Info = 3,
-    Warning = 4,
-    Error = 5
-}
+export type UIKind = ValueOf<VSCodeAPI["UIKind"]>;
+export type LogLevel = ValueOf<VSCodeAPI["LogLevel"]>;
 /**
 	 * Represents the state of a window.
 	 */ export interface WindowState {
@@ -7875,11 +7665,7 @@ export type TreeItem = {
 		 * however, there are cases where a TreeItem is not displayed in a tree-like way where setting the `role` may make sense.
 		 */ accessibilityInformation?: AccessibilityInformation;
 };
-export enum TreeItemCollapsibleState {
-    None = 0,
-    Collapsed = 1,
-    Expanded = 2
-}
+export type TreeItemCollapsibleState = ValueOf<VSCodeAPI["TreeItemCollapsibleState"]>;
 /**
 	 * Label describing the {@link TreeItem Tree item}
 	 */ export interface TreeItemLabel {
@@ -8149,18 +7935,8 @@ export enum TreeItemCollapsibleState {
 		 * The reason that triggered the exit of a terminal.
 		 */ readonly reason: TerminalExitReason;
 }
-export enum TerminalExitReason {
-    Unknown = 0,
-    Shutdown = 1,
-    Process = 2,
-    User = 3,
-    Extension = 4
-}
-export enum EnvironmentVariableMutatorType {
-    Replace = 1,
-    Append = 2,
-    Prepend = 3
-}
+export type TerminalExitReason = ValueOf<VSCodeAPI["TerminalExitReason"]>;
+export type EnvironmentVariableMutatorType = ValueOf<VSCodeAPI["EnvironmentVariableMutatorType"]>;
 /**
 	 * A type of mutation and its value to be applied to an environment variable.
 	 */ export interface EnvironmentVariableMutator {
@@ -8228,11 +8004,7 @@ export enum EnvironmentVariableMutatorType {
 		 * Clears all mutators from this collection.
 		 */ clear(): void;
 }
-export enum ProgressLocation {
-    SourceControl = 1,
-    Window = 10,
-    Notification = 15
-}
+export type ProgressLocation = ValueOf<VSCodeAPI["ProgressLocation"]>;
 /**
 	 * Value-object describing where and how progress should show.
 	 */ export interface ProgressOptions {
@@ -8470,10 +8242,7 @@ export type QuickInputButtons = {
 		 * The new text for the range.
 		 */ readonly text: string;
 }
-export enum TextDocumentChangeReason {
-    Undo = 1,
-    Redo = 2
-}
+export type TextDocumentChangeReason = ValueOf<VSCodeAPI["TextDocumentChangeReason"]>;
 /**
 	 * An event describing a transactional {@link TextDocument document} change.
 	 */ export interface TextDocumentChangeEvent {
@@ -8488,11 +8257,7 @@ export enum TextDocumentChangeReason {
 		 * Is `undefined` if the reason is not known.
 		*/ readonly reason: TextDocumentChangeReason | undefined;
 }
-export enum TextDocumentSaveReason {
-    Manual = 1,
-    AfterDelay = 2,
-    FocusOut = 3
-}
+export type TextDocumentSaveReason = ValueOf<VSCodeAPI["TextDocumentSaveReason"]>;
 /**
 	 * An event that is fired when a {@link TextDocument document} will be saved.
 	 *
@@ -8727,12 +8492,7 @@ export enum TextDocumentSaveReason {
 		 * @return `true` if the given section has changed.
 		 */ affectsConfiguration(section: string, scope?: ConfigurationScope): boolean;
 }
-export enum NotebookEditorRevealType {
-    Default = 0,
-    InCenter = 1,
-    InCenterIfOutsideViewport = 2,
-    AtTop = 3
-}
+export type NotebookEditorRevealType = ValueOf<VSCodeAPI["NotebookEditorRevealType"]>;
 /**
 	 * Represents a notebook editor that is attached to a {@link NotebookDocument notebook}.
 	 * Additional properties of the NotebookEditor are available in the proposed
@@ -8781,10 +8541,7 @@ export enum NotebookEditorRevealType {
 		 * delivered to any renderer.
 		 */ postMessage(message: any, editor?: NotebookEditor): Thenable<boolean>;
 }
-export enum NotebookCellKind {
-    Markup = 1,
-    Code = 2
-}
+export type NotebookCellKind = ValueOf<VSCodeAPI["NotebookCellKind"]>;
 /**
 	 * Represents a cell of a {@link NotebookDocument notebook}, either a {@link NotebookCellKind.Code code}-cell
 	 * or {@link NotebookCellKind.Markup markup}-cell.
@@ -9079,10 +8836,7 @@ export type NotebookData = {
         [key: string]: boolean | undefined;
     };
 }
-export enum NotebookControllerAffinity {
-    Default = 1,
-    Preferred = 2
-}
+export type NotebookControllerAffinity = ValueOf<VSCodeAPI["NotebookControllerAffinity"]>;
 /**
 	 * A notebook controller represents an entity that can execute notebook cells. This is often referred to as a kernel.
 	 *
@@ -9259,10 +9013,7 @@ export enum NotebookControllerAffinity {
 		 * @return A thenable that resolves when the operation finished.
 		 */ appendOutputItems(items: NotebookCellOutputItem | readonly NotebookCellOutputItem[], output: NotebookCellOutput): Thenable<void>;
 }
-export enum NotebookCellStatusBarAlignment {
-    Left = 1,
-    Right = 2
-}
+export type NotebookCellStatusBarAlignment = ValueOf<VSCodeAPI["NotebookCellStatusBarAlignment"]>;
 export type NotebookCellStatusBarItem = {
     /**
 		 * The text to show for the item.
@@ -9745,10 +9496,7 @@ export type FunctionBreakpoint = Breakpoint & {
 		 * The name of the function to which this breakpoint is attached.
 		 */ readonly functionName: string;
 };
-export enum DebugConsoleMode {
-    Separate = 0,
-    MergeWithParent = 1
-}
+export type DebugConsoleMode = ValueOf<VSCodeAPI["DebugConsoleMode"]>;
 /**
 	 * Options for {@link debug.startDebugging starting a debug session}.
 	 */ export interface DebugSessionOptions {
@@ -9788,22 +9536,10 @@ export enum DebugConsoleMode {
 		 * When true, the debug viewlet will not be automatically revealed for this session.
 		 */ suppressDebugView?: boolean;
 }
-export enum DebugConfigurationProviderTriggerKind {
-    Initial = 1,
-    Dynamic = 2
-}
-export enum CommentThreadCollapsibleState {
-    Collapsed = 0,
-    Expanded = 1
-}
-export enum CommentMode {
-    Editing = 0,
-    Preview = 1
-}
-export enum CommentThreadState {
-    Unresolved = 0,
-    Resolved = 1
-}
+export type DebugConfigurationProviderTriggerKind = ValueOf<VSCodeAPI["DebugConfigurationProviderTriggerKind"]>;
+export type CommentThreadCollapsibleState = ValueOf<VSCodeAPI["CommentThreadCollapsibleState"]>;
+export type CommentMode = ValueOf<VSCodeAPI["CommentMode"]>;
+export type CommentThreadState = ValueOf<VSCodeAPI["CommentThreadState"]>;
 /**
 	 * A collection of {@link Comment comments} representing a conversation at a particular range in a document.
 	 */ export interface CommentThread {
@@ -10138,11 +9874,7 @@ export enum CommentThreadState {
 		 * @param sessionId The id of the session to remove.
 		 */ removeSession(sessionId: string): Thenable<void>;
 }
-export enum TestRunProfileKind {
-    Run = 1,
-    Debug = 2,
-    Coverage = 3
-}
+export type TestRunProfileKind = ValueOf<VSCodeAPI["TestRunProfileKind"]>;
 export type TestTag = {
     /**
 		 * ID of the test tag. `TestTag` instances with the same ID are considered

@@ -41,6 +41,8 @@ pub async fn main() -> anyhow::Result<()> {
 
         module_map.push(vs_code_api_type::module_item(&comments, &result));
 
+        module_map.push(value_of_type());
+
         for module_item in result {
             if let Some(new_module_item) = module_item_transform(&module_item) {
                 module_map.push(new_module_item);
@@ -91,6 +93,57 @@ pub enum Error {
 
     #[error("first module body not found")]
     FirstModuleBodyNotFound,
+}
+
+fn value_of_ident() -> swc_ecma_ast::Ident {
+    swc_ecma_ast::Ident::new(
+        string_cache::Atom::from("ValueOf"),
+        swc_common::Span::default(),
+    )
+}
+
+fn value_of_type() -> swc_ecma_ast::ModuleItem {
+    let t_ident =
+        swc_ecma_ast::Ident::new(string_cache::Atom::from("T"), swc_common::Span::default());
+    let t_type = swc_ecma_ast::TsType::TsTypeRef(swc_ecma_ast::TsTypeRef {
+        span: swc_common::Span::default(),
+        type_name: swc_ecma_ast::TsEntityName::Ident(t_ident.clone()),
+        type_params: None,
+    });
+
+    swc_ecma_ast::ModuleItem::Stmt(swc_ecma_ast::Stmt::Decl(swc_ecma_ast::Decl::TsTypeAlias(
+        Box::new(swc_ecma_ast::TsTypeAliasDecl {
+            span: swc_common::Span::default(),
+            declare: false,
+            id: value_of_ident(),
+            type_params: Some(Box::new(swc_ecma_ast::TsTypeParamDecl {
+                span: swc_common::Span::default(),
+                params: vec![swc_ecma_ast::TsTypeParam {
+                    span: swc_common::Span::default(),
+                    name: t_ident.clone(),
+                    is_in: false,
+                    is_out: false,
+                    is_const: false,
+                    constraint: None,
+                    default: None,
+                }],
+            })),
+            type_ann: Box::new(swc_ecma_ast::TsType::TsIndexedAccessType(
+                swc_ecma_ast::TsIndexedAccessType {
+                    span: swc_common::Span::default(),
+                    readonly: false,
+                    obj_type: Box::new(t_type.clone()),
+                    index_type: Box::new(swc_ecma_ast::TsType::TsTypeOperator(
+                        swc_ecma_ast::TsTypeOperator {
+                            span: swc_common::Span::default(),
+                            op: swc_ecma_ast::TsTypeOperatorOp::KeyOf,
+                            type_ann: Box::new(t_type.clone()),
+                        },
+                    )),
+                },
+            )),
+        }),
+    )))
 }
 
 fn module_item_transform(
@@ -161,7 +214,44 @@ fn module_item_transform(
         pickup::ResultDecl::TsEnum(enum_decl) => Some(swc_ecma_ast::ModuleItem::ModuleDecl(
             swc_ecma_ast::ModuleDecl::ExportDecl(swc_ecma_ast::ExportDecl {
                 span: module_item.span,
-                decl: swc_ecma_ast::Decl::TsEnum(Box::new(enum_decl.clone())),
+                decl: swc_ecma_ast::Decl::TsTypeAlias(Box::new(swc_ecma_ast::TsTypeAliasDecl {
+                    span: swc_common::Span::default(),
+                    declare: false,
+                    id: enum_decl.id.clone(),
+                    type_params: None,
+                    type_ann: Box::new(swc_ecma_ast::TsType::TsTypeRef(swc_ecma_ast::TsTypeRef {
+                        span: swc_common::Span::default(),
+                        type_name: swc_ecma_ast::TsEntityName::Ident(value_of_ident()),
+                        type_params: Some(Box::new(swc_ecma_ast::TsTypeParamInstantiation {
+                            span: swc_common::Span::default(),
+                            params: vec![Box::new(swc_ecma_ast::TsType::TsIndexedAccessType(
+                                swc_ecma_ast::TsIndexedAccessType {
+                                    span: swc_common::Span::default(),
+                                    readonly: false,
+                                    obj_type: Box::new(swc_ecma_ast::TsType::TsTypeRef(
+                                        swc_ecma_ast::TsTypeRef {
+                                            span: swc_common::Span::default(),
+                                            type_name: swc_ecma_ast::TsEntityName::Ident(
+                                                ident::vs_code_api_ident(),
+                                            ),
+                                            type_params: None,
+                                        },
+                                    )),
+                                    index_type: Box::new(swc_ecma_ast::TsType::TsLitType(
+                                        swc_ecma_ast::TsLitType {
+                                            span: swc_common::Span::default(),
+                                            lit: swc_ecma_ast::TsLit::Str(swc_ecma_ast::Str {
+                                                span: swc_common::Span::default(),
+                                                value: enum_decl.id.sym.clone(),
+                                                raw: None,
+                                            }),
+                                        },
+                                    )),
+                                },
+                            ))],
+                        })),
+                    })),
+                })),
             }),
         )),
         _ => None,

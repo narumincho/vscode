@@ -20,7 +20,7 @@ export const requireVsCode = (): VSCodeApi | undefined => {
   const requireFunc = (globalThis as unknown as {
     require?: undefined | ((path: "vscode") => VSCodeApi);
   }).require;
-  return requireFunc === undefined ? undefined : requireFunc('vscode');
+  return requireFunc === undefined ? undefined : requireFunc("vscode");
 };
 
 /**
@@ -178,7 +178,16 @@ export type VSCodeApi = {
      */
     new (callOnDispose: () => any): Disposable;
   };
+
+  readonly EnumType: {
+    readonly A: 1;
+    readonly B: 32;
+  };
 };
+
+type ValueOf<T> = T[keyof T];
+
+export type EnumType = ValueOf<VSCodeApi["EnumType"]>;
 
 /**
  * Represents a reference to a command. Provides a title which
