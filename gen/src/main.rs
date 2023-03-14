@@ -32,7 +32,7 @@ pub async fn main() -> anyhow::Result<()> {
         .parse_typescript_module()
         .map_err(|_| Error::ParseModuleError)?;
 
-    let result = pickup::pick_module_item(&module.body);
+    let result = pickup::pick_module_item(&module.body, &comments);
 
     let mut module_map = Vec::<swc_ecma_ast::ModuleItem>::new();
 
@@ -44,7 +44,7 @@ pub async fn main() -> anyhow::Result<()> {
         module_map.push(value_of_type());
 
         for module_item in result {
-            if let Some(new_module_item) = module_item_transform(&module_item) {
+            if let Some(new_module_item) = module_item_transform(&module_item, &comments) {
                 module_map.push(new_module_item);
             }
         }
@@ -147,12 +147,24 @@ fn value_of_type() -> swc_ecma_ast::ModuleItem {
 }
 
 fn module_item_transform(
-    module_item: &pickup::ResultDeclWithSpan,
+    module_item: &pickup::ResultDeclWithComments,
+    comments: &dyn swc_common::comments::Comments,
 ) -> Option<swc_ecma_ast::ModuleItem> {
     match &module_item.decl {
         pickup::ResultDecl::Class(class) => Some(swc_ecma_ast::ModuleItem::ModuleDecl(
             swc_ecma_ast::ModuleDecl::ExportDecl(swc_ecma_ast::ExportDecl {
-                span: module_item.span,
+                span: {
+                    let span = swc_common::Span::dummy_with_cmt();
+                    match &module_item.comments {
+                        Some(comment_vec) => swc_common::comments::Comments::add_leading_comments(
+                            &comments,
+                            span.lo,
+                            comment_vec.clone(),
+                        ),
+                        None => {}
+                    }
+                    span
+                },
                 decl: swc_ecma_ast::Decl::TsTypeAlias(Box::new(swc_ecma_ast::TsTypeAliasDecl {
                     span: swc_common::Span::default(),
                     declare: false,
@@ -201,19 +213,52 @@ fn module_item_transform(
         )),
         pickup::ResultDecl::TsInterface(interface) => Some(swc_ecma_ast::ModuleItem::ModuleDecl(
             swc_ecma_ast::ModuleDecl::ExportDecl(swc_ecma_ast::ExportDecl {
-                span: module_item.span,
+                span: {
+                    let span = swc_common::Span::dummy_with_cmt();
+                    match &module_item.comments {
+                        Some(comment_vec) => swc_common::comments::Comments::add_leading_comments(
+                            &comments,
+                            span.lo,
+                            comment_vec.clone(),
+                        ),
+                        None => {}
+                    }
+                    span
+                },
                 decl: swc_ecma_ast::Decl::TsInterface(Box::new(interface.clone())),
             }),
         )),
         pickup::ResultDecl::TsTypeAlias(alias) => Some(swc_ecma_ast::ModuleItem::ModuleDecl(
             swc_ecma_ast::ModuleDecl::ExportDecl(swc_ecma_ast::ExportDecl {
-                span: module_item.span,
+                span: {
+                    let span = swc_common::Span::dummy_with_cmt();
+                    match &module_item.comments {
+                        Some(comment_vec) => swc_common::comments::Comments::add_leading_comments(
+                            &comments,
+                            span.lo,
+                            comment_vec.clone(),
+                        ),
+                        None => {}
+                    }
+                    span
+                },
                 decl: swc_ecma_ast::Decl::TsTypeAlias(Box::new(alias.clone())),
             }),
         )),
         pickup::ResultDecl::TsEnum(enum_decl) => Some(swc_ecma_ast::ModuleItem::ModuleDecl(
             swc_ecma_ast::ModuleDecl::ExportDecl(swc_ecma_ast::ExportDecl {
-                span: module_item.span,
+                span: {
+                    let span = swc_common::Span::dummy_with_cmt();
+                    match &module_item.comments {
+                        Some(comment_vec) => swc_common::comments::Comments::add_leading_comments(
+                            &comments,
+                            span.lo,
+                            comment_vec.clone(),
+                        ),
+                        None => {}
+                    }
+                    span
+                },
                 decl: swc_ecma_ast::Decl::TsTypeAlias(Box::new(swc_ecma_ast::TsTypeAliasDecl {
                     span: swc_common::Span::default(),
                     declare: false,

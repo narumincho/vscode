@@ -2347,7 +2347,14 @@ type ValueOf<T> = T[keyof T];
 		 * @return The given position or a new, adjusted position.
 		 */ validatePosition(position: Position): Position;
 }
-export type Position = {
+/**
+	 * Represents a line and character position, such as
+	 * the position of the cursor.
+	 *
+	 * Position objects are __immutable__. Use the {@link Position.with with} or
+	 * {@link Position.translate translate} methods to derive new positions
+	 * from an existing position.
+	 */ export type Position = {
     /**
 		 * The zero-based line value.
 		 */ readonly line: number;
@@ -2355,7 +2362,14 @@ export type Position = {
 		 * The zero-based character value.
 		 */ readonly character: number;
 };
-export type Range = {
+/**
+	 * A range represents an ordered pair of two positions.
+	 * It is guaranteed that {@link Range.start start}.isBeforeOrEqual({@link Range.end end})
+	 *
+	 * Range objects are __immutable__. Use the {@link Range.with with},
+	 * {@link Range.intersection intersection}, or {@link Range.union union} methods
+	 * to derive new ranges from an existing range.
+	 */ export type Range = {
     /**
 		 * The start position. It is before or equal to {@link Range.end end}.
 		 */ readonly start: Position;
@@ -2369,7 +2383,9 @@ export type Range = {
 		 * `true` if `start.line` and `end.line` are equal.
 		 */ isSingleLine: boolean;
 };
-export type Selection = Range & {
+/**
+	 * Represents a text selection in an editor.
+	 */ export type Selection = Range & {
     /**
 		 * The position at which the selection starts.
 		 * This position might be before or after {@link Selection.active active}.
@@ -2382,7 +2398,9 @@ export type Selection = Range & {
 		 * A selection is reversed if its {@link Selection.anchor anchor} is the {@link Selection.end end} position.
 		 */ isReversed: boolean;
 };
-export type TextEditorSelectionChangeKind = ValueOf<VSCodeAPI["TextEditorSelectionChangeKind"]>;
+/**
+	 * Represents sources that can cause {@link window.onDidChangeTextEditorSelection selection change events}.
+	*/ export type TextEditorSelectionChangeKind = ValueOf<VSCodeAPI["TextEditorSelectionChangeKind"]>;
 /**
 	 * Represents an event describing the change in a {@link TextEditor.selections text editor's selections}.
 	 */ export interface TextEditorSelectionChangeEvent {
@@ -2427,8 +2445,12 @@ export type TextEditorSelectionChangeKind = ValueOf<VSCodeAPI["TextEditorSelecti
 		 * The new value for the {@link TextEditor.viewColumn text editor's view column}.
 		 */ readonly viewColumn: ViewColumn;
 }
-export type TextEditorCursorStyle = ValueOf<VSCodeAPI["TextEditorCursorStyle"]>;
-export type TextEditorLineNumbersStyle = ValueOf<VSCodeAPI["TextEditorLineNumbersStyle"]>;
+/**
+	 * Rendering style of the cursor.
+	 */ export type TextEditorCursorStyle = ValueOf<VSCodeAPI["TextEditorCursorStyle"]>;
+/**
+	 * Rendering style of the line numbers.
+	 */ export type TextEditorLineNumbersStyle = ValueOf<VSCodeAPI["TextEditorLineNumbersStyle"]>;
 /**
 	 * Represents a {@link TextEditor text editor}'s {@link TextEditor.options options}.
 	 */ export interface TextEditorOptions {
@@ -2470,9 +2492,16 @@ export type TextEditorLineNumbersStyle = ValueOf<VSCodeAPI["TextEditorLineNumber
 		 * Remove this decoration type and all decorations on all text editors using it.
 		 */ dispose(): void;
 }
-export type TextEditorRevealType = ValueOf<VSCodeAPI["TextEditorRevealType"]>;
-export type OverviewRulerLane = ValueOf<VSCodeAPI["OverviewRulerLane"]>;
-export type DecorationRangeBehavior = ValueOf<VSCodeAPI["DecorationRangeBehavior"]>;
+/**
+	 * Represents different {@link TextEditor.revealRange reveal} strategies in a text editor.
+	 */ export type TextEditorRevealType = ValueOf<VSCodeAPI["TextEditorRevealType"]>;
+/**
+	 * Represents different positions for rendering a decoration in an {@link DecorationRenderOptions.overviewRulerLane overview ruler}.
+	 * The overview ruler supports three lanes.
+	 */ export type OverviewRulerLane = ValueOf<VSCodeAPI["OverviewRulerLane"]>;
+/**
+	 * Describes the behavior of decorations when typing/editing at their edges.
+	 */ export type DecorationRangeBehavior = ValueOf<VSCodeAPI["DecorationRangeBehavior"]>;
 /**
 	 * Represents options to configure the behavior of showing a {@link TextDocument document} in an {@link TextEditor editor}.
 	 */ export interface TextDocumentShowOptions {
@@ -2538,9 +2567,19 @@ export type DecorationRangeBehavior = ValueOf<VSCodeAPI["DecorationRangeBehavior
 		 * An optional selection to apply for the document in the {@link NotebookEditor notebook editor}.
 		 */ readonly selections?: readonly NotebookRange[];
 }
-export type ThemeColor = {
+/**
+	 * A reference to one of the workbench colors as defined in https://code.visualstudio.com/docs/getstarted/theme-color-reference.
+	 * Using a theme color is preferred over a custom color as it gives theme authors and users the possibility to change the color.
+	 */ export type ThemeColor = {
 };
-export type ThemeIcon = {
+/**
+	 * A reference to a named icon. Currently, {@link ThemeIcon.File File}, {@link ThemeIcon.Folder Folder},
+	 * and [ThemeIcon ids](https://code.visualstudio.com/api/references/icons-in-labels#icon-listing) are supported.
+	 * Using a theme icon is preferred over a custom icon as it gives product theme authors the possibility to change the icons.
+	 *
+	 * *Note* that theme icons can also be rendered inside labels and descriptions. Places that support theme icons spell this out
+	 * and they use the `$(<name>)`-syntax, for instance `quickPick.label = "Hello World $(globe)"`.
+	 */ export type ThemeIcon = {
     /**
 		 * The id of the icon. The available icons are listed in https://code.visualstudio.com/api/references/icons-in-labels#icon-listing.
 		 */ readonly id: string;
@@ -2806,7 +2845,9 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * This method shows unexpected behavior and will be removed in the next major update.
 		 */ hide(): void;
 }
-export type EndOfLine = ValueOf<VSCodeAPI["EndOfLine"]>;
+/**
+	 * Represents an end of line character sequence in a {@link TextDocument document}.
+	 */ export type EndOfLine = ValueOf<VSCodeAPI["EndOfLine"]>;
 /**
 	 * A complex edit that will be applied in one transaction on a TextEditor.
 	 * This holds a description of the edits and if the edits are valid (i.e. no overlapping regions, document was not changed in the meantime, etc.)
@@ -2838,7 +2879,10 @@ export type EndOfLine = ValueOf<VSCodeAPI["EndOfLine"]>;
 		 * @param endOfLine The new end of line for the {@link TextDocument document}.
 		 */ setEndOfLine(endOfLine: EndOfLine): void;
 }
-export type Uri = {
+/**
+	 * A universal resource identifier representing either a file on disk
+	 * or another resource, like untitled resources.
+	 */ export type Uri = {
     /**
 		 * Scheme is the `http` part of `http://www.example.com/some/path?query#fragment`.
 		 * The part before the first colon.
@@ -2892,14 +2936,25 @@ export type Uri = {
 		 * An {@link Event} which fires upon cancellation.
 		 */ onCancellationRequested: Event<any>;
 }
-export type CancellationTokenSource = {
+/**
+	 * A cancellation source creates and controls a {@link CancellationToken cancellation token}.
+	 */ export type CancellationTokenSource = {
     /**
 		 * The cancellation token of this source.
 		 */ token: CancellationToken;
 };
-export type CancellationError = Error & {
+/**
+	 * An error type that should be used to signal cancellation of an operation.
+	 *
+	 * This type can be used in response to a {@link CancellationToken cancellation token}
+	 * being cancelled or when an operation is being cancelled by the
+	 * executor of that operation.
+	 */ export type CancellationError = Error & {
 };
-export type Disposable = {
+/**
+	 * Represents a type which can release resources, such
+	 * as event listening or a timer.
+	 */ export type Disposable = {
 };
 /**
 	 * Represents a typed event.
@@ -2920,7 +2975,14 @@ export type Disposable = {
 		 * @return A disposable which unsubscribes the event listener.
 		 */ (listener: (e: T) => any, thisArgs?: any, disposables?: Disposable[]) : Disposable;
 }
-export type EventEmitter = {
+/**
+	 * An event emitter can be used to create and manage an {@link Event} for others
+	 * to subscribe to. One emitter always owns one event.
+	 *
+	 * Use this class if you want to provide event from within your extension, for instance
+	 * inside a {@link TextDocumentContentProvider} or when providing
+	 * API to other extensions.
+	 */ export type EventEmitter = {
     /**
 		 * The event listeners can subscribe to.
 		 */ event: Event<T>;
@@ -2981,7 +3043,9 @@ export type EventEmitter = {
 		 * @return A string or a thenable that resolves to such.
 		 */ provideTextDocumentContent(uri: Uri, token: CancellationToken): ProviderResult<string>;
 }
-export type QuickPickItemKind = ValueOf<VSCodeAPI["QuickPickItemKind"]>;
+/**
+	 * The kind of {@link QuickPickItem quick pick item}.
+	 */ export type QuickPickItemKind = ValueOf<VSCodeAPI["QuickPickItemKind"]>;
 /**
 	 * Represents an item that can be selected from
 	 * a list of items.
@@ -3172,7 +3236,9 @@ export type QuickPickItemKind = ValueOf<VSCodeAPI["QuickPickItemKind"]>;
 		 * is only shown for {@link MessageOptions.modal modal} messages.
 		 */ detail?: string;
 }
-export type InputBoxValidationSeverity = ValueOf<VSCodeAPI["InputBoxValidationSeverity"]>;
+/**
+	 * Impacts the behavior and appearance of the validation message.
+	 */ export type InputBoxValidationSeverity = ValueOf<VSCodeAPI["InputBoxValidationSeverity"]>;
 /**
 	 * Object to configure the behavior of the validation message.
 	 */ export interface InputBoxValidationMessage {
@@ -3222,7 +3288,12 @@ export type InputBoxValidationSeverity = ValueOf<VSCodeAPI["InputBoxValidationSe
 		 *  which can provide a specific message severity. Return `undefined`, `null`, or the empty string when 'value' is valid.
 		 */ validateInput?(value: string): string | InputBoxValidationMessage | undefined | null | Thenable<string | InputBoxValidationMessage | undefined | null>;
 }
-export type RelativePattern = {
+/**
+	 * A relative pattern is a helper to construct glob patterns that are matched
+	 * relatively to a base file path. The base path can either be an absolute file
+	 * path as string or uri or a {@link WorkspaceFolder workspace folder}, which is the
+	 * preferred way of creating the relative pattern.
+	 */ export type RelativePattern = {
     /**
 		 * A base file path to which this pattern will be matched against relatively. The
 		 * file path must be absolute, should not have any trailing path separators and
@@ -3337,12 +3408,21 @@ export type RelativePattern = {
 	 * }
 	 * ```
 	 */ export type ProviderResult<T> = T | undefined | null | Thenable<T | undefined | null>;
-export type CodeActionKind = {
+/**
+	 * Kind of a code action.
+	 *
+	 * Kinds are a hierarchical list of identifiers separated by `.`, e.g. `"refactor.extract.function"`.
+	 *
+	 * Code action kinds are used by the editor for UI elements such as the refactoring context menu. Users
+	 * can also trigger code actions with a specific kind with the `editor.action.codeAction` command.
+	 */ export type CodeActionKind = {
     /**
 		 * String value of the kind, e.g. `"refactor.extract.function"`.
 		 */ readonly value: string;
 };
-export type CodeActionTriggerKind = ValueOf<VSCodeAPI["CodeActionTriggerKind"]>;
+/**
+	 * The reason why code actions were requested.
+	 */ export type CodeActionTriggerKind = ValueOf<VSCodeAPI["CodeActionTriggerKind"]>;
 /**
 	 * Contains additional diagnostic information about the context in which
 	 * a {@link CodeActionProvider.provideCodeActions code action} is run.
@@ -3359,7 +3439,12 @@ export type CodeActionTriggerKind = ValueOf<VSCodeAPI["CodeActionTriggerKind"]>;
 		 * Actions not of this kind are filtered out before being shown by the [lightbulb](https://code.visualstudio.com/docs/editor/editingevolved#_code-action).
 		 */ readonly only: CodeActionKind | undefined;
 }
-export type CodeAction = {
+/**
+	 * A code action represents a change that can be performed in code, e.g. to fix a problem or
+	 * to refactor code.
+	 *
+	 * A CodeAction must set either {@linkcode CodeAction.edit edit} and/or a {@linkcode CodeAction.command command}. If both are supplied, the `edit` is applied first, then the command is executed.
+	 */ export type CodeAction = {
     /**
 		 * A short, human-readable, title for this code action.
 		 */ title: string;
@@ -3497,7 +3582,16 @@ export type CodeAction = {
 			 */ readonly command: Command;
     }>;
 }
-export type CodeLens = {
+/**
+	 * A code lens represents a {@link Command} that should be shown along with
+	 * source text, like the number of references, a way to run tests, etc.
+	 *
+	 * A code lens is _unresolved_ when no command is associated to it. For performance
+	 * reasons the creation of a code lens and resolving should be done to two stages.
+	 *
+	 * @see {@link CodeLensProvider.provideCodeLenses}
+	 * @see {@link CodeLensProvider.resolveCodeLens}
+	 */ export type CodeLens = {
     /**
 		 * The range in which this code lens is valid. Should only span a single line.
 		 */ range: Range;
@@ -3606,7 +3700,14 @@ export type CodeLens = {
 		 * signaled by returning `undefined` or `null`.
 		 */ provideDeclaration(document: TextDocument, position: Position, token: CancellationToken): ProviderResult<Declaration>;
 }
-export type MarkdownString = {
+/**
+	 * Human-readable text that supports formatting via the [markdown syntax](https://commonmark.org).
+	 *
+	 * Rendering of {@link ThemeIcon theme icons} via the `$(<name>)`-syntax is supported
+	 * when the {@linkcode supportThemeIcons} is set to `true`.
+	 *
+	 * Rendering of embedded html is supported when {@linkcode supportHtml} is set to `true`.
+	 */ export type MarkdownString = {
     /**
 		 * The markdown string.
 		 */ value: string;
@@ -3663,7 +3764,10 @@ export type MarkdownString = {
     language: string;
     value: string;
 };
-export type Hover = {
+/**
+	 * A hover represents additional information for a symbol or word. Hovers are
+	 * rendered in a tooltip-like widget.
+	 */ export type Hover = {
     /**
 		 * The contents of this hover.
 		 */ contents: Array<MarkdownString | MarkedString>;
@@ -3689,7 +3793,13 @@ export type Hover = {
 		 * signaled by returning `undefined` or `null`.
 		 */ provideHover(document: TextDocument, position: Position, token: CancellationToken): ProviderResult<Hover>;
 }
-export type EvaluatableExpression = {
+/**
+	 * An EvaluatableExpression represents an expression in a document that can be evaluated by an active debugger or runtime.
+	 * The result of this evaluation is shown in a tooltip-like widget.
+	 * If only a range is specified, the expression will be extracted from the underlying document.
+	 * An optional expression can be used to override the extracted expression.
+	 * In this case the range is still used to highlight the range in the document.
+	 */ export type EvaluatableExpression = {
     /*
 		 * The range is used to extract the evaluatable expression from the underlying document and to highlight it.
 		 */ readonly range: Range;
@@ -3714,7 +3824,9 @@ export type EvaluatableExpression = {
 		 * signaled by returning `undefined` or `null`.
 		 */ provideEvaluatableExpression(document: TextDocument, position: Position, token: CancellationToken): ProviderResult<EvaluatableExpression>;
 }
-export type InlineValueText = {
+/**
+	 * Provide inline value as text.
+	 */ export type InlineValueText = {
     /**
 		 * The document range for which the inline value applies.
 		 */ readonly range: Range;
@@ -3722,7 +3834,11 @@ export type InlineValueText = {
 		 * The text of the inline value.
 		 */ readonly text: string;
 };
-export type InlineValueVariableLookup = {
+/**
+	 * Provide inline value through a variable lookup.
+	 * If only a range is specified, the variable name will be extracted from the underlying document.
+	 * An optional variable name can be used to override the extracted name.
+	 */ export type InlineValueVariableLookup = {
     /**
 		 * The document range for which the inline value applies.
 		 * The range is used to extract the variable name from the underlying document.
@@ -3734,7 +3850,11 @@ export type InlineValueVariableLookup = {
 		 * How to perform the lookup.
 		 */ readonly caseSensitiveLookup: boolean;
 };
-export type InlineValueEvaluatableExpression = {
+/**
+	 * Provide an inline value through an expression evaluation.
+	 * If only a range is specified, the expression will be extracted from the underlying document.
+	 * An optional expression can be used to override the extracted expression.
+	 */ export type InlineValueEvaluatableExpression = {
     /**
 		 * The document range for which the inline value applies.
 		 * The range is used to extract the evaluatable expression from the underlying document.
@@ -3783,8 +3903,14 @@ export type InlineValueEvaluatableExpression = {
 		 * signaled by returning `undefined` or `null`.
 		 */ provideInlineValues(document: TextDocument, viewPort: Range, context: InlineValueContext, token: CancellationToken): ProviderResult<InlineValue[]>;
 }
-export type DocumentHighlightKind = ValueOf<VSCodeAPI["DocumentHighlightKind"]>;
-export type DocumentHighlight = {
+/**
+	 * A document highlight kind.
+	 */ export type DocumentHighlightKind = ValueOf<VSCodeAPI["DocumentHighlightKind"]>;
+/**
+	 * A document highlight is a range inside a text document which deserves
+	 * special attention. Usually a document highlight is visualized by changing
+	 * the background color of its range.
+	 */ export type DocumentHighlight = {
     /**
 		 * The range this highlight applies to.
 		 */ range: Range;
@@ -3807,9 +3933,16 @@ export type DocumentHighlight = {
 		 * signaled by returning `undefined`, `null`, or an empty array.
 		 */ provideDocumentHighlights(document: TextDocument, position: Position, token: CancellationToken): ProviderResult<DocumentHighlight[]>;
 }
-export type SymbolKind = ValueOf<VSCodeAPI["SymbolKind"]>;
-export type SymbolTag = ValueOf<VSCodeAPI["SymbolTag"]>;
-export type SymbolInformation = {
+/**
+	 * A symbol kind.
+	 */ export type SymbolKind = ValueOf<VSCodeAPI["SymbolKind"]>;
+/**
+	 * Symbol tags are extra annotations that tweak the rendering of a symbol.
+	 */ export type SymbolTag = ValueOf<VSCodeAPI["SymbolTag"]>;
+/**
+	 * Represents information about programming constructs like variables, classes,
+	 * interfaces etc.
+	 */ export type SymbolInformation = {
     /**
 		 * The name of this symbol.
 		 */ name: string;
@@ -3826,7 +3959,11 @@ export type SymbolInformation = {
 		 * The location of this symbol.
 		 */ location: Location;
 };
-export type DocumentSymbol = {
+/**
+	 * Represents programming constructs like variables, classes, interfaces etc. that appear in a document. Document
+	 * symbols can be hierarchical and they have two ranges: one that encloses its definition and one that points to
+	 * its most interesting range, e.g. the range of an identifier.
+	 */ export type DocumentSymbol = {
     /**
 		 * The name of this symbol.
 		 */ name: string;
@@ -3927,7 +4064,10 @@ export type DocumentSymbol = {
 		 * signaled by returning `undefined`, `null`, or an empty array.
 		 */ provideReferences(document: TextDocument, position: Position, context: ReferenceContext, token: CancellationToken): ProviderResult<Location[]>;
 }
-export type TextEdit = {
+/**
+	 * A text edit represents edits that should be applied
+	 * to a document.
+	 */ export type TextEdit = {
     /**
 		 * The range this edit applies to.
 		 */ range: Range;
@@ -3941,7 +4081,15 @@ export type TextEdit = {
 		 * whole document.
 		 */ newEol?: EndOfLine;
 };
-export type SnippetTextEdit = {
+/**
+	 * A snippet edit represents an interactive edit that is performed by
+	 * the editor.
+	 *
+	 * *Note* that a snippet edit can always be performed as a normal {@link TextEdit text edit}.
+	 * This will happen when no matching editor is open or when a {@link WorkspaceEdit workspace edit}
+	 * contains snippet edits for multiple files. In that case only those that match the active editor
+	 * will be performed as snippet edits and the others as normal text edits.
+	 */ export type SnippetTextEdit = {
     /**
 		 * The range this edit applies to.
 		 */ range: Range;
@@ -3949,7 +4097,9 @@ export type SnippetTextEdit = {
 		 * The {@link SnippetString snippet} this edit will perform.
 		 */ snippet: SnippetString;
 };
-export type NotebookEdit = {
+/**
+	 * A notebook edit represents edits that should be applied to the contents of a notebook.
+	 */ export type NotebookEdit = {
     /**
 		 * Range of the cells being edited. May be empty.
 		 */ range: NotebookRange;
@@ -3995,12 +4145,26 @@ export type NotebookEdit = {
 		 * Signal to the editor that this edit is a refactoring.
 		 */ isRefactoring?: boolean;
 }
-export type WorkspaceEdit = {
+/**
+	 * A workspace edit is a collection of textual and files changes for
+	 * multiple resources and documents.
+	 *
+	 * Use the {@link workspace.applyEdit applyEdit}-function to apply a workspace edit.
+	 */ export type WorkspaceEdit = {
     /**
 		 * The number of affected resources of textual or resource changes.
 		 */ readonly size: number;
 };
-export type SnippetString = {
+/**
+	 * A snippet string is a template which allows to insert text
+	 * and to control the editor cursor when insertion happens.
+	 *
+	 * A snippet can define tab stops and placeholders with `$1`, `$2`
+	 * and `${3:foo}`. `$0` defines the final tab stop, it defaults to
+	 * the end of the snippet. Variables are defined with `$name` and
+	 * `${name:default value}`. Also see
+	 * [the full snippet syntax](https://code.visualstudio.com/docs/editor/userdefinedsnippets#_creating-your-own-snippets).
+	 */ export type SnippetString = {
     /**
 		 * The snippet string.
 		 */ value: string;
@@ -4037,7 +4201,10 @@ export type SnippetString = {
         placeholder: string;
     }>;
 }
-export type SemanticTokensLegend = {
+/**
+	 * A semantic tokens legend contains the needed information to decipher
+	 * the integer encoded representation of semantic tokens.
+	 */ export type SemanticTokensLegend = {
     /**
 		 * The possible token types.
 		 */ readonly tokenTypes: string[];
@@ -4045,9 +4212,16 @@ export type SemanticTokensLegend = {
 		 * The possible token modifiers.
 		 */ readonly tokenModifiers: string[];
 };
-export type SemanticTokensBuilder = {
+/**
+	 * A semantic tokens builder can help with creating a `SemanticTokens` instance
+	 * which contains delta encoded semantic tokens.
+	 */ export type SemanticTokensBuilder = {
 };
-export type SemanticTokens = {
+/**
+	 * Represents semantic tokens, either in a range or in an entire document.
+	 * @see {@link DocumentSemanticTokensProvider.provideDocumentSemanticTokens provideDocumentSemanticTokens} for an explanation of the format.
+	 * @see {@link SemanticTokensBuilder} for a helper to create an instance.
+	 */ export type SemanticTokens = {
     /**
 		 * The result id of the tokens.
 		 *
@@ -4058,7 +4232,10 @@ export type SemanticTokens = {
 		 * @see {@link DocumentSemanticTokensProvider.provideDocumentSemanticTokens provideDocumentSemanticTokens} for an explanation of the format.
 		 */ readonly data: Uint32Array;
 };
-export type SemanticTokensEdits = {
+/**
+	 * Represents edits to semantic tokens.
+	 * @see {@link DocumentSemanticTokensProvider.provideDocumentSemanticTokensEdits provideDocumentSemanticTokensEdits} for an explanation of the format.
+	 */ export type SemanticTokensEdits = {
     /**
 		 * The result id of the tokens.
 		 *
@@ -4069,7 +4246,10 @@ export type SemanticTokensEdits = {
 		 * All edits refer to the initial data state.
 		 */ readonly edits: SemanticTokensEdit[];
 };
-export type SemanticTokensEdit = {
+/**
+	 * Represents an edit to semantic tokens.
+	 * @see {@link DocumentSemanticTokensProvider.provideDocumentSemanticTokensEdits provideDocumentSemanticTokensEdits} for an explanation of the format.
+	 */ export type SemanticTokensEdit = {
     /**
 		 * The start offset of the edit.
 		 */ readonly start: number;
@@ -4250,7 +4430,10 @@ export type SemanticTokensEdit = {
 		 * signaled by returning `undefined`, `null`, or an empty array.
 		 */ provideOnTypeFormattingEdits(document: TextDocument, position: Position, ch: string, options: FormattingOptions, token: CancellationToken): ProviderResult<TextEdit[]>;
 }
-export type ParameterInformation = {
+/**
+	 * Represents a parameter of a callable-signature. A parameter can
+	 * have a label and a doc-comment.
+	 */ export type ParameterInformation = {
     /**
 		 * The label of this signature.
 		 *
@@ -4263,7 +4446,11 @@ export type ParameterInformation = {
 		 * in the UI but can be omitted.
 		 */ documentation?: string | MarkdownString;
 };
-export type SignatureInformation = {
+/**
+	 * Represents the signature of something callable. A signature
+	 * can have a label, like a function-name, a doc-comment, and
+	 * a set of parameters.
+	 */ export type SignatureInformation = {
     /**
 		 * The label of this signature. Will be shown in
 		 * the UI.
@@ -4281,7 +4468,11 @@ export type SignatureInformation = {
 		 * If provided, this is used in place of {@linkcode SignatureHelp.activeParameter}.
 		 */ activeParameter?: number;
 };
-export type SignatureHelp = {
+/**
+	 * Signature help represents the signature of something
+	 * callable. There can be multiple signatures but only one
+	 * active and only one active parameter.
+	 */ export type SignatureHelp = {
     /**
 		 * One or more signatures.
 		 */ signatures: SignatureInformation[];
@@ -4292,7 +4483,9 @@ export type SignatureHelp = {
 		 * The active parameter of the active signature.
 		 */ activeParameter: number;
 };
-export type SignatureHelpTriggerKind = ValueOf<VSCodeAPI["SignatureHelpTriggerKind"]>;
+/**
+	 * How a {@linkcode SignatureHelpProvider} was triggered.
+	 */ export type SignatureHelpTriggerKind = ValueOf<VSCodeAPI["SignatureHelpTriggerKind"]>;
 /**
 	 * Additional information about the context in which a
 	 * {@linkcode SignatureHelpProvider.provideSignatureHelp SignatureHelpProvider} was triggered.
@@ -4365,9 +4558,28 @@ export type SignatureHelpTriggerKind = ValueOf<VSCodeAPI["SignatureHelpTriggerKi
 		 * for fully qualified names or file path.
 		 */ description?: string;
 }
-export type CompletionItemKind = ValueOf<VSCodeAPI["CompletionItemKind"]>;
-export type CompletionItemTag = ValueOf<VSCodeAPI["CompletionItemTag"]>;
-export type CompletionItem = {
+/**
+	 * Completion item kinds.
+	 */ export type CompletionItemKind = ValueOf<VSCodeAPI["CompletionItemKind"]>;
+/**
+	 * Completion item tags are extra annotations that tweak the rendering of a completion
+	 * item.
+	 */ export type CompletionItemTag = ValueOf<VSCodeAPI["CompletionItemTag"]>;
+/**
+	 * A completion item represents a text snippet that is proposed to complete text that is being typed.
+	 *
+	 * It is sufficient to create a completion item from just a {@link CompletionItem.label label}. In that
+	 * case the completion item will replace the {@link TextDocument.getWordRangeAtPosition word}
+	 * until the cursor with the given label or {@link CompletionItem.insertText insertText}. Otherwise the
+	 * given {@link CompletionItem.textEdit edit} is used.
+	 *
+	 * When selecting a completion item in the editor its defined or synthesized text edit will be applied
+	 * to *all* cursors/selections whereas {@link CompletionItem.additionalTextEdits additionalTextEdits} will be
+	 * applied as provided.
+	 *
+	 * @see {@link CompletionItemProvider.provideCompletionItems}
+	 * @see {@link CompletionItemProvider.resolveCompletionItem}
+	 */ export type CompletionItem = {
     /**
 		 * The label of this completion item. By default
 		 * this is also the text that is inserted when selecting
@@ -4462,7 +4674,10 @@ export type CompletionItem = {
 		 * {@link CompletionItem.additionalTextEdits additionalTextEdits}-property.
 		 */ command?: Command;
 };
-export type CompletionList = {
+/**
+	 * Represents a collection of {@link CompletionItem completion items} to be presented
+	 * in the editor.
+	 */ export type CompletionList = {
     /**
 		 * This list is not complete. Further typing should result in recomputing
 		 * this list.
@@ -4471,7 +4686,9 @@ export type CompletionList = {
 		 * The completion items.
 		 */ items: T[];
 };
-export type CompletionTriggerKind = ValueOf<VSCodeAPI["CompletionTriggerKind"]>;
+/**
+	 * How a {@link CompletionItemProvider completion provider} was triggered
+	 */ export type CompletionTriggerKind = ValueOf<VSCodeAPI["CompletionTriggerKind"]>;
 /**
 	 * Contains additional information about the context in which
 	 * {@link CompletionItemProvider.provideCompletionItems completion provider} is triggered.
@@ -4551,7 +4768,10 @@ export type CompletionTriggerKind = ValueOf<VSCodeAPI["CompletionTriggerKind"]>;
 		 * @return An array of completion items or a thenable that resolves to an array of completion items.
 		 */ provideInlineCompletionItems(document: TextDocument, position: Position, context: InlineCompletionContext, token: CancellationToken): ProviderResult<InlineCompletionItem[] | InlineCompletionList>;
 }
-export type InlineCompletionList = {
+/**
+	 * Represents a collection of {@link InlineCompletionItem inline completion items} to be presented
+	 * in the editor.
+	 */ export type InlineCompletionList = {
     /**
 		 * The inline completion items.
 		 */ items: InlineCompletionItem[];
@@ -4583,8 +4803,14 @@ export type InlineCompletionList = {
 		 * The text the range will be replaced with if this completion is accepted.
 		 */ readonly text: string;
 }
-export type InlineCompletionTriggerKind = ValueOf<VSCodeAPI["InlineCompletionTriggerKind"]>;
-export type InlineCompletionItem = {
+/**
+	 * Describes how an {@link InlineCompletionItemProvider inline completion provider} was triggered.
+	 */ export type InlineCompletionTriggerKind = ValueOf<VSCodeAPI["InlineCompletionTriggerKind"]>;
+/**
+	 * An inline completion item represents a text snippet that is proposed inline to complete text that is being typed.
+	 *
+	 * @see {@link InlineCompletionItemProvider.provideInlineCompletionItems}
+	 */ export type InlineCompletionItem = {
     /**
 		 * The text to replace the range with. Must be set.
 		 * Is used both for the preview and the accept operation.
@@ -4605,7 +4831,10 @@ export type InlineCompletionItem = {
 		 * An optional {@link Command} that is executed *after* inserting this completion.
 		 */ command?: Command;
 };
-export type DocumentLink = {
+/**
+	 * A document link is a range in a text document that links to an internal or external resource, like another
+	 * text document or a web site.
+	 */ export type DocumentLink = {
     /**
 		 * The range this link applies to.
 		 */ range: Range;
@@ -4643,7 +4872,9 @@ export type DocumentLink = {
 		 * @param token A cancellation token.
 		 */ resolveDocumentLink?(link: T, token: CancellationToken): ProviderResult<T>;
 }
-export type Color = {
+/**
+	 * Represents a color in RGBA space.
+	 */ export type Color = {
     /**
 		 * The red component of this color in the range [0-1].
 		 */ readonly red: number;
@@ -4657,7 +4888,9 @@ export type Color = {
 		 * The alpha component of this color in the range [0-1].
 		 */ readonly alpha: number;
 };
-export type ColorInformation = {
+/**
+	 * Represents a color range from a document.
+	 */ export type ColorInformation = {
     /**
 		 * The range in the document where this color appears.
 		 */ range: Range;
@@ -4665,7 +4898,14 @@ export type ColorInformation = {
 		 * The actual color value for this color range.
 		 */ color: Color;
 };
-export type ColorPresentation = {
+/**
+	 * A color presentation object describes how a {@linkcode Color} should be represented as text and what
+	 * edits are required to refer to it from source code.
+	 *
+	 * For some languages one color can have multiple presentations, e.g. css can represent the color red with
+	 * the constant `Red`, the hex-value `#ff0000`, or in rgba and hsla forms. In csharp other representations
+	 * apply, e.g. `System.Drawing.Color.Red`.
+	 */ export type ColorPresentation = {
     /**
 		 * The label of this color presentation. It will be shown on the color
 		 * picker header. By default this is also the text that is inserted when selecting
@@ -4706,8 +4946,15 @@ export type ColorPresentation = {
         readonly range: Range;
     }, token: CancellationToken): ProviderResult<ColorPresentation[]>;
 }
-export type InlayHintKind = ValueOf<VSCodeAPI["InlayHintKind"]>;
-export type InlayHintLabelPart = {
+/**
+	 * Inlay hint kinds.
+	 *
+	 * The kind of an inline hint defines its appearance, e.g the corresponding foreground and background colors are being
+	 * used.
+	 */ export type InlayHintKind = ValueOf<VSCodeAPI["InlayHintKind"]>;
+/**
+	 * An inlay hint label part allows for interactive and composite labels of inlay hints.
+	 */ export type InlayHintLabelPart = {
     /**
 		 * The value of this label part.
 		 */ value: string;
@@ -4739,7 +4986,9 @@ export type InlayHintLabelPart = {
 		 * {@link InlayHintsProvider.resolveInlayHint resolving} of inlay hints.
 		 */ command?: Command | undefined;
 };
-export type InlayHint = {
+/**
+	 * Inlay hint information.
+	 */ export type InlayHint = {
     /**
 		 * The position of this hint.
 		 */ position: Position;
@@ -4806,7 +5055,10 @@ export type InlayHint = {
 		 * @return The resolved inlay hint or a thenable that resolves to such. It is OK to return the given `item`. When no result is returned, the given `item` will be used.
 		 */ resolveInlayHint?(hint: T, token: CancellationToken): ProviderResult<T>;
 }
-export type FoldingRange = {
+/**
+	 * A line based folding range. To be valid, start and end line must be bigger than zero and smaller than the number of lines in the document.
+	 * Invalid ranges will be ignored.
+	 */ export type FoldingRange = {
     /**
 		 * The zero-based start line of the range to fold. The folded area starts after the line's last character.
 		 * To be valid, the end must be zero or larger and smaller than the number of lines in the document.
@@ -4823,7 +5075,12 @@ export type FoldingRange = {
 		 * If not set, the range is originated from a syntax element.
 		 */ kind?: FoldingRangeKind;
 };
-export type FoldingRangeKind = ValueOf<VSCodeAPI["FoldingRangeKind"]>;
+/**
+	 * An enumeration of specific folding range kinds. The kind is an optional field of a {@link FoldingRange}
+	 * and is used to distinguish specific folding ranges such as ranges originated from comments. The kind is used by commands like
+	 * `Fold all comments` or `Fold all regions`.
+	 * If the kind is not set on the range, the range originated from a syntax element other than comments, imports or region markers.
+	 */ export type FoldingRangeKind = ValueOf<VSCodeAPI["FoldingRangeKind"]>;
 /**
 	 * Folding context (for future use)
 	 */ export interface FoldingContext {
@@ -4843,7 +5100,10 @@ export type FoldingRangeKind = ValueOf<VSCodeAPI["FoldingRangeKind"]>;
 		 * @param token A cancellation token.
 		 */ provideFoldingRanges(document: TextDocument, context: FoldingContext, token: CancellationToken): ProviderResult<FoldingRange[]>;
 }
-export type SelectionRange = {
+/**
+	 * A selection range represents a part of a selection hierarchy. A selection range
+	 * may have a parent selection range that contains it.
+	 */ export type SelectionRange = {
     /**
 		 * The {@link Range} of this selection range.
 		 */ range: Range;
@@ -4866,7 +5126,10 @@ export interface SelectionRangeProvider {
 		 * signaled by returning `undefined` or `null`.
 		 */ provideSelectionRanges(document: TextDocument, positions: readonly Position[], token: CancellationToken): ProviderResult<SelectionRange[]>;
 }
-export type CallHierarchyItem = {
+/**
+	 * Represents programming constructs like functions or constructors in the context
+	 * of call hierarchy.
+	 */ export type CallHierarchyItem = {
     /**
 		 * The name of this item.
 		 */ name: string;
@@ -4890,7 +5153,9 @@ export type CallHierarchyItem = {
 		 * Must be contained by the {@linkcode CallHierarchyItem.range range}.
 		 */ selectionRange: Range;
 };
-export type CallHierarchyIncomingCall = {
+/**
+	 * Represents an incoming call, e.g. a caller of a method or constructor.
+	 */ export type CallHierarchyIncomingCall = {
     /**
 		 * The item that makes the call.
 		 */ from: CallHierarchyItem;
@@ -4899,7 +5164,9 @@ export type CallHierarchyIncomingCall = {
 		 * denoted by {@linkcode CallHierarchyIncomingCall.from this.from}.
 		 */ fromRanges: Range[];
 };
-export type CallHierarchyOutgoingCall = {
+/**
+	 * Represents an outgoing call, e.g. calling a getter from a method or a method from a constructor etc.
+	 */ export type CallHierarchyOutgoingCall = {
     /**
 		 * The item that is called.
 		 */ to: CallHierarchyItem;
@@ -4946,7 +5213,9 @@ export type CallHierarchyOutgoingCall = {
 		 * signaled by returning `undefined` or `null`.
 		 */ provideCallHierarchyOutgoingCalls(item: CallHierarchyItem, token: CancellationToken): ProviderResult<CallHierarchyOutgoingCall[]>;
 }
-export type TypeHierarchyItem = {
+/**
+	 * Represents an item of a type hierarchy, like a class or an interface.
+	 */ export type TypeHierarchyItem = {
     /**
 		 * The name of this item.
 		 */ name: string;
@@ -5007,7 +5276,9 @@ export type TypeHierarchyItem = {
 		 * signaled by returning `undefined` or `null`.
 		 */ provideTypeHierarchySubtypes(item: TypeHierarchyItem, token: CancellationToken): ProviderResult<TypeHierarchyItem[]>;
 }
-export type LinkedEditingRanges = {
+/**
+	 * Represents a list of ranges that can be edited together along with a word pattern to describe valid range contents.
+	 */ export type LinkedEditingRanges = {
     /**
 		 * A list of ranges that can be edited together. The ranges must have
 		 * identical length and text content. The ranges cannot overlap.
@@ -5033,7 +5304,9 @@ export type LinkedEditingRanges = {
 		 * @return A list of ranges that can be edited together
 		 */ provideLinkedEditingRanges(document: TextDocument, position: Position, token: CancellationToken): ProviderResult<LinkedEditingRanges>;
 }
-export type DocumentDropEdit = {
+/**
+	 * An edit operation applied {@link DocumentDropEditProvider on drop}.
+	 */ export type DocumentDropEdit = {
     /**
 		 * The text or snippet to insert at the drop location.
 		 */ insertText: string | SnippetString;
@@ -5090,7 +5363,9 @@ export type DocumentDropEdit = {
 		 * If a line matches this pattern, then its indentation should not be changed and it should not be evaluated against the other rules.
 		 */ unIndentedLinePattern?: RegExp;
 }
-export type IndentAction = ValueOf<VSCodeAPI["IndentAction"]>;
+/**
+	 * Describes what to do with the indentation when pressing Enter.
+	 */ export type IndentAction = ValueOf<VSCodeAPI["IndentAction"]>;
 /**
 	 * Describes what to do when pressing Enter.
 	 */ export interface EnterAction {
@@ -5178,7 +5453,9 @@ export type IndentAction = ValueOf<VSCodeAPI["IndentAction"]>;
         }[];
     };
 }
-export type ConfigurationTarget = ValueOf<VSCodeAPI["ConfigurationTarget"]>;
+/**
+	 * The configuration target
+	 */ export type ConfigurationTarget = ValueOf<VSCodeAPI["ConfigurationTarget"]>;
 /**
 	 * Represents the configuration. It is a merged view of
 	 *
@@ -5319,7 +5596,10 @@ export type ConfigurationTarget = ValueOf<VSCodeAPI["ConfigurationTarget"]>;
 		 * Readable dictionary that backs this configuration.
 		 */ readonly [key: string]: any;
 }
-export type Location = {
+/**
+	 * Represents a location inside a resource, such as a line
+	 * inside a text file.
+	 */ export type Location = {
     /**
 		 * The resource identifier of this location.
 		 */ uri: Uri;
@@ -5354,8 +5634,14 @@ export type Location = {
 		 * An array of resources for which diagnostics have changed.
 		 */ readonly uris: readonly Uri[];
 }
-export type DiagnosticSeverity = ValueOf<VSCodeAPI["DiagnosticSeverity"]>;
-export type DiagnosticRelatedInformation = {
+/**
+	 * Represents the severity of diagnostics.
+	 */ export type DiagnosticSeverity = ValueOf<VSCodeAPI["DiagnosticSeverity"]>;
+/**
+	 * Represents a related message and source code location for a diagnostic. This should be
+	 * used to point to code locations that cause or related to a diagnostics, e.g. when duplicating
+	 * a symbol in a scope.
+	 */ export type DiagnosticRelatedInformation = {
     /**
 		 * The location of this related diagnostic information.
 		 */ location: Location;
@@ -5363,8 +5649,13 @@ export type DiagnosticRelatedInformation = {
 		 * The message of this related diagnostic information.
 		 */ message: string;
 };
-export type DiagnosticTag = ValueOf<VSCodeAPI["DiagnosticTag"]>;
-export type Diagnostic = {
+/**
+	 * Additional metadata about the type of a diagnostic.
+	 */ export type DiagnosticTag = ValueOf<VSCodeAPI["DiagnosticTag"]>;
+/**
+	 * Represents a diagnostic, such as a compiler error or warning. Diagnostic objects
+	 * are only valid in the scope of a file.
+	 */ export type Diagnostic = {
     /**
 		 * The range to which this diagnostic applies.
 		 */ range: Range;
@@ -5463,7 +5754,9 @@ export type Diagnostic = {
 		 * {@link DiagnosticCollection.clear clear}.
 		 */ dispose(): void;
 }
-export type LanguageStatusSeverity = ValueOf<VSCodeAPI["LanguageStatusSeverity"]>;
+/**
+	 * Represents the severity of a language status item.
+	 */ export type LanguageStatusSeverity = ValueOf<VSCodeAPI["LanguageStatusSeverity"]>;
 /**
 	 * A language status item is the preferred way to present language status reports for the active text editors,
 	 * such as selected linter or notifying about a configuration problem.
@@ -5509,7 +5802,11 @@ export type LanguageStatusSeverity = ValueOf<VSCodeAPI["LanguageStatusSeverity"]
 		 * Dispose and free associated resources.
 		 */ dispose(): void;
 }
-export type ViewColumn = ValueOf<VSCodeAPI["ViewColumn"]>;
+/**
+	 * Denotes a location of an editor in the window. Editors can be arranged in a grid
+	 * and each column represents one editor location in that grid by counting the editors
+	 * in order of their appearance.
+	 */ export type ViewColumn = ValueOf<VSCodeAPI["ViewColumn"]>;
 /**
 	 * An output channel is a container for readonly textual information.
 	 *
@@ -5619,7 +5916,9 @@ export type ViewColumn = ValueOf<VSCodeAPI["ViewColumn"]>;
 		 * More about aria roles can be found here https://w3c.github.io/aria/#widget_roles
 		 */ readonly role?: string;
 }
-export type StatusBarAlignment = ValueOf<VSCodeAPI["StatusBarAlignment"]>;
+/**
+	 * Represents the alignment of status bar items.
+	 */ export type StatusBarAlignment = ValueOf<VSCodeAPI["StatusBarAlignment"]>;
 /**
 	 * A status bar item is a status bar contribution that can
 	 * show text and icons and run a command on click.
@@ -5750,7 +6049,9 @@ export type StatusBarAlignment = ValueOf<VSCodeAPI["StatusBarAlignment"]>;
 		 * Dispose and free associated resources.
 		 */ dispose(): void;
 }
-export type TerminalLocation = ValueOf<VSCodeAPI["TerminalLocation"]>;
+/**
+	 * The location of the terminal.
+	 */ export type TerminalLocation = ValueOf<VSCodeAPI["TerminalLocation"]>;
 /**
 	 * Assumes a {@link TerminalLocation} of editor and allows specifying a {@link ViewColumn} and
 	 * {@link TerminalEditorLocationOptions.preserveFocus preserveFocus } property
@@ -5818,7 +6119,9 @@ export type TerminalLocation = ValueOf<VSCodeAPI["TerminalLocation"]>;
 		 * @param link The link to handle.
 		 */ handleTerminalLink(link: T): ProviderResult<void>;
 }
-export type TerminalLink = {
+/**
+	 * A link on a terminal line.
+	 */ export type TerminalLink = {
     /**
 		 * The start index of the link on {@link TerminalLinkContext.line}.
 		 */ startIndex: number;
@@ -5843,12 +6146,16 @@ export type TerminalLink = {
 		 * @returns The terminal profile.
 		 */ provideTerminalProfile(token: CancellationToken): ProviderResult<TerminalProfile>;
 }
-export type TerminalProfile = {
+/**
+	 * A terminal profile defines how a terminal will be launched.
+	 */ export type TerminalProfile = {
     /**
 		 * The options that the terminal will launch with.
 		 */ options: TerminalOptions | ExtensionTerminalOptions;
 };
-export type FileDecoration = {
+/**
+	 * A file decoration represents metadata that can be rendered with a file.
+	 */ export type FileDecoration = {
     /**
 		 * A very short string that represents this decoration.
 		 */ badge?: string;
@@ -5886,7 +6193,10 @@ export type FileDecoration = {
 		 * @returns A decoration or a thenable that resolves to such.
 		 */ provideFileDecoration(uri: Uri, token: CancellationToken): ProviderResult<FileDecoration>;
 }
-export type ExtensionKind = ValueOf<VSCodeAPI["ExtensionKind"]>;
+/**
+	 * In a remote window the extension kind describes if an extension
+	 * runs where the UI (window) runs or if an extension runs remotely.
+	 */ export type ExtensionKind = ValueOf<VSCodeAPI["ExtensionKind"]>;
 /**
 	 * Represents an extension.
 	 *
@@ -5925,7 +6235,10 @@ export type ExtensionKind = ValueOf<VSCodeAPI["ExtensionKind"]>;
 		 * @return A promise that will resolve when this extension has been activated.
 		 */ activate(): Thenable<T>;
 }
-export type ExtensionMode = ValueOf<VSCodeAPI["ExtensionMode"]>;
+/**
+	 * The ExtensionMode is provided on the `ExtensionContext` and indicates the
+	 * mode the specific extension is running in.
+	 */ export type ExtensionMode = ValueOf<VSCodeAPI["ExtensionMode"]>;
 /**
 	 * An extension context is a collection of utilities private to an
 	 * extension.
@@ -6115,7 +6428,9 @@ export type ExtensionMode = ValueOf<VSCodeAPI["ExtensionMode"]>;
 		 * Fires when a secret is stored or deleted.
 		 */ onDidChange: Event<SecretStorageChangeEvent>;
 }
-export type ColorThemeKind = ValueOf<VSCodeAPI["ColorThemeKind"]>;
+/**
+	 * Represents a color theme kind.
+	 */ export type ColorThemeKind = ValueOf<VSCodeAPI["ColorThemeKind"]>;
 /**
 	 * Represents a color theme.
 	 */ export interface ColorTheme {
@@ -6123,8 +6438,12 @@ export type ColorThemeKind = ValueOf<VSCodeAPI["ColorThemeKind"]>;
 		 * The kind of this color theme: light, dark, high contrast dark and high contrast light.
 		 */ readonly kind: ColorThemeKind;
 }
-export type TaskRevealKind = ValueOf<VSCodeAPI["TaskRevealKind"]>;
-export type TaskPanelKind = ValueOf<VSCodeAPI["TaskPanelKind"]>;
+/**
+	 * Controls the behaviour of the terminal's visibility.
+	 */ export type TaskRevealKind = ValueOf<VSCodeAPI["TaskRevealKind"]>;
+/**
+	 * Controls how the task channel is used between tasks
+	 */ export type TaskPanelKind = ValueOf<VSCodeAPI["TaskPanelKind"]>;
 /**
 	 * Controls how the task is presented in the UI.
 	 */ export interface TaskPresentationOptions {
@@ -6151,7 +6470,10 @@ export type TaskPanelKind = ValueOf<VSCodeAPI["TaskPanelKind"]>;
 		 * Controls whether the terminal is cleared before executing the task.
 		 */ clear?: boolean;
 }
-export type TaskGroup = {
+/**
+	 * A grouping for tasks. The editor by default supports the
+	 * 'Clean', 'Build', 'RebuildAll' and 'Test' group.
+	 */ export type TaskGroup = {
     /**
 		 * Whether the task that is part of this group is the default for the group.
 		 * This property cannot be set through API, and is controlled by a user's task configurations.
@@ -6198,7 +6520,10 @@ export type TaskGroup = {
         [key: string]: string;
     };
 }
-export type ProcessExecution = {
+/**
+	 * The execution of a task happens as an external process
+	 * without shell interaction.
+	 */ export type ProcessExecution = {
     /**
 		 * The process to be executed.
 		 */ process: string;
@@ -6259,7 +6584,10 @@ export type ProcessExecution = {
         [key: string]: string;
     };
 }
-export type ShellQuoting = ValueOf<VSCodeAPI["ShellQuoting"]>;
+/**
+	 * Defines how an argument should be quoted if it contains
+	 * spaces or unsupported characters.
+	 */ export type ShellQuoting = ValueOf<VSCodeAPI["ShellQuoting"]>;
 /**
 	 * A string that will be quoted depending on the used shell.
 	 */ export interface ShellQuotedString {
@@ -6285,9 +6613,13 @@ export type ShellExecution = {
 		 * Defaults to undefined.
 		 */ options?: ShellExecutionOptions;
 };
-export type CustomExecution = {
+/**
+	 * Class used to execute an extension callback as a task.
+	 */ export type CustomExecution = {
 };
-export type TaskScope = ValueOf<VSCodeAPI["TaskScope"]>;
+/**
+	 * The scope of a task.
+	 */ export type TaskScope = ValueOf<VSCodeAPI["TaskScope"]>;
 /**
 	 * Run options for a task.
 	 */ export interface RunOptions {
@@ -6295,7 +6627,9 @@ export type TaskScope = ValueOf<VSCodeAPI["TaskScope"]>;
 		 * Controls whether task variables are re-evaluated on rerun.
 		 */ reevaluateOnRerun?: boolean;
 }
-export type Task = {
+/**
+	 * A task to execute
+	 */ export type Task = {
     /**
 		 * The task's definition.
 		 */ definition: TaskDefinition;
@@ -6381,7 +6715,11 @@ export type Task = {
 	 * An event signaling the start of a task execution.
 	 *
 	 * This interface is not intended to be implemented.
-	 */ export interface TaskStartEvent {
+	 */ export /**
+	 * An event signaling the start of a task execution.
+	 *
+	 * This interface is not intended to be implemented.
+	 */ interface TaskStartEvent {
     /**
 		 * The task item representing the task that got started.
 		 */ readonly execution: TaskExecution;
@@ -6390,7 +6728,11 @@ export type Task = {
 	 * An event signaling the end of an executed task.
 	 *
 	 * This interface is not intended to be implemented.
-	 */ export interface TaskEndEvent {
+	 */ export /**
+	 * An event signaling the end of an executed task.
+	 *
+	 * This interface is not intended to be implemented.
+	 */ interface TaskEndEvent {
     /**
 		 * The task item representing the task that finished.
 		 */ readonly execution: TaskExecution;
@@ -6426,7 +6768,11 @@ export interface TaskFilter {
 		 * The task type to return;
 		 */ type?: string;
 }
-export type FileType = ValueOf<VSCodeAPI["FileType"]>;
+/**
+	 * Enumeration of file types. The types `File` and `Directory` can also be
+	 * a symbolic links, in that case use `FileType.File | FileType.SymbolicLink` and
+	 * `FileType.Directory | FileType.SymbolicLink`.
+	 */ export type FileType = ValueOf<VSCodeAPI["FileType"]>;
 export type FilePermission = ValueOf<VSCodeAPI["FilePermission"]>;
 /**
 	 * The `FileStat`-type represents metadata about a file
@@ -6460,7 +6806,12 @@ export type FilePermission = ValueOf<VSCodeAPI["FilePermission"]>;
 		 * *Note:* This value might be a bitmask, e.g. `FilePermission.Readonly | FilePermission.Other`.
 		 */ permissions?: FilePermission;
 }
-export type FileSystemError = Error & {
+/**
+	 * A type that filesystem providers should use to signal errors.
+	 *
+	 * This class has factory methods for common error-cases, like `FileNotFound` when
+	 * a file or folder doesn't exist, use them like so: `throw vscode.FileSystemError.FileNotFound(someUri);`
+	 */ export type FileSystemError = Error & {
     /**
 		 * A code that identifies this error.
 		 *
@@ -6468,7 +6819,9 @@ export type FileSystemError = Error & {
 		 * or `Unknown` for unspecified errors.
 		 */ readonly code: string;
 };
-export type FileChangeType = ValueOf<VSCodeAPI["FileChangeType"]>;
+/**
+	 * Enumeration of file change types.
+	 */ export type FileChangeType = ValueOf<VSCodeAPI["FileChangeType"]>;
 /**
 	 * The event filesystem providers must use to signal a file change.
 	 */ export interface FileChangeEvent {
@@ -6860,7 +7213,9 @@ export type FileChangeType = ValueOf<VSCodeAPI["FileChangeType"]>;
 }
 /**
 	 * A panel that contains a webview.
-	 */ export interface WebviewPanel {
+	 */ export /**
+	 * A panel that contains a webview.
+	 */ interface WebviewPanel {
     /**
 		 * Identifies the type of the webview panel, such as `'markdown.preview'`.
 		 */ readonly viewType: string;
@@ -6956,7 +7311,39 @@ export type FileChangeType = ValueOf<VSCodeAPI["FileChangeType"]>;
 	 * The extension can then restore the old `WebviewPanel` from this state.
 	 *
 	 * @param T Type of the webview's state.
-	 */ export interface WebviewPanelSerializer<T = unknown> {
+	 */ export /**
+	 * Restore webview panels that have been persisted when vscode shuts down.
+	 *
+	 * There are two types of webview persistence:
+	 *
+	 * - Persistence within a session.
+	 * - Persistence across sessions (across restarts of the editor).
+	 *
+	 * A `WebviewPanelSerializer` is only required for the second case: persisting a webview across sessions.
+	 *
+	 * Persistence within a session allows a webview to save its state when it becomes hidden
+	 * and restore its content from this state when it becomes visible again. It is powered entirely
+	 * by the webview content itself. To save off a persisted state, call `acquireVsCodeApi().setState()` with
+	 * any json serializable object. To restore the state again, call `getState()`
+	 *
+	 * ```js
+	 * // Within the webview
+	 * const vscode = acquireVsCodeApi();
+	 *
+	 * // Get existing state
+	 * const oldState = vscode.getState() || { value: 0 };
+	 *
+	 * // Update state
+	 * setState({ value: oldState.value + 1 })
+	 * ```
+	 *
+	 * A `WebviewPanelSerializer` extends this persistence across restarts of the editor. When the editor is shutdown,
+	 * it will save off the state from `setState` of all webviews that have a serializer. When the
+	 * webview first becomes visible after the restart, this state is passed to `deserializeWebviewPanel`.
+	 * The extension can then restore the old `WebviewPanel` from this state.
+	 *
+	 * @param T Type of the webview's state.
+	 */ interface WebviewPanelSerializer<T = unknown> {
     /**
 		 * Restore a webview panel from its serialized `state`.
 		 *
@@ -7025,7 +7412,11 @@ export type FileChangeType = ValueOf<VSCodeAPI["FileChangeType"]>;
 	 * Additional information the webview view being resolved.
 	 *
 	 * @param T Type of the webview's state.
-	 */ export interface WebviewViewResolveContext<T = unknown> {
+	 */ export /**
+	 * Additional information the webview view being resolved.
+	 *
+	 * @param T Type of the webview's state.
+	 */ interface WebviewViewResolveContext<T = unknown> {
     /**
 		 * Persisted state from the webview content.
 		 *
@@ -7105,7 +7496,12 @@ export type FileChangeType = ValueOf<VSCodeAPI["FileChangeType"]>;
 	 *
 	 * Custom documents are only used within a given `CustomEditorProvider`. The lifecycle of a `CustomDocument` is
 	 * managed by the editor. When no more references remain to a `CustomDocument`, it is disposed of.
-	 */ export interface CustomDocument {
+	 */ export /**
+	 * Represents a custom document used by a {@linkcode CustomEditorProvider}.
+	 *
+	 * Custom documents are only used within a given `CustomEditorProvider`. The lifecycle of a `CustomDocument` is
+	 * managed by the editor. When no more references remain to a `CustomDocument`, it is disposed of.
+	 */ interface CustomDocument {
     /**
 		 * The associated uri for this document.
 		 */ readonly uri: Uri;
@@ -7120,7 +7516,11 @@ export type FileChangeType = ValueOf<VSCodeAPI["FileChangeType"]>;
 	 * Event triggered by extensions to signal to the editor that an edit has occurred on an {@linkcode CustomDocument}.
 	 *
 	 * @see {@linkcode CustomEditorProvider.onDidChangeCustomDocument}.
-	 */ export interface CustomDocumentEditEvent<T extends CustomDocument = CustomDocument> {
+	 */ export /**
+	 * Event triggered by extensions to signal to the editor that an edit has occurred on an {@linkcode CustomDocument}.
+	 *
+	 * @see {@linkcode CustomEditorProvider.onDidChangeCustomDocument}.
+	 */ interface CustomDocumentEditEvent<T extends CustomDocument = CustomDocument> {
     /**
 		 * The document that the edit is for.
 		 */ readonly document: T;
@@ -7149,14 +7549,21 @@ export type FileChangeType = ValueOf<VSCodeAPI["FileChangeType"]>;
 	 * has changed.
 	 *
 	 * @see {@linkcode CustomEditorProvider.onDidChangeCustomDocument}.
-	 */ export interface CustomDocumentContentChangeEvent<T extends CustomDocument = CustomDocument> {
+	 */ export /**
+	 * Event triggered by extensions to signal to the editor that the content of a {@linkcode CustomDocument}
+	 * has changed.
+	 *
+	 * @see {@linkcode CustomEditorProvider.onDidChangeCustomDocument}.
+	 */ interface CustomDocumentContentChangeEvent<T extends CustomDocument = CustomDocument> {
     /**
 		 * The document that the change is for.
 		 */ readonly document: T;
 }
 /**
 	 * A backup for an {@linkcode CustomDocument}.
-	 */ export interface CustomDocumentBackup {
+	 */ export /**
+	 * A backup for an {@linkcode CustomDocument}.
+	 */ interface CustomDocumentBackup {
     /**
 		 * Unique identifier for the backup.
 		 *
@@ -7171,7 +7578,9 @@ export type FileChangeType = ValueOf<VSCodeAPI["FileChangeType"]>;
 }
 /**
 	 * Additional information used to implement {@linkcode CustomDocumentBackup}.
-	 */ export interface CustomDocumentBackupContext {
+	 */ export /**
+	 * Additional information used to implement {@linkcode CustomDocumentBackup}.
+	 */ interface CustomDocumentBackupContext {
     /**
 		 * Suggested file location to write the new backup.
 		 *
@@ -7184,7 +7593,9 @@ export type FileChangeType = ValueOf<VSCodeAPI["FileChangeType"]>;
 }
 /**
 	 * Additional information about the opening custom document.
-	 */ export interface CustomDocumentOpenContext {
+	 */ export /**
+	 * Additional information about the opening custom document.
+	 */ interface CustomDocumentOpenContext {
     /**
 		 * The id of the backup to restore the document from or `undefined` if there is no backup.
 		 *
@@ -7350,8 +7761,12 @@ export type FileChangeType = ValueOf<VSCodeAPI["FileChangeType"]>;
 		 * @returns A thenable that resolves when writing happened.
 		 */ writeText(value: string): Thenable<void>;
 }
-export type UIKind = ValueOf<VSCodeAPI["UIKind"]>;
-export type LogLevel = ValueOf<VSCodeAPI["LogLevel"]>;
+/**
+	 * Possible kinds of UI that can use extensions.
+	 */ export type UIKind = ValueOf<VSCodeAPI["UIKind"]>;
+/**
+	 * Log levels
+	 */ export type LogLevel = ValueOf<VSCodeAPI["LogLevel"]>;
 /**
 	 * Represents the state of a window.
 	 */ export interface WindowState {
@@ -7424,7 +7839,9 @@ export type LogLevel = ValueOf<VSCodeAPI["LogLevel"]>;
 		 * The full file contents of the file.
 		 */ data(): Thenable<Uint8Array>;
 }
-export type DataTransferItem = {
+/**
+	 * Encapsulates data transferred during drag and drop operations.
+	 */ export type DataTransferItem = {
     /**
 		 * Custom data stored on this item.
 		 *
@@ -7432,7 +7849,13 @@ export type DataTransferItem = {
 		 * created the `DataTransferItem` runs in the same extension host.
 		 */ readonly value: any;
 };
-export type DataTransfer = {
+/**
+	 * A map containing a mapping of the mime type of the corresponding transferred data.
+	 *
+	 * Drag and drop controllers that implement {@link TreeDragAndDropController.handleDrag `handleDrag`} can add additional mime types to the
+	 * data transfer. These additional mime types will only be included in the `handleDrop` when the the drag was initiated from
+	 * an element in the same drag and drop controller.
+	 */ export type DataTransfer = {
 };
 /**
 	 * Provides support for drag and drop in `TreeView`.
@@ -7665,7 +8088,9 @@ export type TreeItem = {
 		 * however, there are cases where a TreeItem is not displayed in a tree-like way where setting the `role` may make sense.
 		 */ accessibilityInformation?: AccessibilityInformation;
 };
-export type TreeItemCollapsibleState = ValueOf<VSCodeAPI["TreeItemCollapsibleState"]>;
+/**
+	 * Collapsible state of the tree item
+	 */ export type TreeItemCollapsibleState = ValueOf<VSCodeAPI["TreeItemCollapsibleState"]>;
 /**
 	 * Label describing the {@link TreeItem Tree item}
 	 */ export interface TreeItemLabel {
@@ -7767,7 +8192,9 @@ export type TreeItemCollapsibleState = ValueOf<VSCodeAPI["TreeItemCollapsibleSta
 }
 /**
 	 * Defines the interface of a terminal pty, enabling extensions to control a terminal.
-	 */ export interface Pseudoterminal {
+	 */ export /**
+	 * Defines the interface of a terminal pty, enabling extensions to control a terminal.
+	 */ interface Pseudoterminal {
     /**
 		 * An event that when fired will write data to the terminal. Unlike
 		 * {@link Terminal.sendText} which sends text to the underlying child
@@ -7935,8 +8362,12 @@ export type TreeItemCollapsibleState = ValueOf<VSCodeAPI["TreeItemCollapsibleSta
 		 * The reason that triggered the exit of a terminal.
 		 */ readonly reason: TerminalExitReason;
 }
-export type TerminalExitReason = ValueOf<VSCodeAPI["TerminalExitReason"]>;
-export type EnvironmentVariableMutatorType = ValueOf<VSCodeAPI["EnvironmentVariableMutatorType"]>;
+/**
+	 * Terminal exit reason kind.
+	 */ export type TerminalExitReason = ValueOf<VSCodeAPI["TerminalExitReason"]>;
+/**
+	 * A type of mutation that can be applied to an environment variable.
+	 */ export type EnvironmentVariableMutatorType = ValueOf<VSCodeAPI["EnvironmentVariableMutatorType"]>;
 /**
 	 * A type of mutation and its value to be applied to an environment variable.
 	 */ export interface EnvironmentVariableMutator {
@@ -8004,7 +8435,10 @@ export type EnvironmentVariableMutatorType = ValueOf<VSCodeAPI["EnvironmentVaria
 		 * Clears all mutators from this collection.
 		 */ clear(): void;
 }
-export type ProgressLocation = ValueOf<VSCodeAPI["ProgressLocation"]>;
+/**
+	 * A location in the editor at which progress information can be shown. It depends on the
+	 * location how progress is visually represented.
+	 */ export type ProgressLocation = ValueOf<VSCodeAPI["ProgressLocation"]>;
 /**
 	 * Value-object describing where and how progress should show.
 	 */ export interface ProgressOptions {
@@ -8213,7 +8647,9 @@ export type ProgressLocation = ValueOf<VSCodeAPI["ProgressLocation"]>;
 		 * An optional tooltip.
 		 */ readonly tooltip?: string | undefined;
 }
-export type QuickInputButtons = {
+/**
+	 * Predefined buttons for {@link QuickPick} and {@link InputBox}.
+	 */ export type QuickInputButtons = {
 };
 /**
 	 * An event signaling when a button in a particular {@link QuickPickItem} was triggered.
@@ -8257,7 +8693,9 @@ export type TextDocumentChangeReason = ValueOf<VSCodeAPI["TextDocumentChangeReas
 		 * Is `undefined` if the reason is not known.
 		*/ readonly reason: TextDocumentChangeReason | undefined;
 }
-export type TextDocumentSaveReason = ValueOf<VSCodeAPI["TextDocumentSaveReason"]>;
+/**
+	 * Represents reasons why a text document is saved.
+	 */ export type TextDocumentSaveReason = ValueOf<VSCodeAPI["TextDocumentSaveReason"]>;
 /**
 	 * An event that is fired when a {@link TextDocument document} will be saved.
 	 *
@@ -8492,7 +8930,9 @@ export type TextDocumentSaveReason = ValueOf<VSCodeAPI["TextDocumentSaveReason"]
 		 * @return `true` if the given section has changed.
 		 */ affectsConfiguration(section: string, scope?: ConfigurationScope): boolean;
 }
-export type NotebookEditorRevealType = ValueOf<VSCodeAPI["NotebookEditorRevealType"]>;
+/**
+	 * Represents a notebook editor that is attached to a {@link NotebookDocument notebook}.
+	 */ export type NotebookEditorRevealType = ValueOf<VSCodeAPI["NotebookEditorRevealType"]>;
 /**
 	 * Represents a notebook editor that is attached to a {@link NotebookDocument notebook}.
 	 * Additional properties of the NotebookEditor are available in the proposed
@@ -8541,7 +8981,9 @@ export type NotebookEditorRevealType = ValueOf<VSCodeAPI["NotebookEditorRevealTy
 		 * delivered to any renderer.
 		 */ postMessage(message: any, editor?: NotebookEditor): Thenable<boolean>;
 }
-export type NotebookCellKind = ValueOf<VSCodeAPI["NotebookCellKind"]>;
+/**
+	 * A notebook cell kind.
+	 */ export type NotebookCellKind = ValueOf<VSCodeAPI["NotebookCellKind"]>;
 /**
 	 * Represents a cell of a {@link NotebookDocument notebook}, either a {@link NotebookCellKind.Code code}-cell
 	 * or {@link NotebookCellKind.Markup markup}-cell.
@@ -8709,7 +9151,10 @@ export type NotebookCellKind = ValueOf<VSCodeAPI["NotebookCellKind"]>;
         readonly endTime: number;
     };
 }
-export type NotebookRange = {
+/**
+	 * A notebook range represents an ordered pair of two cell indices.
+	 * It is guaranteed that start is less than or equal to end.
+	 */ export type NotebookRange = {
     /**
 		 * The zero-based start index of this range.
 		 */ readonly start: number;
@@ -8720,7 +9165,9 @@ export type NotebookRange = {
 		 * `true` if `start` and `end` are equal.
 		 */ readonly isEmpty: boolean;
 };
-export type NotebookCellOutputItem = {
+/**
+	 * One representation of a {@link NotebookCellOutput notebook output}, defined by MIME type and data.
+	 */ export type NotebookCellOutputItem = {
     /**
 		 * The mime type which determines how the {@linkcode NotebookCellOutputItem.data data}-property
 		 * is interpreted.
@@ -8732,7 +9179,11 @@ export type NotebookCellOutputItem = {
 		 * The data of this output item. Must always be an array of unsigned 8-bit integers.
 		 */ data: Uint8Array;
 };
-export type NotebookCellOutput = {
+/**
+	 * Notebook cell output represents a result of executing a cell. It is a container type for multiple
+	 * {@link NotebookCellOutputItem output items} where contained items represent the same result but
+	 * use different MIME types.
+	 */ export type NotebookCellOutput = {
     /**
 		 * The output items of this output. Each item must represent the same result. _Note_ that repeated
 		 * MIME types per output is invalid and that the editor will just pick one of them.
@@ -8752,7 +9203,9 @@ export type NotebookCellOutput = {
         [key: string]: any;
     };
 };
-export type NotebookCellData = {
+/**
+	 * NotebookCellData is the raw representation of notebook cells. Its is part of {@linkcode NotebookData}.
+	 */ export type NotebookCellData = {
     /**
 		 * The {@link NotebookCellKind kind} of this cell data.
 		 */ kind: NotebookCellKind;
@@ -8775,7 +9228,14 @@ export type NotebookCellData = {
 		 * The execution summary of this cell data.
 		 */ executionSummary?: NotebookCellExecutionSummary;
 };
-export type NotebookData = {
+/**
+	 * Raw representation of a notebook.
+	 *
+	 * Extensions are responsible for creating {@linkcode NotebookData} so that the editor
+	 * can create a {@linkcode NotebookDocument}.
+	 *
+	 * @see {@link NotebookSerializer}
+	 */ export type NotebookData = {
     /**
 		 * The cell data of this notebook data.
 		 */ cells: NotebookCellData[];
@@ -8836,7 +9296,11 @@ export type NotebookData = {
         [key: string]: boolean | undefined;
     };
 }
-export type NotebookControllerAffinity = ValueOf<VSCodeAPI["NotebookControllerAffinity"]>;
+/**
+	 * Notebook controller affinity for notebook documents.
+	 *
+	 * @see {@link NotebookController.updateNotebookAffinity}
+	 */ export type NotebookControllerAffinity = ValueOf<VSCodeAPI["NotebookControllerAffinity"]>;
 /**
 	 * A notebook controller represents an entity that can execute notebook cells. This is often referred to as a kernel.
 	 *
@@ -9013,8 +9477,12 @@ export type NotebookControllerAffinity = ValueOf<VSCodeAPI["NotebookControllerAf
 		 * @return A thenable that resolves when the operation finished.
 		 */ appendOutputItems(items: NotebookCellOutputItem | readonly NotebookCellOutputItem[], output: NotebookCellOutput): Thenable<void>;
 }
-export type NotebookCellStatusBarAlignment = ValueOf<VSCodeAPI["NotebookCellStatusBarAlignment"]>;
-export type NotebookCellStatusBarItem = {
+/**
+	 * Represents the alignment of status bar items.
+	 */ export type NotebookCellStatusBarAlignment = ValueOf<VSCodeAPI["NotebookCellStatusBarAlignment"]>;
+/**
+	 * A contribution to a cell's status bar
+	 */ export type NotebookCellStatusBarItem = {
     /**
 		 * The text to show for the item.
 		 */ text: string;
@@ -9333,7 +9801,9 @@ export interface QuickDiffProvider {
 		 * @return The resolved debug configuration or undefined or null.
 		 */ resolveDebugConfigurationWithSubstitutedVariables?(folder: WorkspaceFolder | undefined, debugConfiguration: DebugConfiguration, token?: CancellationToken): ProviderResult<DebugConfiguration>;
 }
-export type DebugAdapterExecutable = {
+/**
+	 * Represents a debug adapter executable and optional arguments and runtime options passed to it.
+	 */ export type DebugAdapterExecutable = {
     /**
 		 * The command or path of the debug adapter executable.
 		 * A command must be either an absolute path of an executable or the name of an command to be looked up via the PATH environment variable.
@@ -9361,7 +9831,9 @@ export type DebugAdapterExecutable = {
 		 * The current working directory for the executed debug adapter.
 		 */ cwd?: string;
 }
-export type DebugAdapterServer = {
+/**
+	 * Represents a debug adapter running as a socket based server.
+	 */ export type DebugAdapterServer = {
     /**
 		 * The port.
 		 */ readonly port: number;
@@ -9369,7 +9841,9 @@ export type DebugAdapterServer = {
 		 * The host.
 		 */ readonly host?: string | undefined;
 };
-export type DebugAdapterNamedPipeServer = {
+/**
+	 * Represents a debug adapter running as a Named Pipe (on Windows)/UNIX Domain Socket (on non-Windows) based server.
+	 */ export type DebugAdapterNamedPipeServer = {
     /**
 		 * The path to the NamedPipe/UNIX Domain Socket.
 		 */ readonly path: string;
@@ -9388,7 +9862,9 @@ export type DebugAdapterNamedPipeServer = {
 		 * @param message A Debug Adapter Protocol message
 		 */ handleMessage(message: DebugProtocolMessage): void;
 }
-export type DebugAdapterInlineImplementation = {
+/**
+	 * A debug adapter descriptor for an inline implementation.
+	 */ export type DebugAdapterInlineImplementation = {
 };
 export type DebugAdapterDescriptor = DebugAdapterExecutable | DebugAdapterServer | DebugAdapterNamedPipeServer | DebugAdapterInlineImplementation;
 export interface DebugAdapterDescriptorFactory {
@@ -9469,7 +9945,9 @@ export interface DebugAdapterTrackerFactory {
 		 * Changed breakpoints.
 		 */ readonly changed: readonly Breakpoint[];
 }
-export type Breakpoint = {
+/**
+	 * The base class of all breakpoint types.
+	 */ export type Breakpoint = {
     /**
 		 * The unique ID of the breakpoint.
 		 */ readonly id: string;
@@ -9486,17 +9964,23 @@ export type Breakpoint = {
 		 * An optional message that gets logged when this breakpoint is hit. Embedded expressions within {} are interpolated by the debug adapter.
 		 */ readonly logMessage?: string | undefined;
 };
-export type SourceBreakpoint = Breakpoint & {
+/**
+	 * A breakpoint specified by a source location.
+	 */ export type SourceBreakpoint = Breakpoint & {
     /**
 		 * The source and line position of this breakpoint.
 		 */ readonly location: Location;
 };
-export type FunctionBreakpoint = Breakpoint & {
+/**
+	 * A breakpoint specified by a function name.
+	 */ export type FunctionBreakpoint = Breakpoint & {
     /**
 		 * The name of the function to which this breakpoint is attached.
 		 */ readonly functionName: string;
 };
-export type DebugConsoleMode = ValueOf<VSCodeAPI["DebugConsoleMode"]>;
+/**
+	 * Debug console mode used by debug session, see {@link DebugSessionOptions options}.
+	 */ export type DebugConsoleMode = ValueOf<VSCodeAPI["DebugConsoleMode"]>;
 /**
 	 * Options for {@link debug.startDebugging starting a debug session}.
 	 */ export interface DebugSessionOptions {
@@ -9536,10 +10020,21 @@ export type DebugConsoleMode = ValueOf<VSCodeAPI["DebugConsoleMode"]>;
 		 * When true, the debug viewlet will not be automatically revealed for this session.
 		 */ suppressDebugView?: boolean;
 }
-export type DebugConfigurationProviderTriggerKind = ValueOf<VSCodeAPI["DebugConfigurationProviderTriggerKind"]>;
-export type CommentThreadCollapsibleState = ValueOf<VSCodeAPI["CommentThreadCollapsibleState"]>;
-export type CommentMode = ValueOf<VSCodeAPI["CommentMode"]>;
-export type CommentThreadState = ValueOf<VSCodeAPI["CommentThreadState"]>;
+/**
+	 * A DebugConfigurationProviderTriggerKind specifies when the `provideDebugConfigurations` method of a `DebugConfigurationProvider` is triggered.
+	 * Currently there are two situations: to provide the initial debug configurations for a newly created launch.json or
+	 * to provide dynamically generated debug configurations when the user asks for them through the UI (e.g. via the "Select and Start Debugging" command).
+	 * A trigger kind is used when registering a `DebugConfigurationProvider` with {@link debug.registerDebugConfigurationProvider}.
+	 */ export type DebugConfigurationProviderTriggerKind = ValueOf<VSCodeAPI["DebugConfigurationProviderTriggerKind"]>;
+/**
+	 * Collapsible state of a {@link CommentThread comment thread}
+	 */ export type CommentThreadCollapsibleState = ValueOf<VSCodeAPI["CommentThreadCollapsibleState"]>;
+/**
+	 * Comment mode of a {@link Comment}
+	 */ export type CommentMode = ValueOf<VSCodeAPI["CommentMode"]>;
+/**
+	 * The state of a comment thread.
+	 */ export type CommentThreadState = ValueOf<VSCodeAPI["CommentThreadState"]>;
 /**
 	 * A collection of {@link Comment comments} representing a conversation at a particular range in a document.
 	 */ export interface CommentThread {
@@ -9874,8 +10369,14 @@ export type CommentThreadState = ValueOf<VSCodeAPI["CommentThreadState"]>;
 		 * @param sessionId The id of the session to remove.
 		 */ removeSession(sessionId: string): Thenable<void>;
 }
-export type TestRunProfileKind = ValueOf<VSCodeAPI["TestRunProfileKind"]>;
-export type TestTag = {
+/**
+	 * The kind of executions that {@link TestRunProfile TestRunProfiles} control.
+	 */ export type TestRunProfileKind = ValueOf<VSCodeAPI["TestRunProfileKind"]>;
+/**
+	 * Tags can be associated with {@link TestItem TestItems} and
+	 * {@link TestRunProfile TestRunProfiles}. A profile with a tag can only
+	 * execute tests that include that tag in their {@link TestItem.tags} array.
+	 */ export type TestTag = {
     /**
 		 * ID of the test tag. `TestTag` instances with the same ID are considered
 		 * to be identical.
@@ -10031,7 +10532,16 @@ export type TestTag = {
 		 * and unpersisted results.
 		 */ dispose(): void;
 }
-export type TestRunRequest = {
+/**
+	 * A TestRunRequest is a precursor to a {@link TestRun}, which in turn is
+	 * created by passing a request to {@link TestController.createTestRun}. The
+	 * TestRunRequest contains information about which tests should be run, which
+	 * should not be run, and how they are run (via the {@link TestRunRequest.profile profile}).
+	 *
+	 * In general, TestRunRequests are created by the editor and pass to
+	 * {@link TestRunProfile.runHandler}, however you can also create test
+	 * requests and runs outside of the `runHandler`.
+	 */ export type TestRunRequest = {
     /**
 		 * A filter for specific tests to run. If given, the extension should run
 		 * all of the included tests and all their children, excluding any tests
@@ -10216,7 +10726,10 @@ export type TestRunRequest = {
 		 * test discovery, such as syntax errors.
 		 */ error: string | MarkdownString | undefined;
 }
-export type TestMessage = {
+/**
+	 * Message associated with the test state. Can be linked to a specific
+	 * source range -- useful for assertion failures, for example.
+	 */ export type TestMessage = {
     /**
 		 * Human-readable message text to display.
 		 */ message: string | MarkdownString;
@@ -10230,12 +10743,17 @@ export type TestMessage = {
 		 * Associated file location.
 		 */ location?: Location;
 };
-export type TabInputText = {
+/**
+	 * The tab represents a single text based resource.
+	 */ export type TabInputText = {
     /**
 		 * The uri represented by the tab.
 		 */ readonly uri: Uri;
 };
-export type TabInputTextDiff = {
+/**
+	 * The tab represents two text based resources
+	 * being rendered as a diff.
+	 */ export type TabInputTextDiff = {
     /**
 		 * The uri of the original text resource.
 		 */ readonly original: Uri;
@@ -10243,7 +10761,9 @@ export type TabInputTextDiff = {
 		 * The uri of the modified text resource.
 		 */ readonly modified: Uri;
 };
-export type TabInputCustom = {
+/**
+	 * The tab represents a custom editor.
+	 */ export type TabInputCustom = {
     /**
 		 * The uri that the tab is representing.
 		 */ readonly uri: Uri;
@@ -10251,12 +10771,16 @@ export type TabInputCustom = {
 		 * The type of custom editor.
 		 */ readonly viewType: string;
 };
-export type TabInputWebview = {
+/**
+	 * The tab represents a webview.
+	 */ export type TabInputWebview = {
     /**
 		 * The type of webview. Maps to {@linkcode WebviewPanel.viewType WebviewPanel's viewType}
 		 */ readonly viewType: string;
 };
-export type TabInputNotebook = {
+/**
+	 * The tab represents a notebook.
+	 */ export type TabInputNotebook = {
     /**
 		 * The uri that the tab is representing.
 		 */ readonly uri: Uri;
@@ -10264,7 +10788,9 @@ export type TabInputNotebook = {
 		 * The type of notebook. Maps to {@linkcode NotebookDocument.notebookType NotebookDocuments's notebookType}
 		 */ readonly notebookType: string;
 };
-export type TabInputNotebookDiff = {
+/**
+	 * The tabs represents two notebooks in a diff configuration.
+	 */ export type TabInputNotebookDiff = {
     /**
 		 * The uri of the original notebook.
 		 */ readonly original: Uri;
@@ -10275,7 +10801,9 @@ export type TabInputNotebookDiff = {
 		 * The type of notebook. Maps to {@linkcode NotebookDocument.notebookType NotebookDocuments's notebookType}
 		 */ readonly notebookType: string;
 };
-export type TabInputTerminal = {
+/**
+	 * The tab represents a terminal in the editor area.
+	 */ export type TabInputTerminal = {
 };
 /**
 	 * Represents a tab within a {@link TabGroup group of tabs}.
@@ -10391,7 +10919,10 @@ export type TabInputTerminal = {
 		 * @returns A promise that resolves to `true` when all tab groups have been closed.
 		 */ close(tabGroup: TabGroup | readonly TabGroup[], preserveFocus?: boolean): Thenable<boolean>;
 }
-export type TelemetryTrustedValue = {
+/**
+	 * A special value wrapper denoting a value that is safe to not clean.
+	 * This is to be used when you can guarantee no identifiable information is contained in the value and the cleaning is improperly redacting it.
+	 */ export type TelemetryTrustedValue = {
     readonly value: T;
 };
 /**
@@ -10497,7 +11028,12 @@ export type TelemetryTrustedValue = {
  * and others. This API makes no assumption about what promise library is being used which
  * enables reusing existing code without migrating to a specific promise implementation. Still,
  * we recommend the use of native promises which are available in this editor.
- */ export interface Thenable<T> {
+ */ export /**
+ * Thenable is a common denominator between ES6 promises, Q, jquery.Deferred, WinJS.Promise,
+ * and others. This API makes no assumption about what promise library is being used which
+ * enables reusing existing code without migrating to a specific promise implementation. Still,
+ * we recommend the use of native promises which are available in this editor.
+ */ interface Thenable<T> {
     /**
 	* Attaches callbacks for the resolution and/or rejection of the Promise.
 	* @param onfulfilled The callback to execute when the Promise is resolved.

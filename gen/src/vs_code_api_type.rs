@@ -1,6 +1,6 @@
 pub fn module_item(
-    comments: &swc_common::comments::SingleThreadedComments,
-    result_vec: &Vec<crate::pickup::ResultDeclWithSpan>,
+    comments: &dyn swc_common::comments::Comments,
+    result_vec: &Vec<crate::pickup::ResultDeclWithComments>,
 ) -> swc_ecma_ast::ModuleItem {
     swc_ecma_ast::ModuleItem::ModuleDecl(swc_ecma_ast::ModuleDecl::ExportDecl(
         swc_ecma_ast::ExportDecl {
@@ -31,14 +31,14 @@ pub fn module_item(
                     span: swc_common::Span::default(),
                     members: result_vec
                         .iter()
-                        .filter_map(
-                            |result| match result_decl_to_ts_property_signature(result) {
+                        .filter_map(|result| {
+                            match result_decl_to_ts_property_signature(result, comments) {
                                 Some(sig) => {
                                     Some(swc_ecma_ast::TsTypeElement::TsPropertySignature(sig))
                                 }
                                 None => None,
-                            },
-                        )
+                            }
+                        })
                         .collect(),
                 })),
                 type_params: None,
@@ -48,11 +48,23 @@ pub fn module_item(
 }
 
 fn result_decl_to_ts_property_signature(
-    result: &crate::pickup::ResultDeclWithSpan,
+    result: &crate::pickup::ResultDeclWithComments,
+    comments: &dyn swc_common::comments::Comments,
 ) -> Option<swc_ecma_ast::TsPropertySignature> {
     match &result.decl {
         crate::pickup::ResultDecl::Class(class) => Some(swc_ecma_ast::TsPropertySignature {
-            span: result.span,
+            span: {
+                let span = swc_common::Span::dummy_with_cmt();
+                match &result.comments {
+                    Some(comment_vec) => swc_common::comments::Comments::add_leading_comments(
+                        &comments,
+                        span.lo,
+                        comment_vec.clone(),
+                    ),
+                    None => {}
+                }
+                span
+            },
             readonly: true,
             key: Box::new(swc_ecma_ast::Expr::Ident(class.ident.clone())),
             computed: false,
@@ -78,7 +90,18 @@ fn result_decl_to_ts_property_signature(
         crate::pickup::ResultDecl::TsInterface(_) => None,
         crate::pickup::ResultDecl::TsTypeAlias(_) => None,
         crate::pickup::ResultDecl::TsEnum(ts_enum) => Some(swc_ecma_ast::TsPropertySignature {
-            span: result.span,
+            span: {
+                let span = swc_common::Span::dummy_with_cmt();
+                match &result.comments {
+                    Some(comment_vec) => swc_common::comments::Comments::add_leading_comments(
+                        &comments,
+                        span.lo,
+                        comment_vec.clone(),
+                    ),
+                    None => {}
+                }
+                span
+            },
             readonly: true,
             key: Box::new(swc_ecma_ast::Expr::Ident(ts_enum.id.clone())),
             computed: false,
