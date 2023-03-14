@@ -943,7 +943,7 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * @param items The completion items.
 		 * @param isIncomplete The list is not complete.
-		 */ new(items?: T[], isIncomplete?: boolean): CompletionList;
+		 */ new(items?: T[], isIncomplete?: boolean): CompletionList<T>;
     };
     /**
 	 * How a {@link CompletionItemProvider completion provider} was triggered
@@ -2174,7 +2174,7 @@ Returns VSCodeApi only within the vscode extension.
 	 * A special value wrapper denoting a value that is safe to not clean.
 	 * This is to be used when you can guarantee no identifiable information is contained in the value and the cleaning is improperly redacting it.
 	 */ readonly TelemetryTrustedValue: {
-        new(value: T): TelemetryTrustedValue;
+        new(value: T): TelemetryTrustedValue<T>;
     };
 };
 type ValueOf<T> = T[keyof T];
@@ -2982,7 +2982,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 	 * Use this class if you want to provide event from within your extension, for instance
 	 * inside a {@link TextDocumentContentProvider} or when providing
 	 * API to other extensions.
-	 */ export type EventEmitter = {
+	 */ export type EventEmitter<T> = {
     /**
 		 * The event listeners can subscribe to.
 		 */ event: Event<T>;
@@ -4677,7 +4677,7 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 /**
 	 * Represents a collection of {@link CompletionItem completion items} to be presented
 	 * in the editor.
-	 */ export type CompletionList = {
+	 */ export type CompletionList<T extends CompletionItem = CompletionItem> = {
     /**
 		 * This list is not complete. Further typing should result in recomputing
 		 * this list.
@@ -10922,7 +10922,7 @@ export interface DebugAdapterTrackerFactory {
 /**
 	 * A special value wrapper denoting a value that is safe to not clean.
 	 * This is to be used when you can guarantee no identifiable information is contained in the value and the cleaning is improperly redacting it.
-	 */ export type TelemetryTrustedValue = {
+	 */ export type TelemetryTrustedValue<T = any> = {
     readonly value: T;
 };
 /**

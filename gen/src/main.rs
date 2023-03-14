@@ -207,7 +207,7 @@ fn module_item_transform(
                             },
                         ),
                     )),
-                    type_params: None,
+                    type_params: class.class.type_params.clone(),
                 })),
             }),
         )),

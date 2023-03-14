@@ -79,7 +79,13 @@ fn result_decl_to_ts_property_signature(
                         .class
                         .body
                         .iter()
-                        .filter_map(|item| class_member_to_ts_type_element(item, &class.ident))
+                        .filter_map(|item| {
+                            class_member_to_ts_type_element(
+                                item,
+                                &class.ident,
+                                &class.class.type_params,
+                            )
+                        })
                         .collect(),
                 })),
             })),
@@ -127,6 +133,7 @@ fn result_decl_to_ts_property_signature(
 fn class_member_to_ts_type_element(
     class_member: &swc_ecma_ast::ClassMember,
     class_name: &swc_ecma_ast::Ident,
+    type_params: &Option<Box<swc_ecma_ast::TsTypeParamDecl>>,
 ) -> Option<swc_ecma_ast::TsTypeElement> {
     match class_member {
         swc_ecma_ast::ClassMember::Constructor(constructor) => {
@@ -140,14 +147,37 @@ fn class_member_to_ts_type_element(
                             crate::fn_to_type::param_or_ts_param_prop_to_ts_fn_param(param)
                         })
                         .collect(),
-                    type_params: None,
+                    type_params: type_params.clone(),
                     type_ann: Some(Box::new(swc_ecma_ast::TsTypeAnn {
                         span: swc_common::Span::default(),
                         type_ann: Box::new(swc_ecma_ast::TsType::TsTypeRef(
                             swc_ecma_ast::TsTypeRef {
                                 span: swc_common::Span::default(),
                                 type_name: swc_ecma_ast::TsEntityName::Ident(class_name.clone()),
-                                type_params: None,
+                                type_params: match type_params {
+                                    Some(p) => {
+                                        Some(Box::new(swc_ecma_ast::TsTypeParamInstantiation {
+                                            span: swc_common::Span::default(),
+                                            params: p
+                                                .params
+                                                .iter()
+                                                .map(|param| {
+                                                    Box::new(swc_ecma_ast::TsType::TsTypeRef(
+                                                        swc_ecma_ast::TsTypeRef {
+                                                            span: swc_common::Span::default(),
+                                                            type_name:
+                                                                swc_ecma_ast::TsEntityName::Ident(
+                                                                    param.name.clone(),
+                                                                ),
+                                                            type_params: None,
+                                                        },
+                                                    ))
+                                                })
+                                                .collect(),
+                                        }))
+                                    }
+                                    None => None,
+                                },
                             },
                         )),
                     })),
