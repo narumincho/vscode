@@ -15,6 +15,9 @@ Returns VSCodeApi only within the vscode extension.
  * See https://code.visualstudio.com/api for more information
  */ export type VSCodeAPI = {
     /**
+	 * The version of the editor.
+	 */ readonly version: string;
+    /**
 	 * Represents a line and character position, such as
 	 * the position of the cursor.
 	 *
@@ -1568,6 +1571,25 @@ Returns VSCodeApi only within the vscode extension.
 		 */ new(taskDefinition: TaskDefinition, name: string, source: string, execution?: ProcessExecution | ShellExecution, problemMatchers?: string | string[]): Task;
     };
     /**
+		 * The currently active task executions or an empty array.
+		 */ readonly taskExecutions: readonly TaskExecution[];
+    /**
+		 * Fires when a task starts.
+		 */ readonly onDidStartTask: Event<TaskStartEvent>;
+    /**
+		 * Fires when a task ends.
+		 */ readonly onDidEndTask: Event<TaskEndEvent>;
+    /**
+		 * Fires when the underlying process has been started.
+		 * This event will not fire for tasks that don't
+		 * execute an underlying process.
+		 */ readonly onDidStartTaskProcess: Event<TaskProcessStartEvent>;
+    /**
+		 * Fires when the underlying process has ended.
+		 * This event will not fire for tasks that don't
+		 * execute an underlying process.
+		 */ readonly onDidEndTaskProcess: Event<TaskProcessEndEvent>;
+    /**
 	 * Enumeration of file types. The types `File` and `Directory` can also be
 	 * a symbolic links, in that case use `FileType.File | FileType.SymbolicLink` and
 	 * `FileType.Directory | FileType.SymbolicLink`.
@@ -1678,6 +1700,167 @@ Returns VSCodeApi only within the vscode extension.
 		 * Only error messages are logged with this level.
 		 */ readonly Error: 5;
     };
+    /**
+		 * The application name of the editor, like 'VS Code'.
+		 */ readonly appName: string;
+    /**
+		 * The application root folder from which the editor is running.
+		 *
+		 * *Note* that the value is the empty string when running in an
+		 * environment that has no representation of an application root folder.
+		 */ readonly appRoot: string;
+    /**
+		 * The hosted location of the application
+		 * On desktop this is 'desktop'
+		 * In the web this is the specified embedder i.e. 'github.dev', 'codespaces', or 'web' if the embedder
+		 * does not provide that information
+		 */ readonly appHost: string;
+    /**
+		 * The custom uri scheme the editor registers to in the operating system.
+		 */ readonly uriScheme: string;
+    /**
+		 * Represents the preferred user-language, like `de-CH`, `fr`, or `en-US`.
+		 */ readonly language: string;
+    /**
+		 * The system clipboard.
+		 */ readonly clipboard: Clipboard;
+    /**
+		 * A unique identifier for the computer.
+		 */ readonly machineId: string;
+    /**
+		 * A unique identifier for the current session.
+		 * Changes each time the editor is started.
+		 */ readonly sessionId: string;
+    /**
+		 * Indicates that this is a fresh install of the application.
+		 * `true` if within the first day of installation otherwise `false`.
+		 */ readonly isNewAppInstall: boolean;
+    /**
+		 * Indicates whether the users has telemetry enabled.
+		 * Can be observed to determine if the extension should send telemetry.
+		 */ readonly isTelemetryEnabled: boolean;
+    /**
+		 * An {@link Event} which fires when the user enabled or disables telemetry.
+		 * `true` if the user has enabled telemetry or `false` if the user has disabled telemetry.
+		 */ readonly onDidChangeTelemetryEnabled: Event<boolean>;
+    /**
+		 * The name of a remote. Defined by extensions, popular samples are `wsl` for the Windows
+		 * Subsystem for Linux or `ssh-remote` for remotes using a secure shell.
+		 *
+		 * *Note* that the value is `undefined` when there is no remote extension host but that the
+		 * value is defined in all extension hosts (local and remote) in case a remote extension host
+		 * exists. Use {@link Extension.extensionKind} to know if
+		 * a specific extension runs remote or not.
+		 */ readonly remoteName: string | undefined;
+    /**
+		 * The detected default shell for the extension host, this is overridden by the
+		 * `terminal.integrated.defaultProfile` setting for the extension host's platform. Note that in
+		 * environments that do not support a shell the value is the empty string.
+		 */ readonly shell: string;
+    /**
+		 * The UI kind property indicates from which UI extensions
+		 * are accessed from. For example, extensions could be accessed
+		 * from a desktop application or a web browser.
+		 */ readonly uiKind: UIKind;
+    /**
+		 * The current log level of the editor.
+		 */ readonly logLevel: LogLevel;
+    /**
+		 * An {@link Event} which fires when the log level of the editor changes.
+		 */ readonly onDidChangeLogLevel: Event<LogLevel>;
+    /**
+		 * Represents the grid widget within the main editor area
+		 */ readonly tabGroups: TabGroups;
+    /**
+		 * The currently active editor or `undefined`. The active editor is the one
+		 * that currently has focus or, when none has focus, the one that has changed
+		 * input most recently.
+		 */ activeTextEditor: TextEditor | undefined;
+    /**
+		 * The currently visible editors or an empty array.
+		 */ visibleTextEditors: readonly TextEditor[];
+    /**
+		 * An {@link Event} which fires when the {@link window.activeTextEditor active editor}
+		 * has changed. *Note* that the event also fires when the active editor changes
+		 * to `undefined`.
+		 */ readonly onDidChangeActiveTextEditor: Event<TextEditor | undefined>;
+    /**
+		 * An {@link Event} which fires when the array of {@link window.visibleTextEditors visible editors}
+		 * has changed.
+		 */ readonly onDidChangeVisibleTextEditors: Event<readonly TextEditor[]>;
+    /**
+		 * An {@link Event} which fires when the selection in an editor has changed.
+		 */ readonly onDidChangeTextEditorSelection: Event<TextEditorSelectionChangeEvent>;
+    /**
+		 * An {@link Event} which fires when the visible ranges of an editor has changed.
+		 */ readonly onDidChangeTextEditorVisibleRanges: Event<TextEditorVisibleRangesChangeEvent>;
+    /**
+		 * An {@link Event} which fires when the options of an editor have changed.
+		 */ readonly onDidChangeTextEditorOptions: Event<TextEditorOptionsChangeEvent>;
+    /**
+		 * An {@link Event} which fires when the view column of an editor has changed.
+		 */ readonly onDidChangeTextEditorViewColumn: Event<TextEditorViewColumnChangeEvent>;
+    /**
+		 * The currently visible {@link NotebookEditor notebook editors} or an empty array.
+		 */ readonly visibleNotebookEditors: readonly NotebookEditor[];
+    /**
+		 * An {@link Event} which fires when the {@link window.visibleNotebookEditors visible notebook editors}
+		 * has changed.
+		 */ readonly onDidChangeVisibleNotebookEditors: Event<readonly NotebookEditor[]>;
+    /**
+		 * The currently active {@link NotebookEditor notebook editor} or `undefined`. The active editor is the one
+		 * that currently has focus or, when none has focus, the one that has changed
+		 * input most recently.
+		 */ readonly activeNotebookEditor: NotebookEditor | undefined;
+    /**
+		 * An {@link Event} which fires when the {@link window.activeNotebookEditor active notebook editor}
+		 * has changed. *Note* that the event also fires when the active editor changes
+		 * to `undefined`.
+		 */ readonly onDidChangeActiveNotebookEditor: Event<NotebookEditor | undefined>;
+    /**
+		 * An {@link Event} which fires when the {@link NotebookEditor.selections notebook editor selections}
+		 * have changed.
+		 */ readonly onDidChangeNotebookEditorSelection: Event<NotebookEditorSelectionChangeEvent>;
+    /**
+		 * An {@link Event} which fires when the {@link NotebookEditor.visibleRanges notebook editor visible ranges}
+		 * have changed.
+		 */ readonly onDidChangeNotebookEditorVisibleRanges: Event<NotebookEditorVisibleRangesChangeEvent>;
+    /**
+		 * The currently opened terminals or an empty array.
+		 */ readonly terminals: readonly Terminal[];
+    /**
+		 * The currently active terminal or `undefined`. The active terminal is the one that
+		 * currently has focus or most recently had focus.
+		 */ readonly activeTerminal: Terminal | undefined;
+    /**
+		 * An {@link Event} which fires when the {@link window.activeTerminal active terminal}
+		 * has changed. *Note* that the event also fires when the active terminal changes
+		 * to `undefined`.
+		 */ readonly onDidChangeActiveTerminal: Event<Terminal | undefined>;
+    /**
+		 * An {@link Event} which fires when a terminal has been created, either through the
+		 * {@link window.createTerminal createTerminal} API or commands.
+		 */ readonly onDidOpenTerminal: Event<Terminal>;
+    /**
+		 * An {@link Event} which fires when a terminal is disposed.
+		 */ readonly onDidCloseTerminal: Event<Terminal>;
+    /**
+		 * An {@link Event} which fires when a {@link Terminal.state terminal's state} has changed.
+		 */ readonly onDidChangeTerminalState: Event<Terminal>;
+    /**
+		 * Represents the current window's state.
+		 */ readonly state: WindowState;
+    /**
+		 * An {@link Event} which fires when the focus state of the current window
+		 * changes. The value of the event represents whether the window is focused.
+		 */ readonly onDidChangeWindowState: Event<WindowState>;
+    /**
+		 * The currently active color theme as configured in the settings. The active
+		 * theme can be changed via the `workbench.colorTheme` setting.
+		 */ activeColorTheme: ColorTheme;
+    /**
+		 * An {@link Event} which fires when the active color theme is changed or has changes.
+		 */ readonly onDidChangeActiveColorTheme: Event<ColorTheme>;
     /**
 	 * Encapsulates data transferred during drag and drop operations.
 	 */ readonly DataTransferItem: {
@@ -1797,6 +1980,212 @@ Returns VSCodeApi only within the vscode extension.
 		 * When the editor lost focus.
 		 */ readonly FocusOut: 3;
     };
+    /**
+		 * A {@link FileSystem file system} instance that allows to interact with local and remote
+		 * files, e.g. `vscode.workspace.fs.readDirectory(someUri)` allows to retrieve all entries
+		 * of a directory or `vscode.workspace.fs.stat(anotherUri)` returns the meta data for a
+		 * file.
+		 */ readonly fs: FileSystem;
+    /**
+		 * The uri of the first entry of {@linkcode workspace.workspaceFolders workspaceFolders}
+		 * as `string`. `undefined` if there is no first entry.
+		 *
+		 * Refer to https://code.visualstudio.com/docs/editor/workspaces for more information
+		 * on workspaces.
+		 *
+		 * @deprecated Use {@linkcode workspace.workspaceFolders workspaceFolders} instead.
+		 */ readonly rootPath: string | undefined;
+    /**
+		 * List of workspace folders (0-N) that are open in the editor. `undefined` when no workspace
+		 * has been opened.
+		 *
+		 * Refer to https://code.visualstudio.com/docs/editor/workspaces for more information
+		 * on workspaces.
+		 */ readonly workspaceFolders: readonly WorkspaceFolder[] | undefined;
+    /**
+		 * The name of the workspace. `undefined` when no workspace
+		 * has been opened.
+		 *
+		 * Refer to https://code.visualstudio.com/docs/editor/workspaces for more information on
+		 * the concept of workspaces.
+		 */ readonly name: string | undefined;
+    /**
+		 * The location of the workspace file, for example:
+		 *
+		 * `file:///Users/name/Development/myProject.code-workspace`
+		 *
+		 * or
+		 *
+		 * `untitled:1555503116870`
+		 *
+		 * for a workspace that is untitled and not yet saved.
+		 *
+		 * Depending on the workspace that is opened, the value will be:
+		 *  * `undefined` when no workspace is opened
+		 *  * the path of the workspace file as `Uri` otherwise. if the workspace
+		 * is untitled, the returned URI will use the `untitled:` scheme
+		 *
+		 * The location can e.g. be used with the `vscode.openFolder` command to
+		 * open the workspace again after it has been closed.
+		 *
+		 * **Example:**
+		 * ```typescript
+		 * vscode.commands.executeCommand('vscode.openFolder', uriOfWorkspace);
+		 * ```
+		 *
+		 * Refer to https://code.visualstudio.com/docs/editor/workspaces for more information on
+		 * the concept of workspaces.
+		 *
+		 * **Note:** it is not advised to use `workspace.workspaceFile` to write
+		 * configuration data into the file. You can use `workspace.getConfiguration().update()`
+		 * for that purpose which will work both when a single folder is opened as
+		 * well as an untitled or saved workspace.
+		 */ readonly workspaceFile: Uri | undefined;
+    /**
+		 * An event that is emitted when a workspace folder is added or removed.
+		 *
+		 * **Note:** this event will not fire if the first workspace folder is added, removed or changed,
+		 * because in that case the currently executing extensions (including the one that listens to this
+		 * event) will be terminated and restarted so that the (deprecated) `rootPath` property is updated
+		 * to point to the first workspace folder.
+		 */ readonly onDidChangeWorkspaceFolders: Event<WorkspaceFoldersChangeEvent>;
+    /**
+		 * All text documents currently known to the editor.
+		 */ readonly textDocuments: readonly TextDocument[];
+    /**
+		 * An event that is emitted when a {@link TextDocument text document} is opened or when the language id
+		 * of a text document {@link languages.setTextDocumentLanguage has been changed}.
+		 *
+		 * To add an event listener when a visible text document is opened, use the {@link TextEditor} events in the
+		 * {@link window} namespace. Note that:
+		 *
+		 * - The event is emitted before the {@link TextDocument document} is updated in the
+		 * {@link window.activeTextEditor active text editor}
+		 * - When a {@link TextDocument text document} is already open (e.g.: open in another {@link window.visibleTextEditors visible text editor}) this event is not emitted
+		 *
+		 */ readonly onDidOpenTextDocument: Event<TextDocument>;
+    /**
+		 * An event that is emitted when a {@link TextDocument text document} is disposed or when the language id
+		 * of a text document {@link languages.setTextDocumentLanguage has been changed}.
+		 *
+		 * *Note 1:* There is no guarantee that this event fires when an editor tab is closed, use the
+		 * {@linkcode window.onDidChangeVisibleTextEditors onDidChangeVisibleTextEditors}-event to know when editors change.
+		 *
+		 * *Note 2:* A document can be open but not shown in an editor which means this event can fire
+		 * for a document that has not been shown in an editor.
+		 */ readonly onDidCloseTextDocument: Event<TextDocument>;
+    /**
+		 * An event that is emitted when a {@link TextDocument text document} is changed. This usually happens
+		 * when the {@link TextDocument.getText contents} changes but also when other things like the
+		 * {@link TextDocument.isDirty dirty}-state changes.
+		 */ readonly onDidChangeTextDocument: Event<TextDocumentChangeEvent>;
+    /**
+		 * An event that is emitted when a {@link TextDocument text document} will be saved to disk.
+		 *
+		 * *Note 1:* Subscribers can delay saving by registering asynchronous work. For the sake of data integrity the editor
+		 * might save without firing this event. For instance when shutting down with dirty files.
+		 *
+		 * *Note 2:* Subscribers are called sequentially and they can {@link TextDocumentWillSaveEvent.waitUntil delay} saving
+		 * by registering asynchronous work. Protection against misbehaving listeners is implemented as such:
+		 *  * there is an overall time budget that all listeners share and if that is exhausted no further listener is called
+		 *  * listeners that take a long time or produce errors frequently will not be called anymore
+		 *
+		 * The current thresholds are 1.5 seconds as overall time budget and a listener can misbehave 3 times before being ignored.
+		 */ readonly onWillSaveTextDocument: Event<TextDocumentWillSaveEvent>;
+    /**
+		 * An event that is emitted when a {@link TextDocument text document} is saved to disk.
+		 */ readonly onDidSaveTextDocument: Event<TextDocument>;
+    /**
+		 * All notebook documents currently known to the editor.
+		 */ readonly notebookDocuments: readonly NotebookDocument[];
+    /**
+		 * An event that is emitted when a {@link NotebookDocument notebook} has changed.
+		 */ readonly onDidChangeNotebookDocument: Event<NotebookDocumentChangeEvent>;
+    /**
+		 * An event that is emitted when a {@link NotebookDocument notebook} is saved.
+		 */ readonly onDidSaveNotebookDocument: Event<NotebookDocument>;
+    /**
+		 * An event that is emitted when a {@link NotebookDocument notebook} is opened.
+		 */ readonly onDidOpenNotebookDocument: Event<NotebookDocument>;
+    /**
+		 * An event that is emitted when a {@link NotebookDocument notebook} is disposed.
+		 *
+		 * *Note 1:* There is no guarantee that this event fires when an editor tab is closed.
+		 *
+		 * *Note 2:* A notebook can be open but not shown in an editor which means this event can fire
+		 * for a notebook that has not been shown in an editor.
+		 */ readonly onDidCloseNotebookDocument: Event<NotebookDocument>;
+    /**
+		 * An event that is emitted when files are being created.
+		 *
+		 * *Note 1:* This event is triggered by user gestures, like creating a file from the
+		 * explorer, or from the {@linkcode workspace.applyEdit}-api. This event is *not* fired when
+		 * files change on disk, e.g triggered by another application, or when using the
+		 * {@linkcode FileSystem workspace.fs}-api.
+		 *
+		 * *Note 2:* When this event is fired, edits to files that are are being created cannot be applied.
+		 */ readonly onWillCreateFiles: Event<FileWillCreateEvent>;
+    /**
+		 * An event that is emitted when files have been created.
+		 *
+		 * *Note:* This event is triggered by user gestures, like creating a file from the
+		 * explorer, or from the {@linkcode workspace.applyEdit}-api, but this event is *not* fired when
+		 * files change on disk, e.g triggered by another application, or when using the
+		 * {@linkcode FileSystem workspace.fs}-api.
+		 */ readonly onDidCreateFiles: Event<FileCreateEvent>;
+    /**
+		 * An event that is emitted when files are being deleted.
+		 *
+		 * *Note 1:* This event is triggered by user gestures, like deleting a file from the
+		 * explorer, or from the {@linkcode workspace.applyEdit}-api, but this event is *not* fired when
+		 * files change on disk, e.g triggered by another application, or when using the
+		 * {@linkcode FileSystem workspace.fs}-api.
+		 *
+		 * *Note 2:* When deleting a folder with children only one event is fired.
+		 */ readonly onWillDeleteFiles: Event<FileWillDeleteEvent>;
+    /**
+		 * An event that is emitted when files have been deleted.
+		 *
+		 * *Note 1:* This event is triggered by user gestures, like deleting a file from the
+		 * explorer, or from the {@linkcode workspace.applyEdit}-api, but this event is *not* fired when
+		 * files change on disk, e.g triggered by another application, or when using the
+		 * {@linkcode FileSystem workspace.fs}-api.
+		 *
+		 * *Note 2:* When deleting a folder with children only one event is fired.
+		 */ readonly onDidDeleteFiles: Event<FileDeleteEvent>;
+    /**
+		 * An event that is emitted when files are being renamed.
+		 *
+		 * *Note 1:* This event is triggered by user gestures, like renaming a file from the
+		 * explorer, and from the {@linkcode workspace.applyEdit}-api, but this event is *not* fired when
+		 * files change on disk, e.g triggered by another application, or when using the
+		 * {@linkcode FileSystem workspace.fs}-api.
+		 *
+		 * *Note 2:* When renaming a folder with children only one event is fired.
+		 */ readonly onWillRenameFiles: Event<FileWillRenameEvent>;
+    /**
+		 * An event that is emitted when files have been renamed.
+		 *
+		 * *Note 1:* This event is triggered by user gestures, like renaming a file from the
+		 * explorer, and from the {@linkcode workspace.applyEdit}-api, but this event is *not* fired when
+		 * files change on disk, e.g triggered by another application, or when using the
+		 * {@linkcode FileSystem workspace.fs}-api.
+		 *
+		 * *Note 2:* When renaming a folder with children only one event is fired.
+		 */ readonly onDidRenameFiles: Event<FileRenameEvent>;
+    /**
+		 * An event that is emitted when the {@link WorkspaceConfiguration configuration} changed.
+		 */ readonly onDidChangeConfiguration: Event<ConfigurationChangeEvent>;
+    /**
+		 * When true, the user has explicitly trusted the contents of the workspace.
+		 */ readonly isTrusted: boolean;
+    /**
+		 * Event that fires when the current workspace has been trusted.
+		 */ readonly onDidGrantWorkspaceTrust: Event<void>;
+    /**
+		 * An {@link Event} which fires when the global set of diagnostics changes. This is
+		 * newly added and removed diagnostics.
+		 */ readonly onDidChangeDiagnostics: Event<DiagnosticChangeEvent>;
     /**
 	 * Represents a notebook editor that is attached to a {@link NotebookDocument notebook}.
 	 */ readonly NotebookEditorRevealType: {
@@ -1961,6 +2350,12 @@ Returns VSCodeApi only within the vscode extension.
 		 */ new(text: string, alignment: NotebookCellStatusBarAlignment): NotebookCellStatusBarItem;
     };
     /**
+		 * The {@link SourceControlInputBox input box} for the last source control
+		 * created by the extension.
+		 *
+		 * @deprecated Use SourceControl.inputBox instead
+		 */ readonly inputBox: SourceControlInputBox;
+    /**
 	 * Represents a debug adapter executable and optional arguments and runtime options passed to it.
 	 */ readonly DebugAdapterExecutable: {
         /**
@@ -2036,6 +2431,42 @@ Returns VSCodeApi only within the vscode extension.
 		 */ readonly Dynamic: 2;
     };
     /**
+		 * The currently active {@link DebugSession debug session} or `undefined`. The active debug session is the one
+		 * represented by the debug action floating window or the one currently shown in the drop down menu of the debug action floating window.
+		 * If no debug session is active, the value is `undefined`.
+		 */ activeDebugSession: DebugSession | undefined;
+    /**
+		 * The currently active {@link DebugConsole debug console}.
+		 * If no debug session is active, output sent to the debug console is not shown.
+		 */ activeDebugConsole: DebugConsole;
+    /**
+		 * List of breakpoints.
+		 */ breakpoints: readonly Breakpoint[];
+    /**
+		 * An {@link Event} which fires when the {@link debug.activeDebugSession active debug session}
+		 * has changed. *Note* that the event also fires when the active debug session changes
+		 * to `undefined`.
+		 */ readonly onDidChangeActiveDebugSession: Event<DebugSession | undefined>;
+    /**
+		 * An {@link Event} which fires when a new {@link DebugSession debug session} has been started.
+		 */ readonly onDidStartDebugSession: Event<DebugSession>;
+    /**
+		 * An {@link Event} which fires when a custom DAP event is received from the {@link DebugSession debug session}.
+		 */ readonly onDidReceiveDebugSessionCustomEvent: Event<DebugSessionCustomEvent>;
+    /**
+		 * An {@link Event} which fires when a {@link DebugSession debug session} has terminated.
+		 */ readonly onDidTerminateDebugSession: Event<DebugSession>;
+    /**
+		 * An {@link Event} that is emitted when the set of breakpoints is added, removed, or changed.
+		 */ readonly onDidChangeBreakpoints: Event<BreakpointsChangeEvent>;
+    /**
+		 * All extensions currently known to the system.
+		 */ readonly all: readonly Extension<any>[];
+    /**
+		 * An event which fires when `extensions.all` changes. This can happen when extensions are
+		 * installed, uninstalled, enabled or disabled.
+		 */ readonly onDidChange: Event<void>;
+    /**
 	 * Collapsible state of a {@link CommentThread comment thread}
 	 */ readonly CommentThreadCollapsibleState: {
         /**
@@ -2061,6 +2492,22 @@ Returns VSCodeApi only within the vscode extension.
         readonly Unresolved: 0;
         readonly Resolved: 1;
     };
+    /**
+		 * An {@link Event} which fires when the authentication sessions of an authentication provider have
+		 * been added, removed, or changed.
+		 */ readonly onDidChangeSessions: Event<AuthenticationSessionsChangeEvent>;
+    /**
+		 * The bundle of localized strings that have been loaded for the extension.
+		 * It's undefined if no bundle has been loaded. The bundle is typically not loaded if
+		 * there was no bundle found or when we are running with the default language.
+		 */ readonly bundle: {
+        [key: string]: string;
+    } | undefined;
+    /**
+		 * The URI of the localization bundle that has been loaded for the extension.
+		 * It's undefined if no bundle has been loaded. The bundle is typically not loaded if
+		 * there was no bundle found or when we are running with the default language.
+		 */ readonly uri: Uri | undefined;
     /**
 	 * The kind of executions that {@link TestRunProfile TestRunProfiles} control.
 	 */ readonly TestRunProfileKind: {

@@ -31,13 +31,13 @@ pub fn module_item(
                     span: swc_common::Span::default(),
                     members: result_vec
                         .iter()
-                        .filter_map(|result| {
-                            match result_decl_to_ts_property_signature(result, comments) {
-                                Some(sig) => {
-                                    Some(swc_ecma_ast::TsTypeElement::TsPropertySignature(sig))
-                                }
-                                None => None,
-                            }
+                        .flat_map(|result| {
+                            result_decl_to_ts_property_signature(result, comments)
+                                .iter()
+                                .map(|sig| {
+                                    swc_ecma_ast::TsTypeElement::TsPropertySignature(sig.clone())
+                                })
+                                .collect::<Vec<_>>()
                         })
                         .collect(),
                 })),
@@ -50,9 +50,9 @@ pub fn module_item(
 fn result_decl_to_ts_property_signature(
     result: &crate::pickup::ResultDeclWithComments,
     comments: &dyn swc_common::comments::Comments,
-) -> Option<swc_ecma_ast::TsPropertySignature> {
+) -> Vec<swc_ecma_ast::TsPropertySignature> {
     match &result.decl {
-        crate::pickup::ResultDecl::Class(class) => Some(swc_ecma_ast::TsPropertySignature {
+        crate::pickup::ResultDecl::Class(class) => vec![swc_ecma_ast::TsPropertySignature {
             span: {
                 let span = swc_common::Span::dummy_with_cmt();
                 match &result.comments {
@@ -90,12 +90,57 @@ fn result_decl_to_ts_property_signature(
                 })),
             })),
             type_params: None,
-        }),
-        crate::pickup::ResultDecl::Fn(_) => None,
-        crate::pickup::ResultDecl::Var(_) => None,
-        crate::pickup::ResultDecl::TsInterface(_) => None,
-        crate::pickup::ResultDecl::TsTypeAlias(_) => None,
-        crate::pickup::ResultDecl::TsEnum(ts_enum) => Some(swc_ecma_ast::TsPropertySignature {
+        }],
+        crate::pickup::ResultDecl::Fn(_) => vec![],
+        crate::pickup::ResultDecl::Var(var_decl) => var_decl
+            .decls
+            .iter()
+            .map(|decl| swc_ecma_ast::TsPropertySignature {
+                span: {
+                    let span = swc_common::Span::dummy_with_cmt();
+                    match &result.comments {
+                        Some(comment_vec) => swc_common::comments::Comments::add_leading_comments(
+                            &comments,
+                            span.lo,
+                            comment_vec.clone(),
+                        ),
+                        None => {}
+                    }
+                    span
+                },
+                readonly: match var_decl.kind {
+                    swc_ecma_ast::VarDeclKind::Var => false,
+                    swc_ecma_ast::VarDeclKind::Let => false,
+                    swc_ecma_ast::VarDeclKind::Const => true,
+                },
+                key: Box::new(swc_ecma_ast::Expr::Ident(match &decl.name {
+                    swc_ecma_ast::Pat::Ident(biding_ident) => biding_ident.id.clone(),
+                    swc_ecma_ast::Pat::Array(_) => todo!(),
+                    swc_ecma_ast::Pat::Rest(_) => todo!(),
+                    swc_ecma_ast::Pat::Object(_) => todo!(),
+                    swc_ecma_ast::Pat::Assign(_) => todo!(),
+                    swc_ecma_ast::Pat::Invalid(_) => todo!(),
+                    swc_ecma_ast::Pat::Expr(_) => todo!(),
+                })),
+                computed: false,
+                optional: false,
+                init: None,
+                params: vec![],
+                type_ann: match &decl.name {
+                    swc_ecma_ast::Pat::Ident(biding_ident) => biding_ident.type_ann.clone(),
+                    swc_ecma_ast::Pat::Array(_) => todo!(),
+                    swc_ecma_ast::Pat::Rest(_) => todo!(),
+                    swc_ecma_ast::Pat::Object(_) => todo!(),
+                    swc_ecma_ast::Pat::Assign(_) => todo!(),
+                    swc_ecma_ast::Pat::Invalid(_) => todo!(),
+                    swc_ecma_ast::Pat::Expr(_) => todo!(),
+                },
+                type_params: None,
+            })
+            .collect(),
+        crate::pickup::ResultDecl::TsInterface(_) => vec![],
+        crate::pickup::ResultDecl::TsTypeAlias(_) => vec![],
+        crate::pickup::ResultDecl::TsEnum(ts_enum) => vec![swc_ecma_ast::TsPropertySignature {
             span: {
                 let span = swc_common::Span::dummy_with_cmt();
                 match &result.comments {
@@ -126,7 +171,7 @@ fn result_decl_to_ts_property_signature(
                 })),
             })),
             type_params: None,
-        }),
+        }],
     }
 }
 
