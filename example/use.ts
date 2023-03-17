@@ -1,15 +1,25 @@
-import { importVsCodeApi } from "../gen/out.ts";
+import { ExtensionContext, importVsCodeApi } from "../mod.ts";
 
-const api = (() => {
-  const api = importVsCodeApi();
-  if (api === undefined) {
-    throw new Error(
-      "Could not import vscode api because it was not working within the extension",
-    );
-  }
-  return api;
-})();
+export function activate(context: ExtensionContext) {
+  const vscode = (() => {
+    const api = importVsCodeApi();
+    if (api === undefined) {
+      throw new Error(
+        "Could not import vscode api because it was not working within the extension",
+      );
+    }
+    return api;
+  })();
+  console.log(
+    'Congratulations, your extension "helloworld-sample" is now active!',
+  );
 
-const pos = new api.Position(1, 3);
-pos.line;
-pos.character;
+  const disposable = vscode.commands.registerCommand(
+    "extension.helloWorld",
+    () => {
+      vscode.window.showInformationMessage("Hello World!");
+    },
+  );
+
+  context.subscriptions.push(disposable);
+}
