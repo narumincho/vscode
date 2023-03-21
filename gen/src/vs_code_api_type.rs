@@ -98,7 +98,33 @@ fn result_decl_to_ts_property_signature(
                 }]
             }
         }
-        crate::pickup::ResultDecl::Fn(_) => vec![],
+        crate::pickup::ResultDecl::Fn(fn_decl) => vec![swc_ecma_ast::TsPropertySignature {
+            span: {
+                let span = swc_common::Span::dummy_with_cmt();
+                match &result.comments {
+                    Some(comment_vec) => swc_common::comments::Comments::add_leading_comments(
+                        &comments,
+                        span.lo,
+                        comment_vec.clone(),
+                    ),
+                    None => {}
+                }
+                span
+            },
+            readonly: true,
+            computed: false,
+            optional: false,
+            init: None,
+            key: Box::new(swc_ecma_ast::Expr::Ident(fn_decl.ident.clone())),
+            params: fn_decl
+                .function
+                .params
+                .iter()
+                .map(|param| crate::fn_to_type::param_to_ts_fn_param(&param.pat))
+                .collect(),
+            type_ann: fn_decl.function.return_type.clone(),
+            type_params: fn_decl.function.type_params.clone(),
+        }],
         crate::pickup::ResultDecl::Var(var_decl) => var_decl
             .decls
             .iter()

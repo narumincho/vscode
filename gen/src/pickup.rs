@@ -37,12 +37,23 @@ pub fn pick_module_item(
                     }
                 },
                 swc_ecma_ast::ModuleDecl::ExportNamed(_) => vec![],
-                swc_ecma_ast::ModuleDecl::ExportDefaultDecl(_) => vec![],
+                swc_ecma_ast::ModuleDecl::ExportDefaultDecl(decl) => {
+                    println!("ExportDefaultDecl {:?}", decl.decl);
+                    match decl.decl {
+                        swc_ecma_ast::DefaultDecl::Class(_) => todo!(),
+                        swc_ecma_ast::DefaultDecl::Fn(_) => todo!(),
+                        swc_ecma_ast::DefaultDecl::TsInterfaceDecl(_) => todo!(),
+                    };
+                    vec![]
+                }
                 swc_ecma_ast::ModuleDecl::ExportDefaultExpr(_) => vec![],
                 swc_ecma_ast::ModuleDecl::ExportAll(_) => vec![],
                 swc_ecma_ast::ModuleDecl::TsImportEquals(_) => vec![],
                 swc_ecma_ast::ModuleDecl::TsExportAssignment(_) => vec![],
-                swc_ecma_ast::ModuleDecl::TsNamespaceExport(_) => vec![],
+                swc_ecma_ast::ModuleDecl::TsNamespaceExport(namespace) => {
+                    println!("TsNamespaceExport {:?}", namespace.id);
+                    vec![]
+                }
             },
             swc_ecma_ast::ModuleItem::Stmt(statement) => {
                 statement_to_result_decl_vec(statement, comments)
@@ -137,4 +148,10 @@ pub enum ResultDecl {
     TsInterface(swc_ecma_ast::TsInterfaceDecl),
     TsTypeAlias(swc_ecma_ast::TsTypeAliasDecl),
     TsEnum(swc_ecma_ast::TsEnumDecl),
+    // SubModule(Box<SubModule>),
+}
+
+pub struct SubModule {
+    pub name: String,
+    pub decl_vec: ResultDecl,
 }

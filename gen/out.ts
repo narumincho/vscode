@@ -1545,6 +1545,30 @@ Returns VSCodeApi only within the vscode extension.
 		 */ new(taskDefinition: TaskDefinition, name: string, source: string, execution?: ProcessExecution | ShellExecution, problemMatchers?: string | string[]): Task;
     };
     /**
+		 * Register a task provider.
+		 *
+		 * @param type The task kind type this provider is registered for.
+		 * @param provider A task provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerTaskProvider: Disposable;
+    /**
+		 * Fetches all tasks available in the systems. This includes tasks
+		 * from `tasks.json` files as well as tasks from task providers
+		 * contributed through extensions.
+		 *
+		 * @param filter Optional filter to select tasks of a certain type or version.
+		 */ readonly fetchTasks: Thenable<Task[]>;
+    /**
+		 * Executes a task that is managed by the editor. The returned
+		 * task execution can be used to terminate the task.
+		 *
+		 * @throws When running a ShellExecution or a ProcessExecution
+		 * task in an environment where a new process cannot be started.
+		 * In such an environment, only CustomExecution tasks can be run.
+		 *
+		 * @param task the task to execute
+		 */ readonly executeTask: Thenable<TaskExecution>;
+    /**
 		 * The currently active task executions or an empty array.
 		 */ readonly taskExecutions: readonly TaskExecution[];
     /**
@@ -1718,6 +1742,13 @@ Returns VSCodeApi only within the vscode extension.
 		 * `true` if the user has enabled telemetry or `false` if the user has disabled telemetry.
 		 */ readonly onDidChangeTelemetryEnabled: Event<boolean>;
     /**
+		 * Creates a new {@link TelemetryLogger telemetry logger}.
+		 *
+		 * @param sender The telemetry sender that is used by the telemetry logger.
+		 * @param options Options for the telemetry logger.
+		 * @returns A new telemetry logger
+		 */ readonly createTelemetryLogger: TelemetryLogger;
+    /**
 		 * The name of a remote. Defined by extensions, popular samples are `wsl` for the Windows
 		 * Subsystem for Linux or `ssh-remote` for remotes using a secure shell.
 		 *
@@ -1737,11 +1768,125 @@ Returns VSCodeApi only within the vscode extension.
 		 * from a desktop application or a web browser.
 		 */ readonly uiKind: UIKind;
     /**
+		 * Opens a link externally using the default application. Depending on the
+		 * used scheme this can be:
+		 * * a browser (`http:`, `https:`)
+		 * * a mail client (`mailto:`)
+		 * * VSCode itself (`vscode:` from `vscode.env.uriScheme`)
+		 *
+		 * *Note* that {@linkcode window.showTextDocument showTextDocument} is the right
+		 * way to open a text document inside the editor, not this function.
+		 *
+		 * @param target The uri that should be opened.
+		 * @returns A promise indicating if open was successful.
+		 */ readonly openExternal: Thenable<boolean>;
+    /**
+		 * Resolves a uri to a form that is accessible externally.
+		 *
+		 * #### `http:` or `https:` scheme
+		 *
+		 * Resolves an *external* uri, such as a `http:` or `https:` link, from where the extension is running to a
+		 * uri to the same resource on the client machine.
+		 *
+		 * This is a no-op if the extension is running on the client machine.
+		 *
+		 * If the extension is running remotely, this function automatically establishes a port forwarding tunnel
+		 * from the local machine to `target` on the remote and returns a local uri to the tunnel. The lifetime of
+		 * the port forwarding tunnel is managed by the editor and the tunnel can be closed by the user.
+		 *
+		 * *Note* that uris passed through `openExternal` are automatically resolved and you should not call `asExternalUri` on them.
+		 *
+		 * #### `vscode.env.uriScheme`
+		 *
+		 * Creates a uri that - if opened in a browser (e.g. via `openExternal`) - will result in a registered {@link UriHandler}
+		 * to trigger.
+		 *
+		 * Extensions should not make any assumptions about the resulting uri and should not alter it in any way.
+		 * Rather, extensions can e.g. use this uri in an authentication flow, by adding the uri as callback query
+		 * argument to the server to authenticate to.
+		 *
+		 * *Note* that if the server decides to add additional query parameters to the uri (e.g. a token or secret), it
+		 * will appear in the uri that is passed to the {@link UriHandler}.
+		 *
+		 * **Example** of an authentication flow:
+		 * ```typescript
+		 * vscode.window.registerUriHandler({
+		 *   handleUri(uri: vscode.Uri): vscode.ProviderResult<void> {
+		 *     if (uri.path === '/did-authenticate') {
+		 *       console.log(uri.toString());
+		 *     }
+		 *   }
+		 * });
+		 *
+		 * const callableUri = await vscode.env.asExternalUri(vscode.Uri.parse(vscode.env.uriScheme + '://my.extension/did-authenticate'));
+		 * await vscode.env.openExternal(callableUri);
+		 * ```
+		 *
+		 * *Note* that extensions should not cache the result of `asExternalUri` as the resolved uri may become invalid due to
+		 * a system or user action — for example, in remote cases, a user may close a port forwarding tunnel that was opened by
+		 * `asExternalUri`.
+		 *
+		 * #### Any other scheme
+		 *
+		 * Any other scheme will be handled as if the provided URI is a workspace URI. In that case, the method will return
+		 * a URI which, when handled, will make the editor open the workspace.
+		 *
+		 * @return A uri that can be used on the client machine.
+		 */ readonly asExternalUri: Thenable<Uri>;
+    /**
 		 * The current log level of the editor.
 		 */ readonly logLevel: LogLevel;
     /**
 		 * An {@link Event} which fires when the log level of the editor changes.
 		 */ readonly onDidChangeLogLevel: Event<LogLevel>;
+    /**
+		 * Registers a command that can be invoked via a keyboard shortcut,
+		 * a menu item, an action, or directly.
+		 *
+		 * Registering a command with an existing command identifier twice
+		 * will cause an error.
+		 *
+		 * @param command A unique identifier for the command.
+		 * @param callback A command handler function.
+		 * @param thisArg The `this` context used when invoking the handler function.
+		 * @return Disposable which unregisters this command on disposal.
+		 */ readonly registerCommand: Disposable;
+    /**
+		 * Registers a text editor command that can be invoked via a keyboard shortcut,
+		 * a menu item, an action, or directly.
+		 *
+		 * Text editor commands are different from ordinary {@link commands.registerCommand commands} as
+		 * they only execute when there is an active editor when the command is called. Also, the
+		 * command handler of an editor command has access to the active editor and to an
+		 * {@link TextEditorEdit edit}-builder. Note that the edit-builder is only valid while the
+		 * callback executes.
+		 *
+		 * @param command A unique identifier for the command.
+		 * @param callback A command handler function with access to an {@link TextEditor editor} and an {@link TextEditorEdit edit}.
+		 * @param thisArg The `this` context used when invoking the handler function.
+		 * @return Disposable which unregisters this command on disposal.
+		 */ readonly registerTextEditorCommand: Disposable;
+    /**
+		 * Executes the command denoted by the given command identifier.
+		 *
+		 * * *Note 1:* When executing an editor command not all types are allowed to
+		 * be passed as arguments. Allowed are the primitive types `string`, `boolean`,
+		 * `number`, `undefined`, and `null`, as well as {@linkcode Position}, {@linkcode Range}, {@linkcode Uri} and {@linkcode Location}.
+		 * * *Note 2:* There are no restrictions when executing commands that have been contributed
+		 * by extensions.
+		 *
+		 * @param command Identifier of the command to execute.
+		 * @param rest Parameters passed to the command function.
+		 * @return A thenable that resolves to the returned value of the given command. Returns `undefined` when
+		 * the command handler function doesn't return anything.
+		 */ readonly executeCommand<T = unknown>: Thenable<T>;
+    /**
+		 * Retrieve the list of all available commands. Commands starting with an underscore are
+		 * treated as internal commands.
+		 *
+		 * @param filterInternal Set `true` to not see internal commands (starting with an underscore)
+		 * @return Thenable that resolves to a list of command ids.
+		 */ readonly getCommands: Thenable<string[]>;
     /**
 		 * Represents the grid widget within the main editor area
 		 */ readonly tabGroups: TabGroups;
@@ -1828,6 +1973,451 @@ Returns VSCodeApi only within the vscode extension.
 		 * An {@link Event} which fires when the focus state of the current window
 		 * changes. The value of the event represents whether the window is focused.
 		 */ readonly onDidChangeWindowState: Event<WindowState>;
+    /**
+		 * Show the given document in a text editor. A {@link ViewColumn column} can be provided
+		 * to control where the editor is being shown. Might change the {@link window.activeTextEditor active editor}.
+		 *
+		 * @param document A text document to be shown.
+		 * @param column A view column in which the {@link TextEditor editor} should be shown. The default is the {@link ViewColumn.Active active}.
+		 * Columns that do not exist will be created as needed up to the maximum of {@linkcode ViewColumn.Nine}. Use {@linkcode ViewColumn.Beside}
+		 * to open the editor to the side of the currently active one.
+		 * @param preserveFocus When `true` the editor will not take focus.
+		 * @return A promise that resolves to an {@link TextEditor editor}.
+		 */ readonly showTextDocument: Thenable<TextEditor>;
+    /**
+		 * Show the given document in a text editor. {@link TextDocumentShowOptions Options} can be provided
+		 * to control options of the editor is being shown. Might change the {@link window.activeTextEditor active editor}.
+		 *
+		 * @param document A text document to be shown.
+		 * @param options {@link TextDocumentShowOptions Editor options} to configure the behavior of showing the {@link TextEditor editor}.
+		 * @return A promise that resolves to an {@link TextEditor editor}.
+		 */ readonly showTextDocument: Thenable<TextEditor>;
+    /**
+		 * A short-hand for `openTextDocument(uri).then(document => showTextDocument(document, options))`.
+		 *
+		 * @see {@link workspace.openTextDocument}
+		 *
+		 * @param uri A resource identifier.
+		 * @param options {@link TextDocumentShowOptions Editor options} to configure the behavior of showing the {@link TextEditor editor}.
+		 * @return A promise that resolves to an {@link TextEditor editor}.
+		 */ readonly showTextDocument: Thenable<TextEditor>;
+    /**
+		 * Show the given {@link NotebookDocument} in a {@link NotebookEditor notebook editor}.
+		 *
+		 * @param document A text document to be shown.
+		 * @param options {@link NotebookDocumentShowOptions Editor options} to configure the behavior of showing the {@link NotebookEditor notebook editor}.
+		 *
+		 * @return A promise that resolves to an {@link NotebookEditor notebook editor}.
+		 */ readonly showNotebookDocument: Thenable<NotebookEditor>;
+    /**
+		 * Create a TextEditorDecorationType that can be used to add decorations to text editors.
+		 *
+		 * @param options Rendering options for the decoration type.
+		 * @return A new decoration type instance.
+		 */ readonly createTextEditorDecorationType: TextEditorDecorationType;
+    /**
+		 * Show an information message to users. Optionally provide an array of items which will be presented as
+		 * clickable buttons.
+		 *
+		 * @param message The message to show.
+		 * @param items A set of items that will be rendered as actions in the message.
+		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
+		 */ readonly showInformationMessage<T extends string>: Thenable<T | undefined>;
+    /**
+		 * Show an information message to users. Optionally provide an array of items which will be presented as
+		 * clickable buttons.
+		 *
+		 * @param message The message to show.
+		 * @param options Configures the behaviour of the message.
+		 * @param items A set of items that will be rendered as actions in the message.
+		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
+		 */ readonly showInformationMessage<T extends string>: Thenable<T | undefined>;
+    /**
+		 * Show an information message.
+		 *
+		 * @see {@link window.showInformationMessage showInformationMessage}
+		 *
+		 * @param message The message to show.
+		 * @param items A set of items that will be rendered as actions in the message.
+		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
+		 */ readonly showInformationMessage<T extends MessageItem>: Thenable<T | undefined>;
+    /**
+		 * Show an information message.
+		 *
+		 * @see {@link window.showInformationMessage showInformationMessage}
+		 *
+		 * @param message The message to show.
+		 * @param options Configures the behaviour of the message.
+		 * @param items A set of items that will be rendered as actions in the message.
+		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
+		 */ readonly showInformationMessage<T extends MessageItem>: Thenable<T | undefined>;
+    /**
+		 * Show a warning message.
+		 *
+		 * @see {@link window.showInformationMessage showInformationMessage}
+		 *
+		 * @param message The message to show.
+		 * @param items A set of items that will be rendered as actions in the message.
+		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
+		 */ readonly showWarningMessage<T extends string>: Thenable<T | undefined>;
+    /**
+		 * Show a warning message.
+		 *
+		 * @see {@link window.showInformationMessage showInformationMessage}
+		 *
+		 * @param message The message to show.
+		 * @param options Configures the behaviour of the message.
+		 * @param items A set of items that will be rendered as actions in the message.
+		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
+		 */ readonly showWarningMessage<T extends string>: Thenable<T | undefined>;
+    /**
+		 * Show a warning message.
+		 *
+		 * @see {@link window.showInformationMessage showInformationMessage}
+		 *
+		 * @param message The message to show.
+		 * @param items A set of items that will be rendered as actions in the message.
+		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
+		 */ readonly showWarningMessage<T extends MessageItem>: Thenable<T | undefined>;
+    /**
+		 * Show a warning message.
+		 *
+		 * @see {@link window.showInformationMessage showInformationMessage}
+		 *
+		 * @param message The message to show.
+		 * @param options Configures the behaviour of the message.
+		 * @param items A set of items that will be rendered as actions in the message.
+		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
+		 */ readonly showWarningMessage<T extends MessageItem>: Thenable<T | undefined>;
+    /**
+		 * Show an error message.
+		 *
+		 * @see {@link window.showInformationMessage showInformationMessage}
+		 *
+		 * @param message The message to show.
+		 * @param items A set of items that will be rendered as actions in the message.
+		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
+		 */ readonly showErrorMessage<T extends string>: Thenable<T | undefined>;
+    /**
+		 * Show an error message.
+		 *
+		 * @see {@link window.showInformationMessage showInformationMessage}
+		 *
+		 * @param message The message to show.
+		 * @param options Configures the behaviour of the message.
+		 * @param items A set of items that will be rendered as actions in the message.
+		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
+		 */ readonly showErrorMessage<T extends string>: Thenable<T | undefined>;
+    /**
+		 * Show an error message.
+		 *
+		 * @see {@link window.showInformationMessage showInformationMessage}
+		 *
+		 * @param message The message to show.
+		 * @param items A set of items that will be rendered as actions in the message.
+		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
+		 */ readonly showErrorMessage<T extends MessageItem>: Thenable<T | undefined>;
+    /**
+		 * Show an error message.
+		 *
+		 * @see {@link window.showInformationMessage showInformationMessage}
+		 *
+		 * @param message The message to show.
+		 * @param options Configures the behaviour of the message.
+		 * @param items A set of items that will be rendered as actions in the message.
+		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
+		 */ readonly showErrorMessage<T extends MessageItem>: Thenable<T | undefined>;
+    /**
+		 * Shows a selection list allowing multiple selections.
+		 *
+		 * @param items An array of strings, or a promise that resolves to an array of strings.
+		 * @param options Configures the behavior of the selection list.
+		 * @param token A token that can be used to signal cancellation.
+		 * @return A promise that resolves to the selected items or `undefined`.
+		 */ readonly showQuickPick: Thenable<string[] | undefined>;
+    /**
+		 * Shows a selection list.
+		 *
+		 * @param items An array of strings, or a promise that resolves to an array of strings.
+		 * @param options Configures the behavior of the selection list.
+		 * @param token A token that can be used to signal cancellation.
+		 * @return A promise that resolves to the selection or `undefined`.
+		 */ readonly showQuickPick: Thenable<string | undefined>;
+    /**
+		 * Shows a selection list allowing multiple selections.
+		 *
+		 * @param items An array of items, or a promise that resolves to an array of items.
+		 * @param options Configures the behavior of the selection list.
+		 * @param token A token that can be used to signal cancellation.
+		 * @return A promise that resolves to the selected items or `undefined`.
+		 */ readonly showQuickPick<T extends QuickPickItem>: Thenable<T[] | undefined>;
+    /**
+		 * Shows a selection list.
+		 *
+		 * @param items An array of items, or a promise that resolves to an array of items.
+		 * @param options Configures the behavior of the selection list.
+		 * @param token A token that can be used to signal cancellation.
+		 * @return A promise that resolves to the selected item or `undefined`.
+		 */ readonly showQuickPick<T extends QuickPickItem>: Thenable<T | undefined>;
+    /**
+		 * Shows a selection list of {@link workspace.workspaceFolders workspace folders} to pick from.
+		 * Returns `undefined` if no folder is open.
+		 *
+		 * @param options Configures the behavior of the workspace folder list.
+		 * @return A promise that resolves to the workspace folder or `undefined`.
+		 */ readonly showWorkspaceFolderPick: Thenable<WorkspaceFolder | undefined>;
+    /**
+		 * Shows a file open dialog to the user which allows to select a file
+		 * for opening-purposes.
+		 *
+		 * @param options Options that control the dialog.
+		 * @returns A promise that resolves to the selected resources or `undefined`.
+		 */ readonly showOpenDialog: Thenable<Uri[] | undefined>;
+    /**
+		 * Shows a file save dialog to the user which allows to select a file
+		 * for saving-purposes.
+		 *
+		 * @param options Options that control the dialog.
+		 * @returns A promise that resolves to the selected resource or `undefined`.
+		 */ readonly showSaveDialog: Thenable<Uri | undefined>;
+    /**
+		 * Opens an input box to ask the user for input.
+		 *
+		 * The returned value will be `undefined` if the input box was canceled (e.g. pressing ESC). Otherwise the
+		 * returned value will be the string typed by the user or an empty string if the user did not type
+		 * anything but dismissed the input box with OK.
+		 *
+		 * @param options Configures the behavior of the input box.
+		 * @param token A token that can be used to signal cancellation.
+		 * @return A promise that resolves to a string the user provided or to `undefined` in case of dismissal.
+		 */ readonly showInputBox: Thenable<string | undefined>;
+    /**
+		 * Creates a {@link QuickPick} to let the user pick an item from a list
+		 * of items of type T.
+		 *
+		 * Note that in many cases the more convenient {@link window.showQuickPick}
+		 * is easier to use. {@link window.createQuickPick} should be used
+		 * when {@link window.showQuickPick} does not offer the required flexibility.
+		 *
+		 * @return A new {@link QuickPick}.
+		 */ readonly createQuickPick<T extends QuickPickItem>: QuickPick<T>;
+    /**
+		 * Creates a {@link InputBox} to let the user enter some text input.
+		 *
+		 * Note that in many cases the more convenient {@link window.showInputBox}
+		 * is easier to use. {@link window.createInputBox} should be used
+		 * when {@link window.showInputBox} does not offer the required flexibility.
+		 *
+		 * @return A new {@link InputBox}.
+		 */ readonly createInputBox: InputBox;
+    /**
+		 * Creates a new {@link OutputChannel output channel} with the given name and language id
+		 * If language id is not provided, then **Log** is used as default language id.
+		 *
+		 * You can access the visible or active output channel as a {@link TextDocument text document} from {@link window.visibleTextEditors visible editors} or {@link window.activeTextEditor active editor}
+		 * and use the language id to contribute language features like syntax coloring, code lens etc.,
+		 *
+		 * @param name Human-readable string which will be used to represent the channel in the UI.
+		 * @param languageId The identifier of the language associated with the channel.
+		 */ readonly createOutputChannel: OutputChannel;
+    /**
+		 * Creates a new {@link LogOutputChannel log output channel} with the given name.
+		 *
+		 * @param name Human-readable string which will be used to represent the channel in the UI.
+		 * @param options Options for the log output channel.
+		 */ readonly createOutputChannel: LogOutputChannel;
+    /**
+		 * Create and show a new webview panel.
+		 *
+		 * @param viewType Identifies the type of the webview panel.
+		 * @param title Title of the panel.
+		 * @param showOptions Where to show the webview in the editor. If preserveFocus is set, the new webview will not take focus.
+		 * @param options Settings for the new panel.
+		 *
+		 * @return New webview panel.
+		 */ readonly createWebviewPanel: WebviewPanel;
+    /**
+		 * Set a message to the status bar. This is a short hand for the more powerful
+		 * status bar {@link window.createStatusBarItem items}.
+		 *
+		 * @param text The message to show, supports icon substitution as in status bar {@link StatusBarItem.text items}.
+		 * @param hideAfterTimeout Timeout in milliseconds after which the message will be disposed.
+		 * @return A disposable which hides the status bar message.
+		 */ readonly setStatusBarMessage: Disposable;
+    /**
+		 * Set a message to the status bar. This is a short hand for the more powerful
+		 * status bar {@link window.createStatusBarItem items}.
+		 *
+		 * @param text The message to show, supports icon substitution as in status bar {@link StatusBarItem.text items}.
+		 * @param hideWhenDone Thenable on which completion (resolve or reject) the message will be disposed.
+		 * @return A disposable which hides the status bar message.
+		 */ readonly setStatusBarMessage: Disposable;
+    /**
+		 * Set a message to the status bar. This is a short hand for the more powerful
+		 * status bar {@link window.createStatusBarItem items}.
+		 *
+		 * *Note* that status bar messages stack and that they must be disposed when no
+		 * longer used.
+		 *
+		 * @param text The message to show, supports icon substitution as in status bar {@link StatusBarItem.text items}.
+		 * @return A disposable which hides the status bar message.
+		 */ readonly setStatusBarMessage: Disposable;
+    /**
+		 * Show progress in the Source Control viewlet while running the given callback and while
+		 * its returned promise isn't resolve or rejected.
+		 *
+		 * @deprecated Use `withProgress` instead.
+		 *
+		 * @param task A callback returning a promise. Progress increments can be reported with
+		 * the provided {@link Progress}-object.
+		 * @return The thenable the task did return.
+		 */ readonly withScmProgress<R>: Thenable<R>;
+    /**
+		 * Show progress in the editor. Progress is shown while running the given callback
+		 * and while the promise it returned isn't resolved nor rejected. The location at which
+		 * progress should show (and other details) is defined via the passed {@linkcode ProgressOptions}.
+		 *
+		 * @param task A callback returning a promise. Progress state can be reported with
+		 * the provided {@link Progress}-object.
+		 *
+		 * To report discrete progress, use `increment` to indicate how much work has been completed. Each call with
+		 * a `increment` value will be summed up and reflected as overall progress until 100% is reached (a value of
+		 * e.g. `10` accounts for `10%` of work done).
+		 * Note that currently only `ProgressLocation.Notification` is capable of showing discrete progress.
+		 *
+		 * To monitor if the operation has been cancelled by the user, use the provided {@linkcode CancellationToken}.
+		 * Note that currently only `ProgressLocation.Notification` is supporting to show a cancel button to cancel the
+		 * long running operation.
+		 *
+		 * @return The thenable the task-callback returned.
+		 */ readonly withProgress<R>: Thenable<R>;
+    /**
+		 * Creates a status bar {@link StatusBarItem item}.
+		 *
+		 * @param alignment The alignment of the item.
+		 * @param priority The priority of the item. Higher values mean the item should be shown more to the left.
+		 * @return A new status bar item.
+		 */ readonly createStatusBarItem: StatusBarItem;
+    /**
+		 * Creates a status bar {@link StatusBarItem item}.
+		 *
+		 * @param id The unique identifier of the item.
+		 * @param alignment The alignment of the item.
+		 * @param priority The priority of the item. Higher values mean the item should be shown more to the left.
+		 * @return A new status bar item.
+		 */ readonly createStatusBarItem: StatusBarItem;
+    /**
+		 * Creates a {@link Terminal} with a backing shell process. The cwd of the terminal will be the workspace
+		 * directory if it exists.
+		 *
+		 * @param name Optional human-readable string which will be used to represent the terminal in the UI.
+		 * @param shellPath Optional path to a custom shell executable to be used in the terminal.
+		 * @param shellArgs Optional args for the custom shell executable. A string can be used on Windows only which
+		 * allows specifying shell args in
+		 * [command-line format](https://msdn.microsoft.com/en-au/08dfcab2-eb6e-49a4-80eb-87d4076c98c6).
+		 * @return A new Terminal.
+		 * @throws When running in an environment where a new process cannot be started.
+		 */ readonly createTerminal: Terminal;
+    /**
+		 * Creates a {@link Terminal} with a backing shell process.
+		 *
+		 * @param options A TerminalOptions object describing the characteristics of the new terminal.
+		 * @return A new Terminal.
+		 * @throws When running in an environment where a new process cannot be started.
+		 */ readonly createTerminal: Terminal;
+    /**
+		 * Creates a {@link Terminal} where an extension controls its input and output.
+		 *
+		 * @param options An {@link ExtensionTerminalOptions} object describing
+		 * the characteristics of the new terminal.
+		 * @return A new Terminal.
+		 */ readonly createTerminal: Terminal;
+    /**
+		 * Register a {@link TreeDataProvider} for the view contributed using the extension point `views`.
+		 * This will allow you to contribute data to the {@link TreeView} and update if the data changes.
+		 *
+		 * **Note:** To get access to the {@link TreeView} and perform operations on it, use {@link window.createTreeView createTreeView}.
+		 *
+		 * @param viewId Id of the view contributed using the extension point `views`.
+		 * @param treeDataProvider A {@link TreeDataProvider} that provides tree data for the view
+		 */ readonly registerTreeDataProvider<T>: Disposable;
+    /**
+		 * Create a {@link TreeView} for the view contributed using the extension point `views`.
+		 * @param viewId Id of the view contributed using the extension point `views`.
+		 * @param options Options for creating the {@link TreeView}
+		 * @returns a {@link TreeView}.
+		 */ readonly createTreeView<T>: TreeView<T>;
+    /**
+		 * Registers a {@link UriHandler uri handler} capable of handling system-wide {@link Uri uris}.
+		 * In case there are multiple windows open, the topmost window will handle the uri.
+		 * A uri handler is scoped to the extension it is contributed from; it will only
+		 * be able to handle uris which are directed to the extension itself. A uri must respect
+		 * the following rules:
+		 *
+		 * - The uri-scheme must be `vscode.env.uriScheme`;
+		 * - The uri-authority must be the extension id (e.g. `my.extension`);
+		 * - The uri-path, -query and -fragment parts are arbitrary.
+		 *
+		 * For example, if the `my.extension` extension registers a uri handler, it will only
+		 * be allowed to handle uris with the prefix `product-name://my.extension`.
+		 *
+		 * An extension can only register a single uri handler in its entire activation lifetime.
+		 *
+		 * * *Note:* There is an activation event `onUri` that fires when a uri directed for
+		 * the current extension is about to be handled.
+		 *
+		 * @param handler The uri handler to register for this extension.
+		 */ readonly registerUriHandler: Disposable;
+    /**
+		 * Registers a webview panel serializer.
+		 *
+		 * Extensions that support reviving should have an `"onWebviewPanel:viewType"` activation event and
+		 * make sure that `registerWebviewPanelSerializer` is called during activation.
+		 *
+		 * Only a single serializer may be registered at a time for a given `viewType`.
+		 *
+		 * @param viewType Type of the webview panel that can be serialized.
+		 * @param serializer Webview serializer.
+		 */ readonly registerWebviewPanelSerializer: Disposable;
+    /**
+		 * Register a new provider for webview views.
+		 *
+		 * @param viewId Unique id of the view. This should match the `id` from the
+		 *   `views` contribution in the package.json.
+		 * @param provider Provider for the webview views.
+		 *
+		 * @return Disposable that unregisters the provider.
+		 */ readonly registerWebviewViewProvider: Disposable;
+    /**
+		 * Register a provider for custom editors for the `viewType` contributed by the `customEditors` extension point.
+		 *
+		 * When a custom editor is opened, an `onCustomEditor:viewType` activation event is fired. Your extension
+		 * must register a {@linkcode CustomTextEditorProvider}, {@linkcode CustomReadonlyEditorProvider},
+		 * {@linkcode CustomEditorProvider}for `viewType` as part of activation.
+		 *
+		 * @param viewType Unique identifier for the custom editor provider. This should match the `viewType` from the
+		 *   `customEditors` contribution point.
+		 * @param provider Provider that resolves custom editors.
+		 * @param options Options for the provider.
+		 *
+		 * @return Disposable that unregisters the provider.
+		 */ readonly registerCustomEditorProvider: Disposable;
+    /**
+		 * Register provider that enables the detection and handling of links within the terminal.
+		 * @param provider The provider that provides the terminal links.
+		 * @return Disposable that unregisters the provider.
+		 */ readonly registerTerminalLinkProvider: Disposable;
+    /**
+		 * Registers a provider for a contributed terminal profile.
+		 * @param id The ID of the contributed terminal profile.
+		 * @param provider The terminal profile provider.
+		 */ readonly registerTerminalProfileProvider: Disposable;
+    /**
+		 * Register a file decoration provider.
+		 *
+		 * @param provider A {@link FileDecorationProvider}.
+		 * @return A {@link Disposable} that unregisters the provider.
+		 */ readonly registerFileDecorationProvider: Disposable;
     /**
 		 * The currently active color theme as configured in the settings. The active
 		 * theme can be changed via the `workbench.colorTheme` setting.
@@ -2016,8 +2606,276 @@ Returns VSCodeApi only within the vscode extension.
 		 * to point to the first workspace folder.
 		 */ readonly onDidChangeWorkspaceFolders: Event<WorkspaceFoldersChangeEvent>;
     /**
+		 * Returns the {@link WorkspaceFolder workspace folder} that contains a given uri.
+		 * * returns `undefined` when the given uri doesn't match any workspace folder
+		 * * returns the *input* when the given uri is a workspace folder itself
+		 *
+		 * @param uri An uri.
+		 * @return A workspace folder or `undefined`
+		 */ readonly getWorkspaceFolder: WorkspaceFolder | undefined;
+    /**
+		 * Returns a path that is relative to the workspace folder or folders.
+		 *
+		 * When there are no {@link workspace.workspaceFolders workspace folders} or when the path
+		 * is not contained in them, the input is returned.
+		 *
+		 * @param pathOrUri A path or uri. When a uri is given its {@link Uri.fsPath fsPath} is used.
+		 * @param includeWorkspaceFolder When `true` and when the given path is contained inside a
+		 * workspace folder the name of the workspace is prepended. Defaults to `true` when there are
+		 * multiple workspace folders and `false` otherwise.
+		 * @return A path relative to the root or the input.
+		 */ readonly asRelativePath: string;
+    /**
+		 * This method replaces `deleteCount` {@link workspace.workspaceFolders workspace folders} starting at index `start`
+		 * by an optional set of `workspaceFoldersToAdd` on the `vscode.workspace.workspaceFolders` array. This "splice"
+		 * behavior can be used to add, remove and change workspace folders in a single operation.
+		 *
+		 * **Note:** in some cases calling this method may result in the currently executing extensions (including the
+		 * one that called this method) to be terminated and restarted. For example when the first workspace folder is
+		 * added, removed or changed the (deprecated) `rootPath` property is updated to point to the first workspace
+		 * folder. Another case is when transitioning from an empty or single-folder workspace into a multi-folder
+		 * workspace (see also: https://code.visualstudio.com/docs/editor/workspaces).
+		 *
+		 * Use the {@linkcode onDidChangeWorkspaceFolders onDidChangeWorkspaceFolders()} event to get notified when the
+		 * workspace folders have been updated.
+		 *
+		 * **Example:** adding a new workspace folder at the end of workspace folders
+		 * ```typescript
+		 * workspace.updateWorkspaceFolders(workspace.workspaceFolders ? workspace.workspaceFolders.length : 0, null, { uri: ...});
+		 * ```
+		 *
+		 * **Example:** removing the first workspace folder
+		 * ```typescript
+		 * workspace.updateWorkspaceFolders(0, 1);
+		 * ```
+		 *
+		 * **Example:** replacing an existing workspace folder with a new one
+		 * ```typescript
+		 * workspace.updateWorkspaceFolders(0, 1, { uri: ...});
+		 * ```
+		 *
+		 * It is valid to remove an existing workspace folder and add it again with a different name
+		 * to rename that folder.
+		 *
+		 * **Note:** it is not valid to call {@link updateWorkspaceFolders updateWorkspaceFolders()} multiple times
+		 * without waiting for the {@linkcode onDidChangeWorkspaceFolders onDidChangeWorkspaceFolders()} to fire.
+		 *
+		 * @param start the zero-based location in the list of currently opened {@link WorkspaceFolder workspace folders}
+		 * from which to start deleting workspace folders.
+		 * @param deleteCount the optional number of workspace folders to remove.
+		 * @param workspaceFoldersToAdd the optional variable set of workspace folders to add in place of the deleted ones.
+		 * Each workspace is identified with a mandatory URI and an optional name.
+		 * @return true if the operation was successfully started and false otherwise if arguments were used that would result
+		 * in invalid workspace folder state (e.g. 2 folders with the same URI).
+		 */ readonly updateWorkspaceFolders: boolean;
+    /**
+		 * Creates a file system watcher that is notified on file events (create, change, delete)
+		 * depending on the parameters provided.
+		 *
+		 * By default, all opened {@link workspace.workspaceFolders workspace folders} will be watched
+		 * for file changes recursively.
+		 *
+		 * Additional paths can be added for file watching by providing a {@link RelativePattern} with
+		 * a `base` path to watch. If the `pattern` is complex (e.g. contains `**` or path segments),
+		 * the path will be watched recursively and otherwise will be watched non-recursively (i.e. only
+		 * changes to the first level of the path will be reported).
+		 *
+		 * *Note* that requests for recursive file watchers for a `base` path that is inside the opened
+		 * workspace are ignored given all opened {@link workspace.workspaceFolders workspace folders} are
+		 * watched for file changes recursively by default. Non-recursive file watchers however are always
+		 * supported, even inside the opened workspace because they allow to bypass the configured settings
+		 * for excludes (`files.watcherExclude`). If you need to watch in a location that is typically
+		 * excluded (for example `node_modules` or `.git` folder), then you can use a non-recursive watcher
+		 * in the workspace for this purpose.
+		 *
+		 * If possible, keep the use of recursive watchers to a minimum because recursive file watching
+		 * is quite resource intense.
+		 *
+		 * Providing a `string` as `globPattern` acts as convenience method for watching file events in
+		 * all opened workspace folders. It cannot be used to add more folders for file watching, nor will
+		 * it report any file events from folders that are not part of the opened workspace folders.
+		 *
+		 * Optionally, flags to ignore certain kinds of events can be provided.
+		 *
+		 * To stop listening to events the watcher must be disposed.
+		 *
+		 * *Note* that file events from recursive file watchers may be excluded based on user configuration.
+		 * The setting `files.watcherExclude` helps to reduce the overhead of file events from folders
+		 * that are known to produce many file changes at once (such as `node_modules` folders). As such,
+		 * it is highly recommended to watch with simple patterns that do not require recursive watchers
+		 * where the exclude settings are ignored and you have full control over the events.
+		 *
+		 * *Note* that symbolic links are not automatically followed for file watching unless the path to
+		 * watch itself is a symbolic link.
+		 *
+		 * *Note* that file changes for the path to be watched may not be delivered when the path itself
+		 * changes. For example, when watching a path `/Users/somename/Desktop` and the path itself is
+		 * being deleted, the watcher may not report an event and may not work anymore from that moment on.
+		 * The underlying behaviour depends on the path that is provided for watching:
+		 * * if the path is within any of the workspace folders, deletions are tracked and reported unless
+		 *   excluded via `files.watcherExclude` setting
+		 * * if the path is equal to any of the workspace folders, deletions are not tracked
+		 * * if the path is outside of any of the workspace folders, deletions are not tracked
+		 *
+		 * If you are interested in being notified when the watched path itself is being deleted, you have
+		 * to watch it's parent folder. Make sure to use a simple `pattern` (such as putting the name of the
+		 * folder) to not accidentally watch all sibling folders recursively.
+		 *
+		 * *Note* that the file paths that are reported for having changed may have a different path casing
+		 * compared to the actual casing on disk on case-insensitive platforms (typically macOS and Windows
+		 * but not Linux). We allow a user to open a workspace folder with any desired path casing and try
+		 * to preserve that. This means:
+		 * * if the path is within any of the workspace folders, the path will match the casing of the
+		 *   workspace folder up to that portion of the path and match the casing on disk for children
+		 * * if the path is outside of any of the workspace folders, the casing will match the case of the
+		 *   path that was provided for watching
+		 * In the same way, symbolic links are preserved, i.e. the file event will report the path of the
+		 * symbolic link as it was provided for watching and not the target.
+		 *
+		 * ### Examples
+		 *
+		 * The basic anatomy of a file watcher is as follows:
+		 *
+		 * ```ts
+		 * const watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(<folder>, <pattern>));
+		 *
+		 * watcher.onDidChange(uri => { ... }); // listen to files being changed
+		 * watcher.onDidCreate(uri => { ... }); // listen to files/folders being created
+		 * watcher.onDidDelete(uri => { ... }); // listen to files/folders getting deleted
+		 *
+		 * watcher.dispose(); // dispose after usage
+		 * ```
+		 *
+		 * #### Workspace file watching
+		 *
+		 * If you only care about file events in a specific workspace folder:
+		 *
+		 * ```ts
+		 * vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(vscode.workspace.workspaceFolders[0], '**​/*.js'));
+		 * ```
+		 *
+		 * If you want to monitor file events across all opened workspace folders:
+		 *
+		 * ```ts
+		 * vscode.workspace.createFileSystemWatcher('**​/*.js'));
+		 * ```
+		 *
+		 * *Note:* the array of workspace folders can be empty if no workspace is opened (empty window).
+		 *
+		 * #### Out of workspace file watching
+		 *
+		 * To watch a folder for changes to *.js files outside the workspace (non recursively), pass in a `Uri` to such
+		 * a folder:
+		 *
+		 * ```ts
+		 * vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(vscode.Uri.file(<path to folder outside workspace>), '*.js'));
+		 * ```
+		 *
+		 * And use a complex glob pattern to watch recursively:
+		 *
+		 * ```ts
+		 * vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(vscode.Uri.file(<path to folder outside workspace>), '**​/*.js'));
+		 * ```
+		 *
+		 * Here is an example for watching the active editor for file changes:
+		 *
+		 * ```ts
+		 * vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(vscode.window.activeTextEditor.document.uri, '*'));
+		 * ```
+		 *
+		 * @param globPattern A {@link GlobPattern glob pattern} that controls which file events the watcher should report.
+		 * @param ignoreCreateEvents Ignore when files have been created.
+		 * @param ignoreChangeEvents Ignore when files have been changed.
+		 * @param ignoreDeleteEvents Ignore when files have been deleted.
+		 * @return A new file system watcher instance. Must be disposed when no longer needed.
+		 */ readonly createFileSystemWatcher: FileSystemWatcher;
+    /**
+		 * Find files across all {@link workspace.workspaceFolders workspace folders} in the workspace.
+		 *
+		 * @example
+		 * findFiles('**​/*.js', '**​/node_modules/**', 10)
+		 *
+		 * @param include A {@link GlobPattern glob pattern} that defines the files to search for. The glob pattern
+		 * will be matched against the file paths of resulting matches relative to their workspace. Use a {@link RelativePattern relative pattern}
+		 * to restrict the search results to a {@link WorkspaceFolder workspace folder}.
+		 * @param exclude  A {@link GlobPattern glob pattern} that defines files and folders to exclude. The glob pattern
+		 * will be matched against the file paths of resulting matches relative to their workspace. When `undefined`, default file-excludes (e.g. the `files.exclude`-setting
+		 * but not `search.exclude`) will apply. When `null`, no excludes will apply.
+		 * @param maxResults An upper-bound for the result.
+		 * @param token A token that can be used to signal cancellation to the underlying search engine.
+		 * @return A thenable that resolves to an array of resource identifiers. Will return no results if no
+		 * {@link workspace.workspaceFolders workspace folders} are opened.
+		 */ readonly findFiles: Thenable<Uri[]>;
+    /**
+		 * Save all dirty files.
+		 *
+		 * @param includeUntitled Also save files that have been created during this session.
+		 * @return A thenable that resolves when the files have been saved. Will return `false`
+		 * for any file that failed to save.
+		 */ readonly saveAll: Thenable<boolean>;
+    /**
+		 * Make changes to one or many resources or create, delete, and rename resources as defined by the given
+		 * {@link WorkspaceEdit workspace edit}.
+		 *
+		 * All changes of a workspace edit are applied in the same order in which they have been added. If
+		 * multiple textual inserts are made at the same position, these strings appear in the resulting text
+		 * in the order the 'inserts' were made, unless that are interleaved with resource edits. Invalid sequences
+		 * like 'delete file a' -> 'insert text in file a' cause failure of the operation.
+		 *
+		 * When applying a workspace edit that consists only of text edits an 'all-or-nothing'-strategy is used.
+		 * A workspace edit with resource creations or deletions aborts the operation, e.g. consecutive edits will
+		 * not be attempted, when a single edit fails.
+		 *
+		 * @param edit A workspace edit.
+		 * @param metadata Optional {@link WorkspaceEditMetadata metadata} for the edit.
+		 * @return A thenable that resolves when the edit could be applied.
+		 */ readonly applyEdit: Thenable<boolean>;
+    /**
 		 * All text documents currently known to the editor.
 		 */ readonly textDocuments: readonly TextDocument[];
+    /**
+		 * Opens a document. Will return early if this document is already open. Otherwise
+		 * the document is loaded and the {@link workspace.onDidOpenTextDocument didOpen}-event fires.
+		 *
+		 * The document is denoted by an {@link Uri}. Depending on the {@link Uri.scheme scheme} the
+		 * following rules apply:
+		 * * `file`-scheme: Open a file on disk (`openTextDocument(Uri.file(path))`). Will be rejected if the file
+		 * does not exist or cannot be loaded.
+		 * * `untitled`-scheme: Open a blank untitled file with associated path (`openTextDocument(Uri.file(path).with({ scheme: 'untitled' }))`).
+		 * The language will be derived from the file name.
+		 * * For all other schemes contributed {@link TextDocumentContentProvider text document content providers} and
+		 * {@link FileSystemProvider file system providers} are consulted.
+		 *
+		 * *Note* that the lifecycle of the returned document is owned by the editor and not by the extension. That means an
+		 * {@linkcode workspace.onDidCloseTextDocument onDidClose}-event can occur at any time after opening it.
+		 *
+		 * @param uri Identifies the resource to open.
+		 * @return A promise that resolves to a {@link TextDocument document}.
+		 */ readonly openTextDocument: Thenable<TextDocument>;
+    /**
+		 * A short-hand for `openTextDocument(Uri.file(fileName))`.
+		 *
+		 * @see {@link workspace.openTextDocument}
+		 * @param fileName A name of a file on disk.
+		 * @return A promise that resolves to a {@link TextDocument document}.
+		 */ readonly openTextDocument: Thenable<TextDocument>;
+    /**
+		 * Opens an untitled text document. The editor will prompt the user for a file
+		 * path when the document is to be saved. The `options` parameter allows to
+		 * specify the *language* and/or the *content* of the document.
+		 *
+		 * @param options Options to control how the document will be created.
+		 * @return A promise that resolves to a {@link TextDocument document}.
+		 */ readonly openTextDocument: Thenable<TextDocument>;
+    /**
+		 * Register a text document content provider.
+		 *
+		 * Only one provider can be registered per scheme.
+		 *
+		 * @param scheme The uri-scheme to register for.
+		 * @param provider A content provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerTextDocumentContentProvider: Disposable;
     /**
 		 * An event that is emitted when a {@link TextDocument text document} is opened or when the language id
 		 * of a text document {@link languages.setTextDocumentLanguage has been changed}.
@@ -2065,11 +2923,44 @@ Returns VSCodeApi only within the vscode extension.
 		 * All notebook documents currently known to the editor.
 		 */ readonly notebookDocuments: readonly NotebookDocument[];
     /**
+		 * Open a notebook. Will return early if this notebook is already {@link notebookDocuments loaded}. Otherwise
+		 * the notebook is loaded and the {@linkcode onDidOpenNotebookDocument}-event fires.
+		 *
+		 * *Note* that the lifecycle of the returned notebook is owned by the editor and not by the extension. That means an
+		 * {@linkcode onDidCloseNotebookDocument}-event can occur at any time after.
+		 *
+		 * *Note* that opening a notebook does not show a notebook editor. This function only returns a notebook document which
+		 * can be shown in a notebook editor but it can also be used for other things.
+		 *
+		 * @param uri The resource to open.
+		 * @returns A promise that resolves to a {@link NotebookDocument notebook}
+		 */ readonly openNotebookDocument: Thenable<NotebookDocument>;
+    /**
+		 * Open an untitled notebook. The editor will prompt the user for a file
+		 * path when the document is to be saved.
+		 *
+		 * @see {@link workspace.openNotebookDocument}
+		 * @param notebookType The notebook type that should be used.
+		 * @param content The initial contents of the notebook.
+		 * @returns A promise that resolves to a {@link NotebookDocument notebook}.
+		 */ readonly openNotebookDocument: Thenable<NotebookDocument>;
+    /**
 		 * An event that is emitted when a {@link NotebookDocument notebook} has changed.
 		 */ readonly onDidChangeNotebookDocument: Event<NotebookDocumentChangeEvent>;
     /**
 		 * An event that is emitted when a {@link NotebookDocument notebook} is saved.
 		 */ readonly onDidSaveNotebookDocument: Event<NotebookDocument>;
+    /**
+		 * Register a {@link NotebookSerializer notebook serializer}.
+		 *
+		 * A notebook serializer must be contributed through the `notebooks` extension point. When opening a notebook file, the editor will send
+		 * the `onNotebook:<notebookType>` activation event, and extensions must register their serializer in return.
+		 *
+		 * @param notebookType A notebook.
+		 * @param serializer A notebook serializer.
+		 * @param options Optional context options that define what parts of a notebook should be persisted
+		 * @return A {@link Disposable} that unregisters this serializer when being disposed.
+		 */ readonly registerNotebookSerializer: Disposable;
     /**
 		 * An event that is emitted when a {@link NotebookDocument notebook} is opened.
 		 */ readonly onDidOpenNotebookDocument: Event<NotebookDocument>;
@@ -2140,8 +3031,41 @@ Returns VSCodeApi only within the vscode extension.
 		 * *Note 2:* When renaming a folder with children only one event is fired.
 		 */ readonly onDidRenameFiles: Event<FileRenameEvent>;
     /**
+		 * Get a workspace configuration object.
+		 *
+		 * When a section-identifier is provided only that part of the configuration
+		 * is returned. Dots in the section-identifier are interpreted as child-access,
+		 * like `{ myExt: { setting: { doIt: true }}}` and `getConfiguration('myExt.setting').get('doIt') === true`.
+		 *
+		 * When a scope is provided configuration confined to that scope is returned. Scope can be a resource or a language identifier or both.
+		 *
+		 * @param section A dot-separated identifier.
+		 * @param scope A scope for which the configuration is asked for.
+		 * @return The full configuration or a subset.
+		 */ readonly getConfiguration: WorkspaceConfiguration;
+    /**
 		 * An event that is emitted when the {@link WorkspaceConfiguration configuration} changed.
 		 */ readonly onDidChangeConfiguration: Event<ConfigurationChangeEvent>;
+    /**
+		 * Register a task provider.
+		 *
+		 * @deprecated Use the corresponding function on the `tasks` namespace instead
+		 *
+		 * @param type The task kind type this provider is registered for.
+		 * @param provider A task provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerTaskProvider: Disposable;
+    /**
+		 * Register a filesystem provider for a given scheme, e.g. `ftp`.
+		 *
+		 * There can only be one provider per scheme and an error is being thrown when a scheme
+		 * has been claimed by another provider or when it is reserved.
+		 *
+		 * @param scheme The uri-{@link Uri.scheme scheme} the provider registers for.
+		 * @param provider The filesystem provider.
+		 * @param options Immutable metadata about the provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerFileSystemProvider: Disposable;
     /**
 		 * When true, the user has explicitly trusted the contents of the workspace.
 		 */ readonly isTrusted: boolean;
@@ -2149,9 +3073,458 @@ Returns VSCodeApi only within the vscode extension.
 		 * Event that fires when the current workspace has been trusted.
 		 */ readonly onDidGrantWorkspaceTrust: Event<void>;
     /**
+		 * Return the identifiers of all known languages.
+		 * @return Promise resolving to an array of identifier strings.
+		 */ readonly getLanguages: Thenable<string[]>;
+    /**
+		 * Set (and change) the {@link TextDocument.languageId language} that is associated
+		 * with the given document.
+		 *
+		 * *Note* that calling this function will trigger the {@linkcode workspace.onDidCloseTextDocument onDidCloseTextDocument} event
+		 * followed by the {@linkcode workspace.onDidOpenTextDocument onDidOpenTextDocument} event.
+		 *
+		 * @param document The document which language is to be changed
+		 * @param languageId The new language identifier.
+		 * @returns A thenable that resolves with the updated document.
+		 */ readonly setTextDocumentLanguage: Thenable<TextDocument>;
+    /**
+		 * Compute the match between a document {@link DocumentSelector selector} and a document. Values
+		 * greater than zero mean the selector matches the document.
+		 *
+		 * A match is computed according to these rules:
+		 * 1. When {@linkcode DocumentSelector} is an array, compute the match for each contained `DocumentFilter` or language identifier and take the maximum value.
+		 * 2. A string will be desugared to become the `language`-part of a {@linkcode DocumentFilter}, so `"fooLang"` is like `{ language: "fooLang" }`.
+		 * 3. A {@linkcode DocumentFilter} will be matched against the document by comparing its parts with the document. The following rules apply:
+		 *    1. When the `DocumentFilter` is empty (`{}`) the result is `0`
+		 *    2. When `scheme`, `language`, `pattern`, or `notebook` are defined but one doesn't match, the result is `0`
+		 *    3. Matching against `*` gives a score of `5`, matching via equality or via a glob-pattern gives a score of `10`
+		 *    4. The result is the maximum value of each match
+		 *
+		 * Samples:
+		 * ```js
+		 * // default document from disk (file-scheme)
+		 * doc.uri; //'file:///my/file.js'
+		 * doc.languageId; // 'javascript'
+		 * match('javascript', doc); // 10;
+		 * match({ language: 'javascript' }, doc); // 10;
+		 * match({ language: 'javascript', scheme: 'file' }, doc); // 10;
+		 * match('*', doc); // 5
+		 * match('fooLang', doc); // 0
+		 * match(['fooLang', '*'], doc); // 5
+		 *
+		 * // virtual document, e.g. from git-index
+		 * doc.uri; // 'git:/my/file.js'
+		 * doc.languageId; // 'javascript'
+		 * match('javascript', doc); // 10;
+		 * match({ language: 'javascript', scheme: 'git' }, doc); // 10;
+		 * match('*', doc); // 5
+		 *
+		 * // notebook cell document
+		 * doc.uri; // `vscode-notebook-cell:///my/notebook.ipynb#gl65s2pmha`;
+		 * doc.languageId; // 'python'
+		 * match({ notebookType: 'jupyter-notebook' }, doc) // 10
+		 * match({ notebookType: 'fooNotebook', language: 'python' }, doc) // 0
+		 * match({ language: 'python' }, doc) // 10
+		 * match({ notebookType: '*' }, doc) // 5
+		 * ```
+		 *
+		 * @param selector A document selector.
+		 * @param document A text document.
+		 * @return A number `>0` when the selector matches and `0` when the selector does not match.
+		 */ readonly match: number;
+    /**
 		 * An {@link Event} which fires when the global set of diagnostics changes. This is
 		 * newly added and removed diagnostics.
 		 */ readonly onDidChangeDiagnostics: Event<DiagnosticChangeEvent>;
+    /**
+		 * Get all diagnostics for a given resource.
+		 *
+		 * @param resource A resource
+		 * @returns An array of {@link Diagnostic diagnostics} objects or an empty array.
+		 */ readonly getDiagnostics: Diagnostic[];
+    /**
+		 * Get all diagnostics.
+		 *
+		 * @returns An array of uri-diagnostics tuples or an empty array.
+		 */ readonly getDiagnostics: [Uri, Diagnostic[]][];
+    /**
+		 * Create a diagnostics collection.
+		 *
+		 * @param name The {@link DiagnosticCollection.name name} of the collection.
+		 * @return A new diagnostic collection.
+		 */ readonly createDiagnosticCollection: DiagnosticCollection;
+    /**
+		 * Creates a new {@link LanguageStatusItem language status item}.
+		 *
+		 * @param id The identifier of the item.
+		 * @param selector The document selector that defines for what editors the item shows.
+		 */ readonly createLanguageStatusItem: LanguageStatusItem;
+    /**
+		 * Register a completion provider.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are sorted
+		 * by their {@link languages.match score} and groups of equal score are sequentially asked for
+		 * completion items. The process stops when one or many providers of a group return a
+		 * result. A failing provider (rejected promise or exception) will not fail the whole
+		 * operation.
+		 *
+		 * A completion item provider can be associated with a set of `triggerCharacters`. When trigger
+		 * characters are being typed, completions are requested but only from providers that registered
+		 * the typed character. Because of that trigger characters should be different than {@link LanguageConfiguration.wordPattern word characters},
+		 * a common trigger character is `.` to trigger member completions.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A completion provider.
+		 * @param triggerCharacters Trigger completion when the user types one of the characters.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerCompletionItemProvider: Disposable;
+    /**
+		 * Registers an inline completion provider.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are asked in
+		 * parallel and the results are merged. A failing provider (rejected promise or exception) will
+		 * not cause a failure of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider An inline completion provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerInlineCompletionItemProvider: Disposable;
+    /**
+		 * Register a code action provider.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are asked in
+		 * parallel and the results are merged. A failing provider (rejected promise or exception) will
+		 * not cause a failure of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A code action provider.
+		 * @param metadata Metadata about the kind of code actions the provider provides.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerCodeActionsProvider: Disposable;
+    /**
+		 * Register a code lens provider.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are asked in
+		 * parallel and the results are merged. A failing provider (rejected promise or exception) will
+		 * not cause a failure of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A code lens provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerCodeLensProvider: Disposable;
+    /**
+		 * Register a definition provider.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are asked in
+		 * parallel and the results are merged. A failing provider (rejected promise or exception) will
+		 * not cause a failure of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A definition provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerDefinitionProvider: Disposable;
+    /**
+		 * Register an implementation provider.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are asked in
+		 * parallel and the results are merged. A failing provider (rejected promise or exception) will
+		 * not cause a failure of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider An implementation provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerImplementationProvider: Disposable;
+    /**
+		 * Register a type definition provider.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are asked in
+		 * parallel and the results are merged. A failing provider (rejected promise or exception) will
+		 * not cause a failure of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A type definition provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerTypeDefinitionProvider: Disposable;
+    /**
+		 * Register a declaration provider.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are asked in
+		 * parallel and the results are merged. A failing provider (rejected promise or exception) will
+		 * not cause a failure of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A declaration provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerDeclarationProvider: Disposable;
+    /**
+		 * Register a hover provider.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are asked in
+		 * parallel and the results are merged. A failing provider (rejected promise or exception) will
+		 * not cause a failure of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A hover provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerHoverProvider: Disposable;
+    /**
+		 * Register a provider that locates evaluatable expressions in text documents.
+		 * The editor will evaluate the expression in the active debug session and will show the result in the debug hover.
+		 *
+		 * If multiple providers are registered for a language an arbitrary provider will be used.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider An evaluatable expression provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerEvaluatableExpressionProvider: Disposable;
+    /**
+		 * Register a provider that returns data for the debugger's 'inline value' feature.
+		 * Whenever the generic debugger has stopped in a source file, providers registered for the language of the file
+		 * are called to return textual data that will be shown in the editor at the end of lines.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are asked in
+		 * parallel and the results are merged. A failing provider (rejected promise or exception) will
+		 * not cause a failure of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider An inline values provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerInlineValuesProvider: Disposable;
+    /**
+		 * Register a document highlight provider.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are sorted
+		 * by their {@link languages.match score} and groups sequentially asked for document highlights.
+		 * The process stops when a provider returns a `non-falsy` or `non-failure` result.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A document highlight provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerDocumentHighlightProvider: Disposable;
+    /**
+		 * Register a document symbol provider.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are asked in
+		 * parallel and the results are merged. A failing provider (rejected promise or exception) will
+		 * not cause a failure of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A document symbol provider.
+		 * @param metaData metadata about the provider
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerDocumentSymbolProvider: Disposable;
+    /**
+		 * Register a workspace symbol provider.
+		 *
+		 * Multiple providers can be registered. In that case providers are asked in parallel and
+		 * the results are merged. A failing provider (rejected promise or exception) will not cause
+		 * a failure of the whole operation.
+		 *
+		 * @param provider A workspace symbol provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerWorkspaceSymbolProvider: Disposable;
+    /**
+		 * Register a reference provider.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are asked in
+		 * parallel and the results are merged. A failing provider (rejected promise or exception) will
+		 * not cause a failure of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A reference provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerReferenceProvider: Disposable;
+    /**
+		 * Register a rename provider.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are sorted
+		 * by their {@link languages.match score} and asked in sequence. The first provider producing a result
+		 * defines the result of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A rename provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerRenameProvider: Disposable;
+    /**
+		 * Register a semantic tokens provider for a whole document.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are sorted
+		 * by their {@link languages.match score} and the best-matching provider is used. Failure
+		 * of the selected provider will cause a failure of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A document semantic tokens provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerDocumentSemanticTokensProvider: Disposable;
+    /**
+		 * Register a semantic tokens provider for a document range.
+		 *
+		 * *Note:* If a document has both a `DocumentSemanticTokensProvider` and a `DocumentRangeSemanticTokensProvider`,
+		 * the range provider will be invoked only initially, for the time in which the full document provider takes
+		 * to resolve the first request. Once the full document provider resolves the first request, the semantic tokens
+		 * provided via the range provider will be discarded and from that point forward, only the document provider
+		 * will be used.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are sorted
+		 * by their {@link languages.match score} and the best-matching provider is used. Failure
+		 * of the selected provider will cause a failure of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A document range semantic tokens provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerDocumentRangeSemanticTokensProvider: Disposable;
+    /**
+		 * Register a formatting provider for a document.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are sorted
+		 * by their {@link languages.match score} and the best-matching provider is used. Failure
+		 * of the selected provider will cause a failure of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A document formatting edit provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerDocumentFormattingEditProvider: Disposable;
+    /**
+		 * Register a formatting provider for a document range.
+		 *
+		 * *Note:* A document range provider is also a {@link DocumentFormattingEditProvider document formatter}
+		 * which means there is no need to {@link languages.registerDocumentFormattingEditProvider register} a document
+		 * formatter when also registering a range provider.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are sorted
+		 * by their {@link languages.match score} and the best-matching provider is used. Failure
+		 * of the selected provider will cause a failure of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A document range formatting edit provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerDocumentRangeFormattingEditProvider: Disposable;
+    /**
+		 * Register a formatting provider that works on type. The provider is active when the user enables the setting `editor.formatOnType`.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are sorted
+		 * by their {@link languages.match score} and the best-matching provider is used. Failure
+		 * of the selected provider will cause a failure of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider An on type formatting edit provider.
+		 * @param firstTriggerCharacter A character on which formatting should be triggered, like `}`.
+		 * @param moreTriggerCharacter More trigger characters.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerOnTypeFormattingEditProvider: Disposable;
+    /**
+		 * Register a signature help provider.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are sorted
+		 * by their {@link languages.match score} and called sequentially until a provider returns a
+		 * valid result.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A signature help provider.
+		 * @param triggerCharacters Trigger signature help when the user types one of the characters, like `,` or `(`.
+		 * @param metadata Information about the provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerSignatureHelpProvider: Disposable;
+    readonly registerSignatureHelpProvider: Disposable;
+    /**
+		 * Register a document link provider.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are asked in
+		 * parallel and the results are merged. A failing provider (rejected promise or exception) will
+		 * not cause a failure of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A document link provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerDocumentLinkProvider: Disposable;
+    /**
+		 * Register a color provider.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are asked in
+		 * parallel and the results are merged. A failing provider (rejected promise or exception) will
+		 * not cause a failure of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A color provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerColorProvider: Disposable;
+    /**
+		 * Register a inlay hints provider.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are asked in
+		 * parallel and the results are merged. A failing provider (rejected promise or exception) will
+		 * not cause a failure of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider An inlay hints provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerInlayHintsProvider: Disposable;
+    /**
+		 * Register a folding range provider.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are asked in
+		 * parallel and the results are merged.
+		 * If multiple folding ranges start at the same position, only the range of the first registered provider is used.
+		 * If a folding range overlaps with an other range that has a smaller position, it is also ignored.
+		 *
+		 * A failing provider (rejected promise or exception) will
+		 * not cause a failure of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A folding range provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerFoldingRangeProvider: Disposable;
+    /**
+		 * Register a selection range provider.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are asked in
+		 * parallel and the results are merged. A failing provider (rejected promise or exception) will
+		 * not cause a failure of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A selection range provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerSelectionRangeProvider: Disposable;
+    /**
+		 * Register a call hierarchy provider.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A call hierarchy provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerCallHierarchyProvider: Disposable;
+    /**
+		 * Register a type hierarchy provider.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A type hierarchy provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerTypeHierarchyProvider: Disposable;
+    /**
+		 * Register a linked editing range provider.
+		 *
+		 * Multiple providers can be registered for a language. In that case providers are sorted
+		 * by their {@link languages.match score} and the best-matching provider that has a result is used. Failure
+		 * of the selected provider will cause a failure of the whole operation.
+		 *
+		 * @param selector A selector that defines the documents this provider is applicable to.
+		 * @param provider A linked editing range provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerLinkedEditingRangeProvider: Disposable;
+    /**
+		 * Registers a new {@link DocumentDropEditProvider}.
+		 *
+		 * @param selector A selector that defines the documents this provider applies to.
+		 * @param provider A drop provider.
+		 *
+		 * @return A {@link Disposable} that unregisters this provider when disposed of.
+		 */ readonly registerDocumentDropEditProvider: Disposable;
+    /**
+		 * Set a {@link LanguageConfiguration language configuration} for a language.
+		 *
+		 * @param language A language identifier like `typescript`.
+		 * @param configuration Language configuration.
+		 * @return A {@link Disposable} that unsets this configuration.
+		 */ readonly setLanguageConfiguration: Disposable;
     /**
 	 * Represents a notebook editor that is attached to a {@link NotebookDocument notebook}.
 	 */ readonly NotebookEditorRevealType: {
@@ -2316,11 +3689,44 @@ Returns VSCodeApi only within the vscode extension.
 		 */ new(text: string, alignment: NotebookCellStatusBarAlignment): NotebookCellStatusBarItem;
     };
     /**
+		 * Creates a new notebook controller.
+		 *
+		 * @param id Identifier of the controller. Must be unique per extension.
+		 * @param notebookType A notebook type for which this controller is for.
+		 * @param label The label of the controller.
+		 * @param handler The execute-handler of the controller.
+		 */ readonly createNotebookController: NotebookController;
+    /**
+		 * Register a {@link NotebookCellStatusBarItemProvider cell statusbar item provider} for the given notebook type.
+		 *
+		 * @param notebookType The notebook type to register for.
+		 * @param provider A cell status bar provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerNotebookCellStatusBarItemProvider: Disposable;
+    /**
+		 * Creates a new messaging instance used to communicate with a specific renderer.
+		 *
+		 * * *Note 1:* Extensions can only create renderer that they have defined in their `package.json`-file
+		 * * *Note 2:* A renderer only has access to messaging if `requiresMessaging` is set to `always` or `optional` in
+		 * its `notebookRenderer` contribution.
+		 *
+		 * @param rendererId The renderer ID to communicate with
+		 * @returns A new notebook renderer messaging object.
+		*/ readonly createRendererMessaging: NotebookRendererMessaging;
+    /**
 		 * The {@link SourceControlInputBox input box} for the last source control
 		 * created by the extension.
 		 *
 		 * @deprecated Use SourceControl.inputBox instead
 		 */ readonly inputBox: SourceControlInputBox;
+    /**
+		 * Creates a new {@link SourceControl source control} instance.
+		 *
+		 * @param id An `id` for the source control. Something short, e.g.: `git`.
+		 * @param label A human-readable string for the source control. E.g.: `Git`.
+		 * @param rootUri An optional Uri of the root of the source control. E.g.: `Uri.parse(workspaceRoot)`.
+		 * @return An instance of {@link SourceControl source control}.
+		 */ readonly createSourceControl: SourceControl;
     /**
 	 * Represents a debug adapter executable and optional arguments and runtime options passed to it.
 	 */ readonly DebugAdapterExecutable: {
@@ -2426,6 +3832,76 @@ Returns VSCodeApi only within the vscode extension.
 		 * An {@link Event} that is emitted when the set of breakpoints is added, removed, or changed.
 		 */ readonly onDidChangeBreakpoints: Event<BreakpointsChangeEvent>;
     /**
+		 * Register a {@link DebugConfigurationProvider debug configuration provider} for a specific debug type.
+		 * The optional {@link DebugConfigurationProviderTriggerKind triggerKind} can be used to specify when the `provideDebugConfigurations` method of the provider is triggered.
+		 * Currently two trigger kinds are possible: with the value `Initial` (or if no trigger kind argument is given) the `provideDebugConfigurations` method is used to provide the initial debug configurations to be copied into a newly created launch.json.
+		 * With the trigger kind `Dynamic` the `provideDebugConfigurations` method is used to dynamically determine debug configurations to be presented to the user (in addition to the static configurations from the launch.json).
+		 * Please note that the `triggerKind` argument only applies to the `provideDebugConfigurations` method: so the `resolveDebugConfiguration` methods are not affected at all.
+		 * Registering a single provider with resolve methods for different trigger kinds, results in the same resolve methods called multiple times.
+		 * More than one provider can be registered for the same type.
+		 *
+		 * @param debugType The debug type for which the provider is registered.
+		 * @param provider The {@link DebugConfigurationProvider debug configuration provider} to register.
+		 * @param triggerKind The {@link DebugConfigurationProviderTriggerKind trigger} for which the 'provideDebugConfiguration' method of the provider is registered. If `triggerKind` is missing, the value `DebugConfigurationProviderTriggerKind.Initial` is assumed.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerDebugConfigurationProvider: Disposable;
+    /**
+		 * Register a {@link DebugAdapterDescriptorFactory debug adapter descriptor factory} for a specific debug type.
+		 * An extension is only allowed to register a DebugAdapterDescriptorFactory for the debug type(s) defined by the extension. Otherwise an error is thrown.
+		 * Registering more than one DebugAdapterDescriptorFactory for a debug type results in an error.
+		 *
+		 * @param debugType The debug type for which the factory is registered.
+		 * @param factory The {@link DebugAdapterDescriptorFactory debug adapter descriptor factory} to register.
+		 * @return A {@link Disposable} that unregisters this factory when being disposed.
+		 */ readonly registerDebugAdapterDescriptorFactory: Disposable;
+    /**
+		 * Register a debug adapter tracker factory for the given debug type.
+		 *
+		 * @param debugType The debug type for which the factory is registered or '*' for matching all debug types.
+		 * @param factory The {@link DebugAdapterTrackerFactory debug adapter tracker factory} to register.
+		 * @return A {@link Disposable} that unregisters this factory when being disposed.
+		 */ readonly registerDebugAdapterTrackerFactory: Disposable;
+    /**
+		 * Start debugging by using either a named launch or named compound configuration,
+		 * or by directly passing a {@link DebugConfiguration}.
+		 * The named configurations are looked up in '.vscode/launch.json' found in the given folder.
+		 * Before debugging starts, all unsaved files are saved and the launch configurations are brought up-to-date.
+		 * Folder specific variables used in the configuration (e.g. '${workspaceFolder}') are resolved against the given folder.
+		 * @param folder The {@link WorkspaceFolder workspace folder} for looking up named configurations and resolving variables or `undefined` for a non-folder setup.
+		 * @param nameOrConfiguration Either the name of a debug or compound configuration or a {@link DebugConfiguration} object.
+		 * @param parentSessionOrOptions Debug session options. When passed a parent {@link DebugSession debug session}, assumes options with just this parent session.
+		 * @return A thenable that resolves when debugging could be successfully started.
+		 */ readonly startDebugging: Thenable<boolean>;
+    /**
+		 * Stop the given debug session or stop all debug sessions if session is omitted.
+		 * @param session The {@link DebugSession debug session} to stop; if omitted all sessions are stopped.
+		 */ readonly stopDebugging: Thenable<void>;
+    /**
+		 * Add breakpoints.
+		 * @param breakpoints The breakpoints to add.
+		*/ readonly addBreakpoints: void;
+    /**
+		 * Remove breakpoints.
+		 * @param breakpoints The breakpoints to remove.
+		 */ readonly removeBreakpoints: void;
+    /**
+		 * Converts a "Source" descriptor object received via the Debug Adapter Protocol into a Uri that can be used to load its contents.
+		 * If the source descriptor is based on a path, a file Uri is returned.
+		 * If the source descriptor uses a reference number, a specific debug Uri (scheme 'debug') is constructed that requires a corresponding ContentProvider and a running debug session
+		 *
+		 * If the "Source" descriptor has insufficient information for creating the Uri, an error is thrown.
+		 *
+		 * @param source An object conforming to the [Source](https://microsoft.github.io/debug-adapter-protocol/specification#Types_Source) type defined in the Debug Adapter Protocol.
+		 * @param session An optional debug session that will be used when the source descriptor uses a reference number to load the contents from an active debug session.
+		 * @return A uri that can be used to load the contents of the source.
+		 */ readonly asDebugSourceUri: Uri;
+    /**
+		 * Get an extension by its full identifier in the form of: `publisher.name`.
+		 *
+		 * @param extensionId An extension identifier.
+		 * @return An extension or `undefined`.
+		 */ readonly getExtension<T = any>: Extension<T> | undefined;
+    /**
 		 * All extensions currently known to the system.
 		 */ readonly all: readonly Extension<any>[];
     /**
@@ -2459,9 +3935,96 @@ Returns VSCodeApi only within the vscode extension.
         readonly Resolved: 1;
     };
     /**
+		 * Creates a new {@link CommentController comment controller} instance.
+		 *
+		 * @param id An `id` for the comment controller.
+		 * @param label A human-readable string for the comment controller.
+		 * @return An instance of {@link CommentController comment controller}.
+		 */ readonly createCommentController: CommentController;
+    /**
+		 * Get an authentication session matching the desired scopes. Rejects if a provider with providerId is not
+		 * registered, or if the user does not consent to sharing authentication information with
+		 * the extension. If there are multiple sessions with the same scopes, the user will be shown a
+		 * quickpick to select which account they would like to use.
+		 *
+		 * Currently, there are only two authentication providers that are contributed from built in extensions
+		 * to the editor that implement GitHub and Microsoft authentication: their providerId's are 'github' and 'microsoft'.
+		 * @param providerId The id of the provider to use
+		 * @param scopes A list of scopes representing the permissions requested. These are dependent on the authentication provider
+		 * @param options The {@link AuthenticationGetSessionOptions} to use
+		 * @returns A thenable that resolves to an authentication session
+		 */ readonly getSession: Thenable<AuthenticationSession>;
+    /**
+		 * Get an authentication session matching the desired scopes. Rejects if a provider with providerId is not
+		 * registered, or if the user does not consent to sharing authentication information with
+		 * the extension. If there are multiple sessions with the same scopes, the user will be shown a
+		 * quickpick to select which account they would like to use.
+		 *
+		 * Currently, there are only two authentication providers that are contributed from built in extensions
+		 * to the editor that implement GitHub and Microsoft authentication: their providerId's are 'github' and 'microsoft'.
+		 * @param providerId The id of the provider to use
+		 * @param scopes A list of scopes representing the permissions requested. These are dependent on the authentication provider
+		 * @param options The {@link AuthenticationGetSessionOptions} to use
+		 * @returns A thenable that resolves to an authentication session
+		 */ readonly getSession: Thenable<AuthenticationSession>;
+    /**
+		 * Get an authentication session matching the desired scopes. Rejects if a provider with providerId is not
+		 * registered, or if the user does not consent to sharing authentication information with
+		 * the extension. If there are multiple sessions with the same scopes, the user will be shown a
+		 * quickpick to select which account they would like to use.
+		 *
+		 * Currently, there are only two authentication providers that are contributed from built in extensions
+		 * to the editor that implement GitHub and Microsoft authentication: their providerId's are 'github' and 'microsoft'.
+		 * @param providerId The id of the provider to use
+		 * @param scopes A list of scopes representing the permissions requested. These are dependent on the authentication provider
+		 * @param options The {@link AuthenticationGetSessionOptions} to use
+		 * @returns A thenable that resolves to an authentication session if available, or undefined if there are no sessions
+		 */ readonly getSession: Thenable<AuthenticationSession | undefined>;
+    /**
 		 * An {@link Event} which fires when the authentication sessions of an authentication provider have
 		 * been added, removed, or changed.
 		 */ readonly onDidChangeSessions: Event<AuthenticationSessionsChangeEvent>;
+    /**
+		 * Register an authentication provider.
+		 *
+		 * There can only be one provider per id and an error is being thrown when an id
+		 * has already been used by another provider. Ids are case-sensitive.
+		 *
+		 * @param id The unique identifier of the provider.
+		 * @param label The human-readable name of the provider.
+		 * @param provider The authentication provider provider.
+		 * @params options Additional options for the provider.
+		 * @return A {@link Disposable} that unregisters this provider when being disposed.
+		 */ readonly registerAuthenticationProvider: Disposable;
+    /**
+		 * Marks a string for localization. If a localized bundle is available for the language specified by
+		 * {@link env.language} and the bundle has a localized value for this message, then that localized
+		 * value will be returned (with injected {@link args} values for any templated values).
+		 * @param message - The message to localize. Supports index templating where strings like `{0}` and `{1}` are
+		 * replaced by the item at that index in the {@link args} array.
+		 * @param args - The arguments to be used in the localized string. The index of the argument is used to
+		 * match the template placeholder in the localized string.
+		 * @returns localized string with injected arguments.
+		 * @example `l10n.t('Hello {0}!', 'World');`
+		 */ readonly t: string;
+    /**
+		 * Marks a string for localization. If a localized bundle is available for the language specified by
+		 * {@link env.language} and the bundle has a localized value for this message, then that localized
+		 * value will be returned (with injected {@link args} values for any templated values).
+		 * @param message The message to localize. Supports named templating where strings like `{foo}` and `{bar}` are
+		 * replaced by the value in the Record for that key (foo, bar, etc).
+		 * @param args The arguments to be used in the localized string. The name of the key in the record is used to
+		 * match the template placeholder in the localized string.
+		 * @returns localized string with injected arguments.
+		 * @example `l10n.t('Hello {name}', { name: 'Erich' });`
+		 */ readonly t: string;
+    /**
+		 * Marks a string for localization. If a localized bundle is available for the language specified by
+		 * {@link env.language} and the bundle has a localized value for this message, then that localized
+		 * value will be returned (with injected args values for any templated values).
+		 * @param options The options to use when localizing the message.
+		 * @returns localized string with injected arguments.
+		 */ readonly t: string;
     /**
 		 * The bundle of localized strings that have been loaded for the extension.
 		 * It's undefined if no bundle has been loaded. The bundle is typically not loaded if
@@ -2474,6 +4037,13 @@ Returns VSCodeApi only within the vscode extension.
 		 * It's undefined if no bundle has been loaded. The bundle is typically not loaded if
 		 * there was no bundle found or when we are running with the default language.
 		 */ readonly uri: Uri | undefined;
+    /**
+		 * Creates a new test controller.
+		 *
+		 * @param id Identifier for the controller, must be globally unique.
+		 * @param label A human-readable label for the controller.
+		 * @returns An instance of the {@link TestController}.
+		*/ readonly createTestController: TestController;
     /**
 	 * The kind of executions that {@link TestRunProfile TestRunProfiles} control.
 	 */ readonly TestRunProfileKind: {
