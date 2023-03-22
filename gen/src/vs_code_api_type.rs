@@ -45,7 +45,7 @@ fn result_decl_vec_to_ts_type(
             .flat_map(|result| {
                 result_decl_to_ts_property_signature(result, comments)
                     .iter()
-                    .map(|sig| swc_ecma_ast::TsTypeElement::TsPropertySignature(sig.clone()))
+                    .map(|sig| sig.clone())
                     .collect::<Vec<_>>()
             })
             .collect(),
@@ -55,7 +55,7 @@ fn result_decl_vec_to_ts_type(
 fn result_decl_to_ts_property_signature(
     result: &crate::pickup::ResultDeclWithComments,
     comments: &dyn swc_common::comments::Comments,
-) -> Vec<swc_ecma_ast::TsPropertySignature> {
+) -> Vec<swc_ecma_ast::TsTypeElement> {
     match &result.decl {
         crate::pickup::ResultDecl::Class(class) => {
             let members = class
@@ -69,7 +69,139 @@ fn result_decl_to_ts_property_signature(
             if members.is_empty() {
                 vec![]
             } else {
-                vec![swc_ecma_ast::TsPropertySignature {
+                vec![swc_ecma_ast::TsTypeElement::TsPropertySignature(
+                    swc_ecma_ast::TsPropertySignature {
+                        span: {
+                            let span = swc_common::Span::dummy_with_cmt();
+                            match &result.comments {
+                                Some(comment_vec) => {
+                                    swc_common::comments::Comments::add_leading_comments(
+                                        &comments,
+                                        span.lo,
+                                        comment_vec.clone(),
+                                    )
+                                }
+                                None => {}
+                            }
+                            span
+                        },
+                        readonly: true,
+                        key: Box::new(swc_ecma_ast::Expr::Ident(class.ident.clone())),
+                        computed: false,
+                        optional: false,
+                        init: None,
+                        params: vec![],
+                        type_ann: Some(Box::new(swc_ecma_ast::TsTypeAnn {
+                            span: swc_common::Span::default(),
+                            type_ann: Box::new(swc_ecma_ast::TsType::TsTypeLit(
+                                swc_ecma_ast::TsTypeLit {
+                                    span: swc_common::Span::default(),
+                                    members,
+                                },
+                            )),
+                        })),
+                        type_params: None,
+                    },
+                )]
+            }
+        }
+        crate::pickup::ResultDecl::Fn(fn_decl) => {
+            vec![swc_ecma_ast::TsTypeElement::TsMethodSignature(
+                swc_ecma_ast::TsMethodSignature {
+                    span: {
+                        let span = swc_common::Span::dummy_with_cmt();
+                        match &result.comments {
+                            Some(comment_vec) => {
+                                swc_common::comments::Comments::add_leading_comments(
+                                    &comments,
+                                    span.lo,
+                                    comment_vec.clone(),
+                                )
+                            }
+                            None => {}
+                        }
+                        span
+                    },
+                    readonly: false,
+                    computed: false,
+                    optional: false,
+                    key: Box::new(swc_ecma_ast::Expr::Ident(fn_decl.ident.clone())),
+                    params: fn_decl
+                        .function
+                        .params
+                        .iter()
+                        .map(|param| crate::fn_to_type::param_to_ts_fn_param(&param.pat))
+                        .collect(),
+                    type_ann: Some(Box::new(swc_ecma_ast::TsTypeAnn {
+                        span: swc_common::Span::default(),
+                        type_ann: Box::new(swc_ecma_ast::TsType::TsKeywordType(
+                            swc_ecma_ast::TsKeywordType {
+                                span: swc_common::Span::default(),
+                                kind: swc_ecma_ast::TsKeywordTypeKind::TsStringKeyword,
+                            },
+                        )),
+                    })),
+                    type_params: fn_decl.function.type_params.clone(),
+                },
+            )]
+        }
+        crate::pickup::ResultDecl::Var(var_decl) => var_decl
+            .decls
+            .iter()
+            .map(|decl| {
+                swc_ecma_ast::TsTypeElement::TsPropertySignature(
+                    swc_ecma_ast::TsPropertySignature {
+                        span: {
+                            let span = swc_common::Span::dummy_with_cmt();
+                            match &result.comments {
+                                Some(comment_vec) => {
+                                    swc_common::comments::Comments::add_leading_comments(
+                                        &comments,
+                                        span.lo,
+                                        comment_vec.clone(),
+                                    )
+                                }
+                                None => {}
+                            }
+                            span
+                        },
+                        readonly: match var_decl.kind {
+                            swc_ecma_ast::VarDeclKind::Var => false,
+                            swc_ecma_ast::VarDeclKind::Let => false,
+                            swc_ecma_ast::VarDeclKind::Const => true,
+                        },
+                        key: Box::new(swc_ecma_ast::Expr::Ident(match &decl.name {
+                            swc_ecma_ast::Pat::Ident(biding_ident) => biding_ident.id.clone(),
+                            swc_ecma_ast::Pat::Array(_) => todo!(),
+                            swc_ecma_ast::Pat::Rest(_) => todo!(),
+                            swc_ecma_ast::Pat::Object(_) => todo!(),
+                            swc_ecma_ast::Pat::Assign(_) => todo!(),
+                            swc_ecma_ast::Pat::Invalid(_) => todo!(),
+                            swc_ecma_ast::Pat::Expr(_) => todo!(),
+                        })),
+                        computed: false,
+                        optional: false,
+                        init: None,
+                        params: vec![],
+                        type_ann: match &decl.name {
+                            swc_ecma_ast::Pat::Ident(biding_ident) => biding_ident.type_ann.clone(),
+                            swc_ecma_ast::Pat::Array(_) => todo!(),
+                            swc_ecma_ast::Pat::Rest(_) => todo!(),
+                            swc_ecma_ast::Pat::Object(_) => todo!(),
+                            swc_ecma_ast::Pat::Assign(_) => todo!(),
+                            swc_ecma_ast::Pat::Invalid(_) => todo!(),
+                            swc_ecma_ast::Pat::Expr(_) => todo!(),
+                        },
+                        type_params: None,
+                    },
+                )
+            })
+            .collect(),
+        crate::pickup::ResultDecl::TsInterface(_) => vec![],
+        crate::pickup::ResultDecl::TsTypeAlias(_) => vec![],
+        crate::pickup::ResultDecl::TsEnum(ts_enum) => {
+            vec![swc_ecma_ast::TsTypeElement::TsPropertySignature(
+                swc_ecma_ast::TsPropertySignature {
                     span: {
                         let span = swc_common::Span::dummy_with_cmt();
                         match &result.comments {
@@ -85,7 +217,7 @@ fn result_decl_to_ts_property_signature(
                         span
                     },
                     readonly: true,
-                    key: Box::new(swc_ecma_ast::Expr::Ident(class.ident.clone())),
+                    key: Box::new(swc_ecma_ast::Expr::Ident(ts_enum.id.clone())),
                     computed: false,
                     optional: false,
                     init: None,
@@ -95,149 +227,53 @@ fn result_decl_to_ts_property_signature(
                         type_ann: Box::new(swc_ecma_ast::TsType::TsTypeLit(
                             swc_ecma_ast::TsTypeLit {
                                 span: swc_common::Span::default(),
-                                members,
+                                members: ts_enum
+                                    .members
+                                    .iter()
+                                    .map(|member| enum_member_to_ts_type_element(member))
+                                    .collect(),
                             },
                         )),
                     })),
                     type_params: None,
-                }]
-            }
+                },
+            )]
         }
-        crate::pickup::ResultDecl::Fn(fn_decl) => vec![swc_ecma_ast::TsPropertySignature {
-            span: {
-                let span = swc_common::Span::dummy_with_cmt();
-                match &result.comments {
-                    Some(comment_vec) => swc_common::comments::Comments::add_leading_comments(
-                        &comments,
-                        span.lo,
-                        comment_vec.clone(),
-                    ),
-                    None => {}
-                }
-                span
-            },
-            readonly: true,
-            computed: false,
-            optional: false,
-            init: None,
-            key: Box::new(swc_ecma_ast::Expr::Ident(fn_decl.ident.clone())),
-            params: fn_decl
-                .function
-                .params
-                .iter()
-                .map(|param| crate::fn_to_type::param_to_ts_fn_param(&param.pat))
-                .collect(),
-            type_ann: fn_decl.function.return_type.clone(),
-            type_params: fn_decl.function.type_params.clone(),
-        }],
-        crate::pickup::ResultDecl::Var(var_decl) => var_decl
-            .decls
-            .iter()
-            .map(|decl| swc_ecma_ast::TsPropertySignature {
-                span: {
-                    let span = swc_common::Span::dummy_with_cmt();
-                    match &result.comments {
-                        Some(comment_vec) => swc_common::comments::Comments::add_leading_comments(
-                            &comments,
-                            span.lo,
-                            comment_vec.clone(),
-                        ),
-                        None => {}
-                    }
-                    span
-                },
-                readonly: match var_decl.kind {
-                    swc_ecma_ast::VarDeclKind::Var => false,
-                    swc_ecma_ast::VarDeclKind::Let => false,
-                    swc_ecma_ast::VarDeclKind::Const => true,
-                },
-                key: Box::new(swc_ecma_ast::Expr::Ident(match &decl.name {
-                    swc_ecma_ast::Pat::Ident(biding_ident) => biding_ident.id.clone(),
-                    swc_ecma_ast::Pat::Array(_) => todo!(),
-                    swc_ecma_ast::Pat::Rest(_) => todo!(),
-                    swc_ecma_ast::Pat::Object(_) => todo!(),
-                    swc_ecma_ast::Pat::Assign(_) => todo!(),
-                    swc_ecma_ast::Pat::Invalid(_) => todo!(),
-                    swc_ecma_ast::Pat::Expr(_) => todo!(),
-                })),
-                computed: false,
-                optional: false,
-                init: None,
-                params: vec![],
-                type_ann: match &decl.name {
-                    swc_ecma_ast::Pat::Ident(biding_ident) => biding_ident.type_ann.clone(),
-                    swc_ecma_ast::Pat::Array(_) => todo!(),
-                    swc_ecma_ast::Pat::Rest(_) => todo!(),
-                    swc_ecma_ast::Pat::Object(_) => todo!(),
-                    swc_ecma_ast::Pat::Assign(_) => todo!(),
-                    swc_ecma_ast::Pat::Invalid(_) => todo!(),
-                    swc_ecma_ast::Pat::Expr(_) => todo!(),
-                },
-                type_params: None,
-            })
-            .collect(),
-        crate::pickup::ResultDecl::TsInterface(_) => vec![],
-        crate::pickup::ResultDecl::TsTypeAlias(_) => vec![],
-        crate::pickup::ResultDecl::TsEnum(ts_enum) => vec![swc_ecma_ast::TsPropertySignature {
-            span: {
-                let span = swc_common::Span::dummy_with_cmt();
-                match &result.comments {
-                    Some(comment_vec) => swc_common::comments::Comments::add_leading_comments(
-                        &comments,
-                        span.lo,
-                        comment_vec.clone(),
-                    ),
-                    None => {}
-                }
-                span
-            },
-            readonly: true,
-            key: Box::new(swc_ecma_ast::Expr::Ident(ts_enum.id.clone())),
-            computed: false,
-            optional: false,
-            init: None,
-            params: vec![],
-            type_ann: Some(Box::new(swc_ecma_ast::TsTypeAnn {
-                span: swc_common::Span::default(),
-                type_ann: Box::new(swc_ecma_ast::TsType::TsTypeLit(swc_ecma_ast::TsTypeLit {
-                    span: swc_common::Span::default(),
-                    members: ts_enum
-                        .members
-                        .iter()
-                        .map(|member| enum_member_to_ts_type_element(member))
-                        .collect(),
-                })),
-            })),
-            type_params: None,
-        }],
         crate::pickup::ResultDecl::SubModule(sub_module) => {
-            vec![swc_ecma_ast::TsPropertySignature {
-                span: {
-                    let span = swc_common::Span::dummy_with_cmt();
-                    match &result.comments {
-                        Some(comment_vec) => swc_common::comments::Comments::add_leading_comments(
-                            &comments,
-                            span.lo,
-                            comment_vec.clone(),
-                        ),
-                        None => {}
-                    }
-                    span
+            vec![swc_ecma_ast::TsTypeElement::TsPropertySignature(
+                swc_ecma_ast::TsPropertySignature {
+                    span: {
+                        let span = swc_common::Span::dummy_with_cmt();
+                        match &result.comments {
+                            Some(comment_vec) => {
+                                swc_common::comments::Comments::add_leading_comments(
+                                    &comments,
+                                    span.lo,
+                                    comment_vec.clone(),
+                                )
+                            }
+                            None => {}
+                        }
+                        span
+                    },
+                    computed: false,
+                    optional: false,
+                    readonly: true,
+                    key: Box::new(swc_ecma_ast::Expr::Ident(
+                        sub_module.name.clone().ident().unwrap(),
+                    )),
+                    init: None,
+                    params: vec![],
+                    type_ann: Some(Box::new(swc_ecma_ast::TsTypeAnn {
+                        span: swc_common::Span::default(),
+                        type_ann: Box::new(result_decl_vec_to_ts_type(
+                            &sub_module.decl_vec,
+                            comments,
+                        )),
+                    })),
+                    type_params: None,
                 },
-                computed: false,
-                optional: false,
-                readonly: true,
-                key: Box::new(swc_ecma_ast::Expr::Ident(
-                    sub_module.name.clone().ident().unwrap(),
-                )),
-                init: None,
-                params: vec![],
-                type_ann: Some(Box::new(swc_ecma_ast::TsTypeAnn {
-                    span: swc_common::Span::default(),
-                    type_ann: Box::new(result_decl_vec_to_ts_type(&sub_module.decl_vec, comments)),
-                })),
-                type_params: None,
-            }]
+            )]
         }
     }
 }
