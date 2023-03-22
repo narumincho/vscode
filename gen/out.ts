@@ -1545,20 +1545,23 @@ Returns VSCodeApi only within the vscode extension.
 		 */ new(taskDefinition: TaskDefinition, name: string, source: string, execution?: ProcessExecution | ShellExecution, problemMatchers?: string | string[]): Task;
     };
     /**
+	 * Namespace for tasks functionality.
+	 */ readonly tasks: {
+        /**
 		 * Register a task provider.
 		 *
 		 * @param type The task kind type this provider is registered for.
 		 * @param provider A task provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerTaskProvider: Disposable;
-    /**
+        /**
 		 * Fetches all tasks available in the systems. This includes tasks
 		 * from `tasks.json` files as well as tasks from task providers
 		 * contributed through extensions.
 		 *
 		 * @param filter Optional filter to select tasks of a certain type or version.
 		 */ readonly fetchTasks: Thenable<Task[]>;
-    /**
+        /**
 		 * Executes a task that is managed by the editor. The returned
 		 * task execution can be used to terminate the task.
 		 *
@@ -1568,25 +1571,26 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * @param task the task to execute
 		 */ readonly executeTask: Thenable<TaskExecution>;
-    /**
+        /**
 		 * The currently active task executions or an empty array.
 		 */ readonly taskExecutions: readonly TaskExecution[];
-    /**
+        /**
 		 * Fires when a task starts.
 		 */ readonly onDidStartTask: Event<TaskStartEvent>;
-    /**
+        /**
 		 * Fires when a task ends.
 		 */ readonly onDidEndTask: Event<TaskEndEvent>;
-    /**
+        /**
 		 * Fires when the underlying process has been started.
 		 * This event will not fire for tasks that don't
 		 * execute an underlying process.
 		 */ readonly onDidStartTaskProcess: Event<TaskProcessStartEvent>;
-    /**
+        /**
 		 * Fires when the underlying process has ended.
 		 * This event will not fire for tasks that don't
 		 * execute an underlying process.
 		 */ readonly onDidEndTaskProcess: Event<TaskProcessEndEvent>;
+    };
     /**
 	 * Enumeration of file types. The types `File` and `Directory` can also be
 	 * a symbolic links, in that case use `FileType.File | FileType.SymbolicLink` and
@@ -1699,56 +1703,59 @@ Returns VSCodeApi only within the vscode extension.
 		 */ readonly Error: 5;
     };
     /**
+	 * Namespace describing the environment the editor runs in.
+	 */ readonly env: {
+        /**
 		 * The application name of the editor, like 'VS Code'.
 		 */ readonly appName: string;
-    /**
+        /**
 		 * The application root folder from which the editor is running.
 		 *
 		 * *Note* that the value is the empty string when running in an
 		 * environment that has no representation of an application root folder.
 		 */ readonly appRoot: string;
-    /**
+        /**
 		 * The hosted location of the application
 		 * On desktop this is 'desktop'
 		 * In the web this is the specified embedder i.e. 'github.dev', 'codespaces', or 'web' if the embedder
 		 * does not provide that information
 		 */ readonly appHost: string;
-    /**
+        /**
 		 * The custom uri scheme the editor registers to in the operating system.
 		 */ readonly uriScheme: string;
-    /**
+        /**
 		 * Represents the preferred user-language, like `de-CH`, `fr`, or `en-US`.
 		 */ readonly language: string;
-    /**
+        /**
 		 * The system clipboard.
 		 */ readonly clipboard: Clipboard;
-    /**
+        /**
 		 * A unique identifier for the computer.
 		 */ readonly machineId: string;
-    /**
+        /**
 		 * A unique identifier for the current session.
 		 * Changes each time the editor is started.
 		 */ readonly sessionId: string;
-    /**
+        /**
 		 * Indicates that this is a fresh install of the application.
 		 * `true` if within the first day of installation otherwise `false`.
 		 */ readonly isNewAppInstall: boolean;
-    /**
+        /**
 		 * Indicates whether the users has telemetry enabled.
 		 * Can be observed to determine if the extension should send telemetry.
 		 */ readonly isTelemetryEnabled: boolean;
-    /**
+        /**
 		 * An {@link Event} which fires when the user enabled or disables telemetry.
 		 * `true` if the user has enabled telemetry or `false` if the user has disabled telemetry.
 		 */ readonly onDidChangeTelemetryEnabled: Event<boolean>;
-    /**
+        /**
 		 * Creates a new {@link TelemetryLogger telemetry logger}.
 		 *
 		 * @param sender The telemetry sender that is used by the telemetry logger.
 		 * @param options Options for the telemetry logger.
 		 * @returns A new telemetry logger
 		 */ readonly createTelemetryLogger: TelemetryLogger;
-    /**
+        /**
 		 * The name of a remote. Defined by extensions, popular samples are `wsl` for the Windows
 		 * Subsystem for Linux or `ssh-remote` for remotes using a secure shell.
 		 *
@@ -1757,17 +1764,17 @@ Returns VSCodeApi only within the vscode extension.
 		 * exists. Use {@link Extension.extensionKind} to know if
 		 * a specific extension runs remote or not.
 		 */ readonly remoteName: string | undefined;
-    /**
+        /**
 		 * The detected default shell for the extension host, this is overridden by the
 		 * `terminal.integrated.defaultProfile` setting for the extension host's platform. Note that in
 		 * environments that do not support a shell the value is the empty string.
 		 */ readonly shell: string;
-    /**
+        /**
 		 * The UI kind property indicates from which UI extensions
 		 * are accessed from. For example, extensions could be accessed
 		 * from a desktop application or a web browser.
 		 */ readonly uiKind: UIKind;
-    /**
+        /**
 		 * Opens a link externally using the default application. Depending on the
 		 * used scheme this can be:
 		 * * a browser (`http:`, `https:`)
@@ -1780,7 +1787,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param target The uri that should be opened.
 		 * @returns A promise indicating if open was successful.
 		 */ readonly openExternal: Thenable<boolean>;
-    /**
+        /**
 		 * Resolves a uri to a form that is accessible externally.
 		 *
 		 * #### `http:` or `https:` scheme
@@ -1833,13 +1840,50 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * @return A uri that can be used on the client machine.
 		 */ readonly asExternalUri: Thenable<Uri>;
-    /**
+        /**
 		 * The current log level of the editor.
 		 */ readonly logLevel: LogLevel;
-    /**
+        /**
 		 * An {@link Event} which fires when the log level of the editor changes.
 		 */ readonly onDidChangeLogLevel: Event<LogLevel>;
+    };
     /**
+	 * Namespace for dealing with commands. In short, a command is a function with a
+	 * unique identifier. The function is sometimes also called _command handler_.
+	 *
+	 * Commands can be added to the editor using the {@link commands.registerCommand registerCommand}
+	 * and {@link commands.registerTextEditorCommand registerTextEditorCommand} functions. Commands
+	 * can be executed {@link commands.executeCommand manually} or from a UI gesture. Those are:
+	 *
+	 * * palette - Use the `commands`-section in `package.json` to make a command show in
+	 * the [command palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette).
+	 * * keybinding - Use the `keybindings`-section in `package.json` to enable
+	 * [keybindings](https://code.visualstudio.com/docs/getstarted/keybindings#_customizing-shortcuts)
+	 * for your extension.
+	 *
+	 * Commands from other extensions and from the editor itself are accessible to an extension. However,
+	 * when invoking an editor command not all argument types are supported.
+	 *
+	 * This is a sample that registers a command handler and adds an entry for that command to the palette. First
+	 * register a command handler with the identifier `extension.sayHello`.
+	 * ```javascript
+	 * commands.registerCommand('extension.sayHello', () => {
+	 * 	window.showInformationMessage('Hello World!');
+	 * });
+	 * ```
+	 * Second, bind the command identifier to a title under which it will show in the palette (`package.json`).
+	 * ```json
+	 * {
+	 * 	"contributes": {
+	 * 		"commands": [{
+	 * 			"command": "extension.sayHello",
+	 * 			"title": "Hello World"
+	 * 		}]
+	 * 	}
+	 * }
+	 * ```
+	 */ readonly commands: {
+        /**
 		 * Registers a command that can be invoked via a keyboard shortcut,
 		 * a menu item, an action, or directly.
 		 *
@@ -1851,7 +1895,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param thisArg The `this` context used when invoking the handler function.
 		 * @return Disposable which unregisters this command on disposal.
 		 */ readonly registerCommand: Disposable;
-    /**
+        /**
 		 * Registers a text editor command that can be invoked via a keyboard shortcut,
 		 * a menu item, an action, or directly.
 		 *
@@ -1866,7 +1910,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param thisArg The `this` context used when invoking the handler function.
 		 * @return Disposable which unregisters this command on disposal.
 		 */ readonly registerTextEditorCommand: Disposable;
-    /**
+        /**
 		 * Executes the command denoted by the given command identifier.
 		 *
 		 * * *Note 1:* When executing an editor command not all types are allowed to
@@ -1880,100 +1924,106 @@ Returns VSCodeApi only within the vscode extension.
 		 * @return A thenable that resolves to the returned value of the given command. Returns `undefined` when
 		 * the command handler function doesn't return anything.
 		 */ readonly executeCommand<T = unknown>: Thenable<T>;
-    /**
+        /**
 		 * Retrieve the list of all available commands. Commands starting with an underscore are
 		 * treated as internal commands.
 		 *
 		 * @param filterInternal Set `true` to not see internal commands (starting with an underscore)
 		 * @return Thenable that resolves to a list of command ids.
 		 */ readonly getCommands: Thenable<string[]>;
+    };
     /**
+	 * Namespace for dealing with the current window of the editor. That is visible
+	 * and active editors, as well as, UI elements to show messages, selections, and
+	 * asking for user input.
+	 */ readonly window: {
+        /**
 		 * Represents the grid widget within the main editor area
 		 */ readonly tabGroups: TabGroups;
-    /**
+        /**
 		 * The currently active editor or `undefined`. The active editor is the one
 		 * that currently has focus or, when none has focus, the one that has changed
 		 * input most recently.
 		 */ activeTextEditor: TextEditor | undefined;
-    /**
+        /**
 		 * The currently visible editors or an empty array.
 		 */ visibleTextEditors: readonly TextEditor[];
-    /**
+        /**
 		 * An {@link Event} which fires when the {@link window.activeTextEditor active editor}
 		 * has changed. *Note* that the event also fires when the active editor changes
 		 * to `undefined`.
 		 */ readonly onDidChangeActiveTextEditor: Event<TextEditor | undefined>;
-    /**
+        /**
 		 * An {@link Event} which fires when the array of {@link window.visibleTextEditors visible editors}
 		 * has changed.
 		 */ readonly onDidChangeVisibleTextEditors: Event<readonly TextEditor[]>;
-    /**
+        /**
 		 * An {@link Event} which fires when the selection in an editor has changed.
 		 */ readonly onDidChangeTextEditorSelection: Event<TextEditorSelectionChangeEvent>;
-    /**
+        /**
 		 * An {@link Event} which fires when the visible ranges of an editor has changed.
 		 */ readonly onDidChangeTextEditorVisibleRanges: Event<TextEditorVisibleRangesChangeEvent>;
-    /**
+        /**
 		 * An {@link Event} which fires when the options of an editor have changed.
 		 */ readonly onDidChangeTextEditorOptions: Event<TextEditorOptionsChangeEvent>;
-    /**
+        /**
 		 * An {@link Event} which fires when the view column of an editor has changed.
 		 */ readonly onDidChangeTextEditorViewColumn: Event<TextEditorViewColumnChangeEvent>;
-    /**
+        /**
 		 * The currently visible {@link NotebookEditor notebook editors} or an empty array.
 		 */ readonly visibleNotebookEditors: readonly NotebookEditor[];
-    /**
+        /**
 		 * An {@link Event} which fires when the {@link window.visibleNotebookEditors visible notebook editors}
 		 * has changed.
 		 */ readonly onDidChangeVisibleNotebookEditors: Event<readonly NotebookEditor[]>;
-    /**
+        /**
 		 * The currently active {@link NotebookEditor notebook editor} or `undefined`. The active editor is the one
 		 * that currently has focus or, when none has focus, the one that has changed
 		 * input most recently.
 		 */ readonly activeNotebookEditor: NotebookEditor | undefined;
-    /**
+        /**
 		 * An {@link Event} which fires when the {@link window.activeNotebookEditor active notebook editor}
 		 * has changed. *Note* that the event also fires when the active editor changes
 		 * to `undefined`.
 		 */ readonly onDidChangeActiveNotebookEditor: Event<NotebookEditor | undefined>;
-    /**
+        /**
 		 * An {@link Event} which fires when the {@link NotebookEditor.selections notebook editor selections}
 		 * have changed.
 		 */ readonly onDidChangeNotebookEditorSelection: Event<NotebookEditorSelectionChangeEvent>;
-    /**
+        /**
 		 * An {@link Event} which fires when the {@link NotebookEditor.visibleRanges notebook editor visible ranges}
 		 * have changed.
 		 */ readonly onDidChangeNotebookEditorVisibleRanges: Event<NotebookEditorVisibleRangesChangeEvent>;
-    /**
+        /**
 		 * The currently opened terminals or an empty array.
 		 */ readonly terminals: readonly Terminal[];
-    /**
+        /**
 		 * The currently active terminal or `undefined`. The active terminal is the one that
 		 * currently has focus or most recently had focus.
 		 */ readonly activeTerminal: Terminal | undefined;
-    /**
+        /**
 		 * An {@link Event} which fires when the {@link window.activeTerminal active terminal}
 		 * has changed. *Note* that the event also fires when the active terminal changes
 		 * to `undefined`.
 		 */ readonly onDidChangeActiveTerminal: Event<Terminal | undefined>;
-    /**
+        /**
 		 * An {@link Event} which fires when a terminal has been created, either through the
 		 * {@link window.createTerminal createTerminal} API or commands.
 		 */ readonly onDidOpenTerminal: Event<Terminal>;
-    /**
+        /**
 		 * An {@link Event} which fires when a terminal is disposed.
 		 */ readonly onDidCloseTerminal: Event<Terminal>;
-    /**
+        /**
 		 * An {@link Event} which fires when a {@link Terminal.state terminal's state} has changed.
 		 */ readonly onDidChangeTerminalState: Event<Terminal>;
-    /**
+        /**
 		 * Represents the current window's state.
 		 */ readonly state: WindowState;
-    /**
+        /**
 		 * An {@link Event} which fires when the focus state of the current window
 		 * changes. The value of the event represents whether the window is focused.
 		 */ readonly onDidChangeWindowState: Event<WindowState>;
-    /**
+        /**
 		 * Show the given document in a text editor. A {@link ViewColumn column} can be provided
 		 * to control where the editor is being shown. Might change the {@link window.activeTextEditor active editor}.
 		 *
@@ -1984,7 +2034,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param preserveFocus When `true` the editor will not take focus.
 		 * @return A promise that resolves to an {@link TextEditor editor}.
 		 */ readonly showTextDocument: Thenable<TextEditor>;
-    /**
+        /**
 		 * Show the given document in a text editor. {@link TextDocumentShowOptions Options} can be provided
 		 * to control options of the editor is being shown. Might change the {@link window.activeTextEditor active editor}.
 		 *
@@ -1992,7 +2042,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param options {@link TextDocumentShowOptions Editor options} to configure the behavior of showing the {@link TextEditor editor}.
 		 * @return A promise that resolves to an {@link TextEditor editor}.
 		 */ readonly showTextDocument: Thenable<TextEditor>;
-    /**
+        /**
 		 * A short-hand for `openTextDocument(uri).then(document => showTextDocument(document, options))`.
 		 *
 		 * @see {@link workspace.openTextDocument}
@@ -2001,7 +2051,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param options {@link TextDocumentShowOptions Editor options} to configure the behavior of showing the {@link TextEditor editor}.
 		 * @return A promise that resolves to an {@link TextEditor editor}.
 		 */ readonly showTextDocument: Thenable<TextEditor>;
-    /**
+        /**
 		 * Show the given {@link NotebookDocument} in a {@link NotebookEditor notebook editor}.
 		 *
 		 * @param document A text document to be shown.
@@ -2009,13 +2059,13 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * @return A promise that resolves to an {@link NotebookEditor notebook editor}.
 		 */ readonly showNotebookDocument: Thenable<NotebookEditor>;
-    /**
+        /**
 		 * Create a TextEditorDecorationType that can be used to add decorations to text editors.
 		 *
 		 * @param options Rendering options for the decoration type.
 		 * @return A new decoration type instance.
 		 */ readonly createTextEditorDecorationType: TextEditorDecorationType;
-    /**
+        /**
 		 * Show an information message to users. Optionally provide an array of items which will be presented as
 		 * clickable buttons.
 		 *
@@ -2023,7 +2073,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param items A set of items that will be rendered as actions in the message.
 		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
 		 */ readonly showInformationMessage<T extends string>: Thenable<T | undefined>;
-    /**
+        /**
 		 * Show an information message to users. Optionally provide an array of items which will be presented as
 		 * clickable buttons.
 		 *
@@ -2032,7 +2082,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param items A set of items that will be rendered as actions in the message.
 		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
 		 */ readonly showInformationMessage<T extends string>: Thenable<T | undefined>;
-    /**
+        /**
 		 * Show an information message.
 		 *
 		 * @see {@link window.showInformationMessage showInformationMessage}
@@ -2041,7 +2091,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param items A set of items that will be rendered as actions in the message.
 		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
 		 */ readonly showInformationMessage<T extends MessageItem>: Thenable<T | undefined>;
-    /**
+        /**
 		 * Show an information message.
 		 *
 		 * @see {@link window.showInformationMessage showInformationMessage}
@@ -2051,7 +2101,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param items A set of items that will be rendered as actions in the message.
 		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
 		 */ readonly showInformationMessage<T extends MessageItem>: Thenable<T | undefined>;
-    /**
+        /**
 		 * Show a warning message.
 		 *
 		 * @see {@link window.showInformationMessage showInformationMessage}
@@ -2060,7 +2110,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param items A set of items that will be rendered as actions in the message.
 		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
 		 */ readonly showWarningMessage<T extends string>: Thenable<T | undefined>;
-    /**
+        /**
 		 * Show a warning message.
 		 *
 		 * @see {@link window.showInformationMessage showInformationMessage}
@@ -2070,7 +2120,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param items A set of items that will be rendered as actions in the message.
 		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
 		 */ readonly showWarningMessage<T extends string>: Thenable<T | undefined>;
-    /**
+        /**
 		 * Show a warning message.
 		 *
 		 * @see {@link window.showInformationMessage showInformationMessage}
@@ -2079,7 +2129,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param items A set of items that will be rendered as actions in the message.
 		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
 		 */ readonly showWarningMessage<T extends MessageItem>: Thenable<T | undefined>;
-    /**
+        /**
 		 * Show a warning message.
 		 *
 		 * @see {@link window.showInformationMessage showInformationMessage}
@@ -2089,7 +2139,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param items A set of items that will be rendered as actions in the message.
 		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
 		 */ readonly showWarningMessage<T extends MessageItem>: Thenable<T | undefined>;
-    /**
+        /**
 		 * Show an error message.
 		 *
 		 * @see {@link window.showInformationMessage showInformationMessage}
@@ -2098,7 +2148,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param items A set of items that will be rendered as actions in the message.
 		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
 		 */ readonly showErrorMessage<T extends string>: Thenable<T | undefined>;
-    /**
+        /**
 		 * Show an error message.
 		 *
 		 * @see {@link window.showInformationMessage showInformationMessage}
@@ -2108,7 +2158,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param items A set of items that will be rendered as actions in the message.
 		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
 		 */ readonly showErrorMessage<T extends string>: Thenable<T | undefined>;
-    /**
+        /**
 		 * Show an error message.
 		 *
 		 * @see {@link window.showInformationMessage showInformationMessage}
@@ -2117,7 +2167,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param items A set of items that will be rendered as actions in the message.
 		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
 		 */ readonly showErrorMessage<T extends MessageItem>: Thenable<T | undefined>;
-    /**
+        /**
 		 * Show an error message.
 		 *
 		 * @see {@link window.showInformationMessage showInformationMessage}
@@ -2127,7 +2177,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param items A set of items that will be rendered as actions in the message.
 		 * @return A thenable that resolves to the selected item or `undefined` when being dismissed.
 		 */ readonly showErrorMessage<T extends MessageItem>: Thenable<T | undefined>;
-    /**
+        /**
 		 * Shows a selection list allowing multiple selections.
 		 *
 		 * @param items An array of strings, or a promise that resolves to an array of strings.
@@ -2135,7 +2185,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param token A token that can be used to signal cancellation.
 		 * @return A promise that resolves to the selected items or `undefined`.
 		 */ readonly showQuickPick: Thenable<string[] | undefined>;
-    /**
+        /**
 		 * Shows a selection list.
 		 *
 		 * @param items An array of strings, or a promise that resolves to an array of strings.
@@ -2143,7 +2193,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param token A token that can be used to signal cancellation.
 		 * @return A promise that resolves to the selection or `undefined`.
 		 */ readonly showQuickPick: Thenable<string | undefined>;
-    /**
+        /**
 		 * Shows a selection list allowing multiple selections.
 		 *
 		 * @param items An array of items, or a promise that resolves to an array of items.
@@ -2151,7 +2201,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param token A token that can be used to signal cancellation.
 		 * @return A promise that resolves to the selected items or `undefined`.
 		 */ readonly showQuickPick<T extends QuickPickItem>: Thenable<T[] | undefined>;
-    /**
+        /**
 		 * Shows a selection list.
 		 *
 		 * @param items An array of items, or a promise that resolves to an array of items.
@@ -2159,28 +2209,28 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param token A token that can be used to signal cancellation.
 		 * @return A promise that resolves to the selected item or `undefined`.
 		 */ readonly showQuickPick<T extends QuickPickItem>: Thenable<T | undefined>;
-    /**
+        /**
 		 * Shows a selection list of {@link workspace.workspaceFolders workspace folders} to pick from.
 		 * Returns `undefined` if no folder is open.
 		 *
 		 * @param options Configures the behavior of the workspace folder list.
 		 * @return A promise that resolves to the workspace folder or `undefined`.
 		 */ readonly showWorkspaceFolderPick: Thenable<WorkspaceFolder | undefined>;
-    /**
+        /**
 		 * Shows a file open dialog to the user which allows to select a file
 		 * for opening-purposes.
 		 *
 		 * @param options Options that control the dialog.
 		 * @returns A promise that resolves to the selected resources or `undefined`.
 		 */ readonly showOpenDialog: Thenable<Uri[] | undefined>;
-    /**
+        /**
 		 * Shows a file save dialog to the user which allows to select a file
 		 * for saving-purposes.
 		 *
 		 * @param options Options that control the dialog.
 		 * @returns A promise that resolves to the selected resource or `undefined`.
 		 */ readonly showSaveDialog: Thenable<Uri | undefined>;
-    /**
+        /**
 		 * Opens an input box to ask the user for input.
 		 *
 		 * The returned value will be `undefined` if the input box was canceled (e.g. pressing ESC). Otherwise the
@@ -2191,7 +2241,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param token A token that can be used to signal cancellation.
 		 * @return A promise that resolves to a string the user provided or to `undefined` in case of dismissal.
 		 */ readonly showInputBox: Thenable<string | undefined>;
-    /**
+        /**
 		 * Creates a {@link QuickPick} to let the user pick an item from a list
 		 * of items of type T.
 		 *
@@ -2201,7 +2251,7 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * @return A new {@link QuickPick}.
 		 */ readonly createQuickPick<T extends QuickPickItem>: QuickPick<T>;
-    /**
+        /**
 		 * Creates a {@link InputBox} to let the user enter some text input.
 		 *
 		 * Note that in many cases the more convenient {@link window.showInputBox}
@@ -2210,7 +2260,7 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * @return A new {@link InputBox}.
 		 */ readonly createInputBox: InputBox;
-    /**
+        /**
 		 * Creates a new {@link OutputChannel output channel} with the given name and language id
 		 * If language id is not provided, then **Log** is used as default language id.
 		 *
@@ -2220,13 +2270,13 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param name Human-readable string which will be used to represent the channel in the UI.
 		 * @param languageId The identifier of the language associated with the channel.
 		 */ readonly createOutputChannel: OutputChannel;
-    /**
+        /**
 		 * Creates a new {@link LogOutputChannel log output channel} with the given name.
 		 *
 		 * @param name Human-readable string which will be used to represent the channel in the UI.
 		 * @param options Options for the log output channel.
 		 */ readonly createOutputChannel: LogOutputChannel;
-    /**
+        /**
 		 * Create and show a new webview panel.
 		 *
 		 * @param viewType Identifies the type of the webview panel.
@@ -2236,7 +2286,7 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * @return New webview panel.
 		 */ readonly createWebviewPanel: WebviewPanel;
-    /**
+        /**
 		 * Set a message to the status bar. This is a short hand for the more powerful
 		 * status bar {@link window.createStatusBarItem items}.
 		 *
@@ -2244,7 +2294,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param hideAfterTimeout Timeout in milliseconds after which the message will be disposed.
 		 * @return A disposable which hides the status bar message.
 		 */ readonly setStatusBarMessage: Disposable;
-    /**
+        /**
 		 * Set a message to the status bar. This is a short hand for the more powerful
 		 * status bar {@link window.createStatusBarItem items}.
 		 *
@@ -2252,7 +2302,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param hideWhenDone Thenable on which completion (resolve or reject) the message will be disposed.
 		 * @return A disposable which hides the status bar message.
 		 */ readonly setStatusBarMessage: Disposable;
-    /**
+        /**
 		 * Set a message to the status bar. This is a short hand for the more powerful
 		 * status bar {@link window.createStatusBarItem items}.
 		 *
@@ -2262,7 +2312,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param text The message to show, supports icon substitution as in status bar {@link StatusBarItem.text items}.
 		 * @return A disposable which hides the status bar message.
 		 */ readonly setStatusBarMessage: Disposable;
-    /**
+        /**
 		 * Show progress in the Source Control viewlet while running the given callback and while
 		 * its returned promise isn't resolve or rejected.
 		 *
@@ -2272,7 +2322,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * the provided {@link Progress}-object.
 		 * @return The thenable the task did return.
 		 */ readonly withScmProgress<R>: Thenable<R>;
-    /**
+        /**
 		 * Show progress in the editor. Progress is shown while running the given callback
 		 * and while the promise it returned isn't resolved nor rejected. The location at which
 		 * progress should show (and other details) is defined via the passed {@linkcode ProgressOptions}.
@@ -2291,14 +2341,14 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * @return The thenable the task-callback returned.
 		 */ readonly withProgress<R>: Thenable<R>;
-    /**
+        /**
 		 * Creates a status bar {@link StatusBarItem item}.
 		 *
 		 * @param alignment The alignment of the item.
 		 * @param priority The priority of the item. Higher values mean the item should be shown more to the left.
 		 * @return A new status bar item.
 		 */ readonly createStatusBarItem: StatusBarItem;
-    /**
+        /**
 		 * Creates a status bar {@link StatusBarItem item}.
 		 *
 		 * @param id The unique identifier of the item.
@@ -2306,7 +2356,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param priority The priority of the item. Higher values mean the item should be shown more to the left.
 		 * @return A new status bar item.
 		 */ readonly createStatusBarItem: StatusBarItem;
-    /**
+        /**
 		 * Creates a {@link Terminal} with a backing shell process. The cwd of the terminal will be the workspace
 		 * directory if it exists.
 		 *
@@ -2318,21 +2368,21 @@ Returns VSCodeApi only within the vscode extension.
 		 * @return A new Terminal.
 		 * @throws When running in an environment where a new process cannot be started.
 		 */ readonly createTerminal: Terminal;
-    /**
+        /**
 		 * Creates a {@link Terminal} with a backing shell process.
 		 *
 		 * @param options A TerminalOptions object describing the characteristics of the new terminal.
 		 * @return A new Terminal.
 		 * @throws When running in an environment where a new process cannot be started.
 		 */ readonly createTerminal: Terminal;
-    /**
+        /**
 		 * Creates a {@link Terminal} where an extension controls its input and output.
 		 *
 		 * @param options An {@link ExtensionTerminalOptions} object describing
 		 * the characteristics of the new terminal.
 		 * @return A new Terminal.
 		 */ readonly createTerminal: Terminal;
-    /**
+        /**
 		 * Register a {@link TreeDataProvider} for the view contributed using the extension point `views`.
 		 * This will allow you to contribute data to the {@link TreeView} and update if the data changes.
 		 *
@@ -2341,13 +2391,13 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param viewId Id of the view contributed using the extension point `views`.
 		 * @param treeDataProvider A {@link TreeDataProvider} that provides tree data for the view
 		 */ readonly registerTreeDataProvider<T>: Disposable;
-    /**
+        /**
 		 * Create a {@link TreeView} for the view contributed using the extension point `views`.
 		 * @param viewId Id of the view contributed using the extension point `views`.
 		 * @param options Options for creating the {@link TreeView}
 		 * @returns a {@link TreeView}.
 		 */ readonly createTreeView<T>: TreeView<T>;
-    /**
+        /**
 		 * Registers a {@link UriHandler uri handler} capable of handling system-wide {@link Uri uris}.
 		 * In case there are multiple windows open, the topmost window will handle the uri.
 		 * A uri handler is scoped to the extension it is contributed from; it will only
@@ -2368,7 +2418,7 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * @param handler The uri handler to register for this extension.
 		 */ readonly registerUriHandler: Disposable;
-    /**
+        /**
 		 * Registers a webview panel serializer.
 		 *
 		 * Extensions that support reviving should have an `"onWebviewPanel:viewType"` activation event and
@@ -2379,7 +2429,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param viewType Type of the webview panel that can be serialized.
 		 * @param serializer Webview serializer.
 		 */ readonly registerWebviewPanelSerializer: Disposable;
-    /**
+        /**
 		 * Register a new provider for webview views.
 		 *
 		 * @param viewId Unique id of the view. This should match the `id` from the
@@ -2388,7 +2438,7 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * @return Disposable that unregisters the provider.
 		 */ readonly registerWebviewViewProvider: Disposable;
-    /**
+        /**
 		 * Register a provider for custom editors for the `viewType` contributed by the `customEditors` extension point.
 		 *
 		 * When a custom editor is opened, an `onCustomEditor:viewType` activation event is fired. Your extension
@@ -2402,29 +2452,30 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * @return Disposable that unregisters the provider.
 		 */ readonly registerCustomEditorProvider: Disposable;
-    /**
+        /**
 		 * Register provider that enables the detection and handling of links within the terminal.
 		 * @param provider The provider that provides the terminal links.
 		 * @return Disposable that unregisters the provider.
 		 */ readonly registerTerminalLinkProvider: Disposable;
-    /**
+        /**
 		 * Registers a provider for a contributed terminal profile.
 		 * @param id The ID of the contributed terminal profile.
 		 * @param provider The terminal profile provider.
 		 */ readonly registerTerminalProfileProvider: Disposable;
-    /**
+        /**
 		 * Register a file decoration provider.
 		 *
 		 * @param provider A {@link FileDecorationProvider}.
 		 * @return A {@link Disposable} that unregisters the provider.
 		 */ readonly registerFileDecorationProvider: Disposable;
-    /**
+        /**
 		 * The currently active color theme as configured in the settings. The active
 		 * theme can be changed via the `workbench.colorTheme` setting.
 		 */ activeColorTheme: ColorTheme;
-    /**
+        /**
 		 * An {@link Event} which fires when the active color theme is changed or has changes.
 		 */ readonly onDidChangeActiveColorTheme: Event<ColorTheme>;
+    };
     /**
 	 * Encapsulates data transferred during drag and drop operations.
 	 */ readonly DataTransferItem: {
@@ -2537,12 +2588,28 @@ Returns VSCodeApi only within the vscode extension.
 		 */ readonly FocusOut: 3;
     };
     /**
+	 * Namespace for dealing with the current workspace. A workspace is the collection of one
+	 * or more folders that are opened in an editor window (instance).
+	 *
+	 * It is also possible to open an editor without a workspace. For example, when you open a
+	 * new editor window by selecting a file from your platform's File menu, you will not be
+	 * inside a workspace. In this mode, some of the editor's capabilities are reduced but you can
+	 * still open text files and edit them.
+	 *
+	 * Refer to https://code.visualstudio.com/docs/editor/workspaces for more information on
+	 * the concept of workspaces.
+	 *
+	 * The workspace offers support for {@link workspace.createFileSystemWatcher listening} to fs
+	 * events and for {@link workspace.findFiles finding} files. Both perform well and run _outside_
+	 * the editor-process so that they should be always used instead of nodejs-equivalents.
+	 */ readonly workspace: {
+        /**
 		 * A {@link FileSystem file system} instance that allows to interact with local and remote
 		 * files, e.g. `vscode.workspace.fs.readDirectory(someUri)` allows to retrieve all entries
 		 * of a directory or `vscode.workspace.fs.stat(anotherUri)` returns the meta data for a
 		 * file.
 		 */ readonly fs: FileSystem;
-    /**
+        /**
 		 * The uri of the first entry of {@linkcode workspace.workspaceFolders workspaceFolders}
 		 * as `string`. `undefined` if there is no first entry.
 		 *
@@ -2551,21 +2618,21 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * @deprecated Use {@linkcode workspace.workspaceFolders workspaceFolders} instead.
 		 */ readonly rootPath: string | undefined;
-    /**
+        /**
 		 * List of workspace folders (0-N) that are open in the editor. `undefined` when no workspace
 		 * has been opened.
 		 *
 		 * Refer to https://code.visualstudio.com/docs/editor/workspaces for more information
 		 * on workspaces.
 		 */ readonly workspaceFolders: readonly WorkspaceFolder[] | undefined;
-    /**
+        /**
 		 * The name of the workspace. `undefined` when no workspace
 		 * has been opened.
 		 *
 		 * Refer to https://code.visualstudio.com/docs/editor/workspaces for more information on
 		 * the concept of workspaces.
 		 */ readonly name: string | undefined;
-    /**
+        /**
 		 * The location of the workspace file, for example:
 		 *
 		 * `file:///Users/name/Development/myProject.code-workspace`
@@ -2597,7 +2664,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * for that purpose which will work both when a single folder is opened as
 		 * well as an untitled or saved workspace.
 		 */ readonly workspaceFile: Uri | undefined;
-    /**
+        /**
 		 * An event that is emitted when a workspace folder is added or removed.
 		 *
 		 * **Note:** this event will not fire if the first workspace folder is added, removed or changed,
@@ -2605,7 +2672,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * event) will be terminated and restarted so that the (deprecated) `rootPath` property is updated
 		 * to point to the first workspace folder.
 		 */ readonly onDidChangeWorkspaceFolders: Event<WorkspaceFoldersChangeEvent>;
-    /**
+        /**
 		 * Returns the {@link WorkspaceFolder workspace folder} that contains a given uri.
 		 * * returns `undefined` when the given uri doesn't match any workspace folder
 		 * * returns the *input* when the given uri is a workspace folder itself
@@ -2613,7 +2680,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param uri An uri.
 		 * @return A workspace folder or `undefined`
 		 */ readonly getWorkspaceFolder: WorkspaceFolder | undefined;
-    /**
+        /**
 		 * Returns a path that is relative to the workspace folder or folders.
 		 *
 		 * When there are no {@link workspace.workspaceFolders workspace folders} or when the path
@@ -2625,7 +2692,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * multiple workspace folders and `false` otherwise.
 		 * @return A path relative to the root or the input.
 		 */ readonly asRelativePath: string;
-    /**
+        /**
 		 * This method replaces `deleteCount` {@link workspace.workspaceFolders workspace folders} starting at index `start`
 		 * by an optional set of `workspaceFoldersToAdd` on the `vscode.workspace.workspaceFolders` array. This "splice"
 		 * behavior can be used to add, remove and change workspace folders in a single operation.
@@ -2668,7 +2735,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @return true if the operation was successfully started and false otherwise if arguments were used that would result
 		 * in invalid workspace folder state (e.g. 2 folders with the same URI).
 		 */ readonly updateWorkspaceFolders: boolean;
-    /**
+        /**
 		 * Creates a file system watcher that is notified on file events (create, change, delete)
 		 * depending on the parameters provided.
 		 *
@@ -2789,7 +2856,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param ignoreDeleteEvents Ignore when files have been deleted.
 		 * @return A new file system watcher instance. Must be disposed when no longer needed.
 		 */ readonly createFileSystemWatcher: FileSystemWatcher;
-    /**
+        /**
 		 * Find files across all {@link workspace.workspaceFolders workspace folders} in the workspace.
 		 *
 		 * @example
@@ -2806,14 +2873,14 @@ Returns VSCodeApi only within the vscode extension.
 		 * @return A thenable that resolves to an array of resource identifiers. Will return no results if no
 		 * {@link workspace.workspaceFolders workspace folders} are opened.
 		 */ readonly findFiles: Thenable<Uri[]>;
-    /**
+        /**
 		 * Save all dirty files.
 		 *
 		 * @param includeUntitled Also save files that have been created during this session.
 		 * @return A thenable that resolves when the files have been saved. Will return `false`
 		 * for any file that failed to save.
 		 */ readonly saveAll: Thenable<boolean>;
-    /**
+        /**
 		 * Make changes to one or many resources or create, delete, and rename resources as defined by the given
 		 * {@link WorkspaceEdit workspace edit}.
 		 *
@@ -2830,10 +2897,10 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param metadata Optional {@link WorkspaceEditMetadata metadata} for the edit.
 		 * @return A thenable that resolves when the edit could be applied.
 		 */ readonly applyEdit: Thenable<boolean>;
-    /**
+        /**
 		 * All text documents currently known to the editor.
 		 */ readonly textDocuments: readonly TextDocument[];
-    /**
+        /**
 		 * Opens a document. Will return early if this document is already open. Otherwise
 		 * the document is loaded and the {@link workspace.onDidOpenTextDocument didOpen}-event fires.
 		 *
@@ -2852,14 +2919,14 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param uri Identifies the resource to open.
 		 * @return A promise that resolves to a {@link TextDocument document}.
 		 */ readonly openTextDocument: Thenable<TextDocument>;
-    /**
+        /**
 		 * A short-hand for `openTextDocument(Uri.file(fileName))`.
 		 *
 		 * @see {@link workspace.openTextDocument}
 		 * @param fileName A name of a file on disk.
 		 * @return A promise that resolves to a {@link TextDocument document}.
 		 */ readonly openTextDocument: Thenable<TextDocument>;
-    /**
+        /**
 		 * Opens an untitled text document. The editor will prompt the user for a file
 		 * path when the document is to be saved. The `options` parameter allows to
 		 * specify the *language* and/or the *content* of the document.
@@ -2867,7 +2934,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param options Options to control how the document will be created.
 		 * @return A promise that resolves to a {@link TextDocument document}.
 		 */ readonly openTextDocument: Thenable<TextDocument>;
-    /**
+        /**
 		 * Register a text document content provider.
 		 *
 		 * Only one provider can be registered per scheme.
@@ -2876,7 +2943,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider A content provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerTextDocumentContentProvider: Disposable;
-    /**
+        /**
 		 * An event that is emitted when a {@link TextDocument text document} is opened or when the language id
 		 * of a text document {@link languages.setTextDocumentLanguage has been changed}.
 		 *
@@ -2888,7 +2955,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * - When a {@link TextDocument text document} is already open (e.g.: open in another {@link window.visibleTextEditors visible text editor}) this event is not emitted
 		 *
 		 */ readonly onDidOpenTextDocument: Event<TextDocument>;
-    /**
+        /**
 		 * An event that is emitted when a {@link TextDocument text document} is disposed or when the language id
 		 * of a text document {@link languages.setTextDocumentLanguage has been changed}.
 		 *
@@ -2898,12 +2965,12 @@ Returns VSCodeApi only within the vscode extension.
 		 * *Note 2:* A document can be open but not shown in an editor which means this event can fire
 		 * for a document that has not been shown in an editor.
 		 */ readonly onDidCloseTextDocument: Event<TextDocument>;
-    /**
+        /**
 		 * An event that is emitted when a {@link TextDocument text document} is changed. This usually happens
 		 * when the {@link TextDocument.getText contents} changes but also when other things like the
 		 * {@link TextDocument.isDirty dirty}-state changes.
 		 */ readonly onDidChangeTextDocument: Event<TextDocumentChangeEvent>;
-    /**
+        /**
 		 * An event that is emitted when a {@link TextDocument text document} will be saved to disk.
 		 *
 		 * *Note 1:* Subscribers can delay saving by registering asynchronous work. For the sake of data integrity the editor
@@ -2916,13 +2983,13 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * The current thresholds are 1.5 seconds as overall time budget and a listener can misbehave 3 times before being ignored.
 		 */ readonly onWillSaveTextDocument: Event<TextDocumentWillSaveEvent>;
-    /**
+        /**
 		 * An event that is emitted when a {@link TextDocument text document} is saved to disk.
 		 */ readonly onDidSaveTextDocument: Event<TextDocument>;
-    /**
+        /**
 		 * All notebook documents currently known to the editor.
 		 */ readonly notebookDocuments: readonly NotebookDocument[];
-    /**
+        /**
 		 * Open a notebook. Will return early if this notebook is already {@link notebookDocuments loaded}. Otherwise
 		 * the notebook is loaded and the {@linkcode onDidOpenNotebookDocument}-event fires.
 		 *
@@ -2935,7 +3002,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param uri The resource to open.
 		 * @returns A promise that resolves to a {@link NotebookDocument notebook}
 		 */ readonly openNotebookDocument: Thenable<NotebookDocument>;
-    /**
+        /**
 		 * Open an untitled notebook. The editor will prompt the user for a file
 		 * path when the document is to be saved.
 		 *
@@ -2944,13 +3011,13 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param content The initial contents of the notebook.
 		 * @returns A promise that resolves to a {@link NotebookDocument notebook}.
 		 */ readonly openNotebookDocument: Thenable<NotebookDocument>;
-    /**
+        /**
 		 * An event that is emitted when a {@link NotebookDocument notebook} has changed.
 		 */ readonly onDidChangeNotebookDocument: Event<NotebookDocumentChangeEvent>;
-    /**
+        /**
 		 * An event that is emitted when a {@link NotebookDocument notebook} is saved.
 		 */ readonly onDidSaveNotebookDocument: Event<NotebookDocument>;
-    /**
+        /**
 		 * Register a {@link NotebookSerializer notebook serializer}.
 		 *
 		 * A notebook serializer must be contributed through the `notebooks` extension point. When opening a notebook file, the editor will send
@@ -2961,10 +3028,10 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param options Optional context options that define what parts of a notebook should be persisted
 		 * @return A {@link Disposable} that unregisters this serializer when being disposed.
 		 */ readonly registerNotebookSerializer: Disposable;
-    /**
+        /**
 		 * An event that is emitted when a {@link NotebookDocument notebook} is opened.
 		 */ readonly onDidOpenNotebookDocument: Event<NotebookDocument>;
-    /**
+        /**
 		 * An event that is emitted when a {@link NotebookDocument notebook} is disposed.
 		 *
 		 * *Note 1:* There is no guarantee that this event fires when an editor tab is closed.
@@ -2972,7 +3039,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * *Note 2:* A notebook can be open but not shown in an editor which means this event can fire
 		 * for a notebook that has not been shown in an editor.
 		 */ readonly onDidCloseNotebookDocument: Event<NotebookDocument>;
-    /**
+        /**
 		 * An event that is emitted when files are being created.
 		 *
 		 * *Note 1:* This event is triggered by user gestures, like creating a file from the
@@ -2982,7 +3049,7 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * *Note 2:* When this event is fired, edits to files that are are being created cannot be applied.
 		 */ readonly onWillCreateFiles: Event<FileWillCreateEvent>;
-    /**
+        /**
 		 * An event that is emitted when files have been created.
 		 *
 		 * *Note:* This event is triggered by user gestures, like creating a file from the
@@ -2990,7 +3057,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * files change on disk, e.g triggered by another application, or when using the
 		 * {@linkcode FileSystem workspace.fs}-api.
 		 */ readonly onDidCreateFiles: Event<FileCreateEvent>;
-    /**
+        /**
 		 * An event that is emitted when files are being deleted.
 		 *
 		 * *Note 1:* This event is triggered by user gestures, like deleting a file from the
@@ -3000,7 +3067,7 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * *Note 2:* When deleting a folder with children only one event is fired.
 		 */ readonly onWillDeleteFiles: Event<FileWillDeleteEvent>;
-    /**
+        /**
 		 * An event that is emitted when files have been deleted.
 		 *
 		 * *Note 1:* This event is triggered by user gestures, like deleting a file from the
@@ -3010,7 +3077,7 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * *Note 2:* When deleting a folder with children only one event is fired.
 		 */ readonly onDidDeleteFiles: Event<FileDeleteEvent>;
-    /**
+        /**
 		 * An event that is emitted when files are being renamed.
 		 *
 		 * *Note 1:* This event is triggered by user gestures, like renaming a file from the
@@ -3020,7 +3087,7 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * *Note 2:* When renaming a folder with children only one event is fired.
 		 */ readonly onWillRenameFiles: Event<FileWillRenameEvent>;
-    /**
+        /**
 		 * An event that is emitted when files have been renamed.
 		 *
 		 * *Note 1:* This event is triggered by user gestures, like renaming a file from the
@@ -3030,7 +3097,7 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * *Note 2:* When renaming a folder with children only one event is fired.
 		 */ readonly onDidRenameFiles: Event<FileRenameEvent>;
-    /**
+        /**
 		 * Get a workspace configuration object.
 		 *
 		 * When a section-identifier is provided only that part of the configuration
@@ -3043,10 +3110,10 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param scope A scope for which the configuration is asked for.
 		 * @return The full configuration or a subset.
 		 */ readonly getConfiguration: WorkspaceConfiguration;
-    /**
+        /**
 		 * An event that is emitted when the {@link WorkspaceConfiguration configuration} changed.
 		 */ readonly onDidChangeConfiguration: Event<ConfigurationChangeEvent>;
-    /**
+        /**
 		 * Register a task provider.
 		 *
 		 * @deprecated Use the corresponding function on the `tasks` namespace instead
@@ -3055,7 +3122,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider A task provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerTaskProvider: Disposable;
-    /**
+        /**
 		 * Register a filesystem provider for a given scheme, e.g. `ftp`.
 		 *
 		 * There can only be one provider per scheme and an error is being thrown when a scheme
@@ -3066,17 +3133,46 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param options Immutable metadata about the provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerFileSystemProvider: Disposable;
-    /**
+        /**
 		 * When true, the user has explicitly trusted the contents of the workspace.
 		 */ readonly isTrusted: boolean;
-    /**
+        /**
 		 * Event that fires when the current workspace has been trusted.
 		 */ readonly onDidGrantWorkspaceTrust: Event<void>;
+    };
     /**
+	 * Namespace for participating in language-specific editor [features](https://code.visualstudio.com/docs/editor/editingevolved),
+	 * like IntelliSense, code actions, diagnostics etc.
+	 *
+	 * Many programming languages exist and there is huge variety in syntaxes, semantics, and paradigms. Despite that, features
+	 * like automatic word-completion, code navigation, or code checking have become popular across different tools for different
+	 * programming languages.
+	 *
+	 * The editor provides an API that makes it simple to provide such common features by having all UI and actions already in place and
+	 * by allowing you to participate by providing data only. For instance, to contribute a hover all you have to do is provide a function
+	 * that can be called with a {@link TextDocument} and a {@link Position} returning hover info. The rest, like tracking the
+	 * mouse, positioning the hover, keeping the hover stable etc. is taken care of by the editor.
+	 *
+	 * ```javascript
+	 * languages.registerHoverProvider('javascript', {
+	 * 	provideHover(document, position, token) {
+	 * 		return new Hover('I am a hover!');
+	 * 	}
+	 * });
+	 * ```
+	 *
+	 * Registration is done using a {@link DocumentSelector document selector} which is either a language id, like `javascript` or
+	 * a more complex {@link DocumentFilter filter} like `{ language: 'typescript', scheme: 'file' }`. Matching a document against such
+	 * a selector will result in a {@link languages.match score} that is used to determine if and how a provider shall be used. When
+	 * scores are equal the provider that came last wins. For features that allow full arity, like {@link languages.registerHoverProvider hover},
+	 * the score is only checked to be `>0`, for other features, like {@link languages.registerCompletionItemProvider IntelliSense} the
+	 * score is used for determining the order in which providers are asked to participate.
+	 */ readonly languages: {
+        /**
 		 * Return the identifiers of all known languages.
 		 * @return Promise resolving to an array of identifier strings.
 		 */ readonly getLanguages: Thenable<string[]>;
-    /**
+        /**
 		 * Set (and change) the {@link TextDocument.languageId language} that is associated
 		 * with the given document.
 		 *
@@ -3087,7 +3183,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param languageId The new language identifier.
 		 * @returns A thenable that resolves with the updated document.
 		 */ readonly setTextDocumentLanguage: Thenable<TextDocument>;
-    /**
+        /**
 		 * Compute the match between a document {@link DocumentSelector selector} and a document. Values
 		 * greater than zero mean the selector matches the document.
 		 *
@@ -3132,34 +3228,34 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param document A text document.
 		 * @return A number `>0` when the selector matches and `0` when the selector does not match.
 		 */ readonly match: number;
-    /**
+        /**
 		 * An {@link Event} which fires when the global set of diagnostics changes. This is
 		 * newly added and removed diagnostics.
 		 */ readonly onDidChangeDiagnostics: Event<DiagnosticChangeEvent>;
-    /**
+        /**
 		 * Get all diagnostics for a given resource.
 		 *
 		 * @param resource A resource
 		 * @returns An array of {@link Diagnostic diagnostics} objects or an empty array.
 		 */ readonly getDiagnostics: Diagnostic[];
-    /**
+        /**
 		 * Get all diagnostics.
 		 *
 		 * @returns An array of uri-diagnostics tuples or an empty array.
 		 */ readonly getDiagnostics: [Uri, Diagnostic[]][];
-    /**
+        /**
 		 * Create a diagnostics collection.
 		 *
 		 * @param name The {@link DiagnosticCollection.name name} of the collection.
 		 * @return A new diagnostic collection.
 		 */ readonly createDiagnosticCollection: DiagnosticCollection;
-    /**
+        /**
 		 * Creates a new {@link LanguageStatusItem language status item}.
 		 *
 		 * @param id The identifier of the item.
 		 * @param selector The document selector that defines for what editors the item shows.
 		 */ readonly createLanguageStatusItem: LanguageStatusItem;
-    /**
+        /**
 		 * Register a completion provider.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are sorted
@@ -3178,7 +3274,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param triggerCharacters Trigger completion when the user types one of the characters.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerCompletionItemProvider: Disposable;
-    /**
+        /**
 		 * Registers an inline completion provider.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are asked in
@@ -3189,7 +3285,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider An inline completion provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerInlineCompletionItemProvider: Disposable;
-    /**
+        /**
 		 * Register a code action provider.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are asked in
@@ -3201,7 +3297,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param metadata Metadata about the kind of code actions the provider provides.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerCodeActionsProvider: Disposable;
-    /**
+        /**
 		 * Register a code lens provider.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are asked in
@@ -3212,7 +3308,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider A code lens provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerCodeLensProvider: Disposable;
-    /**
+        /**
 		 * Register a definition provider.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are asked in
@@ -3223,7 +3319,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider A definition provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerDefinitionProvider: Disposable;
-    /**
+        /**
 		 * Register an implementation provider.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are asked in
@@ -3234,7 +3330,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider An implementation provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerImplementationProvider: Disposable;
-    /**
+        /**
 		 * Register a type definition provider.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are asked in
@@ -3245,7 +3341,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider A type definition provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerTypeDefinitionProvider: Disposable;
-    /**
+        /**
 		 * Register a declaration provider.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are asked in
@@ -3256,7 +3352,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider A declaration provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerDeclarationProvider: Disposable;
-    /**
+        /**
 		 * Register a hover provider.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are asked in
@@ -3267,7 +3363,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider A hover provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerHoverProvider: Disposable;
-    /**
+        /**
 		 * Register a provider that locates evaluatable expressions in text documents.
 		 * The editor will evaluate the expression in the active debug session and will show the result in the debug hover.
 		 *
@@ -3277,7 +3373,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider An evaluatable expression provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerEvaluatableExpressionProvider: Disposable;
-    /**
+        /**
 		 * Register a provider that returns data for the debugger's 'inline value' feature.
 		 * Whenever the generic debugger has stopped in a source file, providers registered for the language of the file
 		 * are called to return textual data that will be shown in the editor at the end of lines.
@@ -3290,7 +3386,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider An inline values provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerInlineValuesProvider: Disposable;
-    /**
+        /**
 		 * Register a document highlight provider.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are sorted
@@ -3301,7 +3397,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider A document highlight provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerDocumentHighlightProvider: Disposable;
-    /**
+        /**
 		 * Register a document symbol provider.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are asked in
@@ -3313,7 +3409,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param metaData metadata about the provider
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerDocumentSymbolProvider: Disposable;
-    /**
+        /**
 		 * Register a workspace symbol provider.
 		 *
 		 * Multiple providers can be registered. In that case providers are asked in parallel and
@@ -3323,7 +3419,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider A workspace symbol provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerWorkspaceSymbolProvider: Disposable;
-    /**
+        /**
 		 * Register a reference provider.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are asked in
@@ -3334,7 +3430,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider A reference provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerReferenceProvider: Disposable;
-    /**
+        /**
 		 * Register a rename provider.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are sorted
@@ -3345,7 +3441,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider A rename provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerRenameProvider: Disposable;
-    /**
+        /**
 		 * Register a semantic tokens provider for a whole document.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are sorted
@@ -3356,7 +3452,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider A document semantic tokens provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerDocumentSemanticTokensProvider: Disposable;
-    /**
+        /**
 		 * Register a semantic tokens provider for a document range.
 		 *
 		 * *Note:* If a document has both a `DocumentSemanticTokensProvider` and a `DocumentRangeSemanticTokensProvider`,
@@ -3373,7 +3469,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider A document range semantic tokens provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerDocumentRangeSemanticTokensProvider: Disposable;
-    /**
+        /**
 		 * Register a formatting provider for a document.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are sorted
@@ -3384,7 +3480,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider A document formatting edit provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerDocumentFormattingEditProvider: Disposable;
-    /**
+        /**
 		 * Register a formatting provider for a document range.
 		 *
 		 * *Note:* A document range provider is also a {@link DocumentFormattingEditProvider document formatter}
@@ -3399,7 +3495,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider A document range formatting edit provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerDocumentRangeFormattingEditProvider: Disposable;
-    /**
+        /**
 		 * Register a formatting provider that works on type. The provider is active when the user enables the setting `editor.formatOnType`.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are sorted
@@ -3412,7 +3508,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param moreTriggerCharacter More trigger characters.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerOnTypeFormattingEditProvider: Disposable;
-    /**
+        /**
 		 * Register a signature help provider.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are sorted
@@ -3425,8 +3521,8 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param metadata Information about the provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerSignatureHelpProvider: Disposable;
-    readonly registerSignatureHelpProvider: Disposable;
-    /**
+        readonly registerSignatureHelpProvider: Disposable;
+        /**
 		 * Register a document link provider.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are asked in
@@ -3437,7 +3533,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider A document link provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerDocumentLinkProvider: Disposable;
-    /**
+        /**
 		 * Register a color provider.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are asked in
@@ -3448,7 +3544,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider A color provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerColorProvider: Disposable;
-    /**
+        /**
 		 * Register a inlay hints provider.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are asked in
@@ -3459,7 +3555,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider An inlay hints provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerInlayHintsProvider: Disposable;
-    /**
+        /**
 		 * Register a folding range provider.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are asked in
@@ -3474,7 +3570,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider A folding range provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerFoldingRangeProvider: Disposable;
-    /**
+        /**
 		 * Register a selection range provider.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are asked in
@@ -3485,21 +3581,21 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider A selection range provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerSelectionRangeProvider: Disposable;
-    /**
+        /**
 		 * Register a call hierarchy provider.
 		 *
 		 * @param selector A selector that defines the documents this provider is applicable to.
 		 * @param provider A call hierarchy provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerCallHierarchyProvider: Disposable;
-    /**
+        /**
 		 * Register a type hierarchy provider.
 		 *
 		 * @param selector A selector that defines the documents this provider is applicable to.
 		 * @param provider A type hierarchy provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerTypeHierarchyProvider: Disposable;
-    /**
+        /**
 		 * Register a linked editing range provider.
 		 *
 		 * Multiple providers can be registered for a language. In that case providers are sorted
@@ -3510,7 +3606,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param provider A linked editing range provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerLinkedEditingRangeProvider: Disposable;
-    /**
+        /**
 		 * Registers a new {@link DocumentDropEditProvider}.
 		 *
 		 * @param selector A selector that defines the documents this provider applies to.
@@ -3518,13 +3614,14 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * @return A {@link Disposable} that unregisters this provider when disposed of.
 		 */ readonly registerDocumentDropEditProvider: Disposable;
-    /**
+        /**
 		 * Set a {@link LanguageConfiguration language configuration} for a language.
 		 *
 		 * @param language A language identifier like `typescript`.
 		 * @param configuration Language configuration.
 		 * @return A {@link Disposable} that unsets this configuration.
 		 */ readonly setLanguageConfiguration: Disposable;
+    };
     /**
 	 * Represents a notebook editor that is attached to a {@link NotebookDocument notebook}.
 	 */ readonly NotebookEditorRevealType: {
@@ -3689,6 +3786,15 @@ Returns VSCodeApi only within the vscode extension.
 		 */ new(text: string, alignment: NotebookCellStatusBarAlignment): NotebookCellStatusBarItem;
     };
     /**
+	 * Namespace for notebooks.
+	 *
+	 * The notebooks functionality is composed of three loosely coupled components:
+	 *
+	 * 1. {@link NotebookSerializer} enable the editor to open, show, and save notebooks
+	 * 2. {@link NotebookController} own the execution of notebooks, e.g they create output from code cells.
+	 * 3. NotebookRenderer present notebook output in the editor. They run in a separate context.
+	 */ readonly notebooks: {
+        /**
 		 * Creates a new notebook controller.
 		 *
 		 * @param id Identifier of the controller. Must be unique per extension.
@@ -3696,14 +3802,14 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param label The label of the controller.
 		 * @param handler The execute-handler of the controller.
 		 */ readonly createNotebookController: NotebookController;
-    /**
+        /**
 		 * Register a {@link NotebookCellStatusBarItemProvider cell statusbar item provider} for the given notebook type.
 		 *
 		 * @param notebookType The notebook type to register for.
 		 * @param provider A cell status bar provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerNotebookCellStatusBarItemProvider: Disposable;
-    /**
+        /**
 		 * Creates a new messaging instance used to communicate with a specific renderer.
 		 *
 		 * * *Note 1:* Extensions can only create renderer that they have defined in their `package.json`-file
@@ -3713,13 +3819,15 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param rendererId The renderer ID to communicate with
 		 * @returns A new notebook renderer messaging object.
 		*/ readonly createRendererMessaging: NotebookRendererMessaging;
-    /**
+    };
+    readonly scm: {
+        /**
 		 * The {@link SourceControlInputBox input box} for the last source control
 		 * created by the extension.
 		 *
 		 * @deprecated Use SourceControl.inputBox instead
 		 */ readonly inputBox: SourceControlInputBox;
-    /**
+        /**
 		 * Creates a new {@link SourceControl source control} instance.
 		 *
 		 * @param id An `id` for the source control. Something short, e.g.: `git`.
@@ -3727,6 +3835,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param rootUri An optional Uri of the root of the source control. E.g.: `Uri.parse(workspaceRoot)`.
 		 * @return An instance of {@link SourceControl source control}.
 		 */ readonly createSourceControl: SourceControl;
+    };
     /**
 	 * Represents a debug adapter executable and optional arguments and runtime options passed to it.
 	 */ readonly DebugAdapterExecutable: {
@@ -3803,35 +3912,38 @@ Returns VSCodeApi only within the vscode extension.
 		 */ readonly Dynamic: 2;
     };
     /**
+	 * Namespace for debug functionality.
+	 */ readonly debug: {
+        /**
 		 * The currently active {@link DebugSession debug session} or `undefined`. The active debug session is the one
 		 * represented by the debug action floating window or the one currently shown in the drop down menu of the debug action floating window.
 		 * If no debug session is active, the value is `undefined`.
 		 */ activeDebugSession: DebugSession | undefined;
-    /**
+        /**
 		 * The currently active {@link DebugConsole debug console}.
 		 * If no debug session is active, output sent to the debug console is not shown.
 		 */ activeDebugConsole: DebugConsole;
-    /**
+        /**
 		 * List of breakpoints.
 		 */ breakpoints: readonly Breakpoint[];
-    /**
+        /**
 		 * An {@link Event} which fires when the {@link debug.activeDebugSession active debug session}
 		 * has changed. *Note* that the event also fires when the active debug session changes
 		 * to `undefined`.
 		 */ readonly onDidChangeActiveDebugSession: Event<DebugSession | undefined>;
-    /**
+        /**
 		 * An {@link Event} which fires when a new {@link DebugSession debug session} has been started.
 		 */ readonly onDidStartDebugSession: Event<DebugSession>;
-    /**
+        /**
 		 * An {@link Event} which fires when a custom DAP event is received from the {@link DebugSession debug session}.
 		 */ readonly onDidReceiveDebugSessionCustomEvent: Event<DebugSessionCustomEvent>;
-    /**
+        /**
 		 * An {@link Event} which fires when a {@link DebugSession debug session} has terminated.
 		 */ readonly onDidTerminateDebugSession: Event<DebugSession>;
-    /**
+        /**
 		 * An {@link Event} that is emitted when the set of breakpoints is added, removed, or changed.
 		 */ readonly onDidChangeBreakpoints: Event<BreakpointsChangeEvent>;
-    /**
+        /**
 		 * Register a {@link DebugConfigurationProvider debug configuration provider} for a specific debug type.
 		 * The optional {@link DebugConfigurationProviderTriggerKind triggerKind} can be used to specify when the `provideDebugConfigurations` method of the provider is triggered.
 		 * Currently two trigger kinds are possible: with the value `Initial` (or if no trigger kind argument is given) the `provideDebugConfigurations` method is used to provide the initial debug configurations to be copied into a newly created launch.json.
@@ -3845,7 +3957,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param triggerKind The {@link DebugConfigurationProviderTriggerKind trigger} for which the 'provideDebugConfiguration' method of the provider is registered. If `triggerKind` is missing, the value `DebugConfigurationProviderTriggerKind.Initial` is assumed.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerDebugConfigurationProvider: Disposable;
-    /**
+        /**
 		 * Register a {@link DebugAdapterDescriptorFactory debug adapter descriptor factory} for a specific debug type.
 		 * An extension is only allowed to register a DebugAdapterDescriptorFactory for the debug type(s) defined by the extension. Otherwise an error is thrown.
 		 * Registering more than one DebugAdapterDescriptorFactory for a debug type results in an error.
@@ -3854,14 +3966,14 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param factory The {@link DebugAdapterDescriptorFactory debug adapter descriptor factory} to register.
 		 * @return A {@link Disposable} that unregisters this factory when being disposed.
 		 */ readonly registerDebugAdapterDescriptorFactory: Disposable;
-    /**
+        /**
 		 * Register a debug adapter tracker factory for the given debug type.
 		 *
 		 * @param debugType The debug type for which the factory is registered or '*' for matching all debug types.
 		 * @param factory The {@link DebugAdapterTrackerFactory debug adapter tracker factory} to register.
 		 * @return A {@link Disposable} that unregisters this factory when being disposed.
 		 */ readonly registerDebugAdapterTrackerFactory: Disposable;
-    /**
+        /**
 		 * Start debugging by using either a named launch or named compound configuration,
 		 * or by directly passing a {@link DebugConfiguration}.
 		 * The named configurations are looked up in '.vscode/launch.json' found in the given folder.
@@ -3872,19 +3984,19 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param parentSessionOrOptions Debug session options. When passed a parent {@link DebugSession debug session}, assumes options with just this parent session.
 		 * @return A thenable that resolves when debugging could be successfully started.
 		 */ readonly startDebugging: Thenable<boolean>;
-    /**
+        /**
 		 * Stop the given debug session or stop all debug sessions if session is omitted.
 		 * @param session The {@link DebugSession debug session} to stop; if omitted all sessions are stopped.
 		 */ readonly stopDebugging: Thenable<void>;
-    /**
+        /**
 		 * Add breakpoints.
 		 * @param breakpoints The breakpoints to add.
 		*/ readonly addBreakpoints: void;
-    /**
+        /**
 		 * Remove breakpoints.
 		 * @param breakpoints The breakpoints to remove.
 		 */ readonly removeBreakpoints: void;
-    /**
+        /**
 		 * Converts a "Source" descriptor object received via the Debug Adapter Protocol into a Uri that can be used to load its contents.
 		 * If the source descriptor is based on a path, a file Uri is returned.
 		 * If the source descriptor uses a reference number, a specific debug Uri (scheme 'debug') is constructed that requires a corresponding ContentProvider and a running debug session
@@ -3895,19 +4007,53 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param session An optional debug session that will be used when the source descriptor uses a reference number to load the contents from an active debug session.
 		 * @return A uri that can be used to load the contents of the source.
 		 */ readonly asDebugSourceUri: Uri;
+    };
     /**
+	 * Namespace for dealing with installed extensions. Extensions are represented
+	 * by an {@link Extension}-interface which enables reflection on them.
+	 *
+	 * Extension writers can provide APIs to other extensions by returning their API public
+	 * surface from the `activate`-call.
+	 *
+	 * ```javascript
+	 * export function activate(context: vscode.ExtensionContext) {
+	 * 	let api = {
+	 * 		sum(a, b) {
+	 * 			return a + b;
+	 * 		},
+	 * 		mul(a, b) {
+	 * 			return a * b;
+	 * 		}
+	 * 	};
+	 * 	// 'export' public api-surface
+	 * 	return api;
+	 * }
+	 * ```
+	 * When depending on the API of another extension add an `extensionDependencies`-entry
+	 * to `package.json`, and use the {@link extensions.getExtension getExtension}-function
+	 * and the {@link Extension.exports exports}-property, like below:
+	 *
+	 * ```javascript
+	 * let mathExt = extensions.getExtension('genius.math');
+	 * let importedApi = mathExt.exports;
+	 *
+	 * console.log(importedApi.mul(42, 1));
+	 * ```
+	 */ readonly extensions: {
+        /**
 		 * Get an extension by its full identifier in the form of: `publisher.name`.
 		 *
 		 * @param extensionId An extension identifier.
 		 * @return An extension or `undefined`.
 		 */ readonly getExtension<T = any>: Extension<T> | undefined;
-    /**
+        /**
 		 * All extensions currently known to the system.
 		 */ readonly all: readonly Extension<any>[];
-    /**
+        /**
 		 * An event which fires when `extensions.all` changes. This can happen when extensions are
 		 * installed, uninstalled, enabled or disabled.
 		 */ readonly onDidChange: Event<void>;
+    };
     /**
 	 * Collapsible state of a {@link CommentThread comment thread}
 	 */ readonly CommentThreadCollapsibleState: {
@@ -3942,6 +4088,9 @@ Returns VSCodeApi only within the vscode extension.
 		 * @return An instance of {@link CommentController comment controller}.
 		 */ readonly createCommentController: CommentController;
     /**
+	 * Namespace for authentication.
+	 */ readonly authentication: {
+        /**
 		 * Get an authentication session matching the desired scopes. Rejects if a provider with providerId is not
 		 * registered, or if the user does not consent to sharing authentication information with
 		 * the extension. If there are multiple sessions with the same scopes, the user will be shown a
@@ -3954,7 +4103,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param options The {@link AuthenticationGetSessionOptions} to use
 		 * @returns A thenable that resolves to an authentication session
 		 */ readonly getSession: Thenable<AuthenticationSession>;
-    /**
+        /**
 		 * Get an authentication session matching the desired scopes. Rejects if a provider with providerId is not
 		 * registered, or if the user does not consent to sharing authentication information with
 		 * the extension. If there are multiple sessions with the same scopes, the user will be shown a
@@ -3967,7 +4116,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param options The {@link AuthenticationGetSessionOptions} to use
 		 * @returns A thenable that resolves to an authentication session
 		 */ readonly getSession: Thenable<AuthenticationSession>;
-    /**
+        /**
 		 * Get an authentication session matching the desired scopes. Rejects if a provider with providerId is not
 		 * registered, or if the user does not consent to sharing authentication information with
 		 * the extension. If there are multiple sessions with the same scopes, the user will be shown a
@@ -3980,11 +4129,11 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param options The {@link AuthenticationGetSessionOptions} to use
 		 * @returns A thenable that resolves to an authentication session if available, or undefined if there are no sessions
 		 */ readonly getSession: Thenable<AuthenticationSession | undefined>;
-    /**
+        /**
 		 * An {@link Event} which fires when the authentication sessions of an authentication provider have
 		 * been added, removed, or changed.
 		 */ readonly onDidChangeSessions: Event<AuthenticationSessionsChangeEvent>;
-    /**
+        /**
 		 * Register an authentication provider.
 		 *
 		 * There can only be one provider per id and an error is being thrown when an id
@@ -3996,7 +4145,18 @@ Returns VSCodeApi only within the vscode extension.
 		 * @params options Additional options for the provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ readonly registerAuthenticationProvider: Disposable;
+    };
     /**
+	 * Namespace for localization-related functionality in the extension API. To use this properly,
+	 * you must have `l10n` defined in your extension manifest and have bundle.l10n.<language>.json files.
+	 * For more information on how to generate bundle.l10n.<language>.json files, check out the
+	 * [vscode-l10n repo](https://github.com/microsoft/vscode-l10n).
+	 *
+	 * Note: Built-in extensions (for example, Git, TypeScript Language Features, GitHub Authentication)
+	 * are excluded from the `l10n` property requirement. In other words, they do not need to specify
+	 * a `l10n` in the extension manifest because their translated strings come from Language Packs.
+	 */ readonly l10n: {
+        /**
 		 * Marks a string for localization. If a localized bundle is available for the language specified by
 		 * {@link env.language} and the bundle has a localized value for this message, then that localized
 		 * value will be returned (with injected {@link args} values for any templated values).
@@ -4007,7 +4167,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @returns localized string with injected arguments.
 		 * @example `l10n.t('Hello {0}!', 'World');`
 		 */ readonly t: string;
-    /**
+        /**
 		 * Marks a string for localization. If a localized bundle is available for the language specified by
 		 * {@link env.language} and the bundle has a localized value for this message, then that localized
 		 * value will be returned (with injected {@link args} values for any templated values).
@@ -4018,32 +4178,40 @@ Returns VSCodeApi only within the vscode extension.
 		 * @returns localized string with injected arguments.
 		 * @example `l10n.t('Hello {name}', { name: 'Erich' });`
 		 */ readonly t: string;
-    /**
+        /**
 		 * Marks a string for localization. If a localized bundle is available for the language specified by
 		 * {@link env.language} and the bundle has a localized value for this message, then that localized
 		 * value will be returned (with injected args values for any templated values).
 		 * @param options The options to use when localizing the message.
 		 * @returns localized string with injected arguments.
 		 */ readonly t: string;
-    /**
+        /**
 		 * The bundle of localized strings that have been loaded for the extension.
 		 * It's undefined if no bundle has been loaded. The bundle is typically not loaded if
 		 * there was no bundle found or when we are running with the default language.
 		 */ readonly bundle: {
-        [key: string]: string;
-    } | undefined;
-    /**
+            [key: string]: string;
+        } | undefined;
+        /**
 		 * The URI of the localization bundle that has been loaded for the extension.
 		 * It's undefined if no bundle has been loaded. The bundle is typically not loaded if
 		 * there was no bundle found or when we are running with the default language.
 		 */ readonly uri: Uri | undefined;
+    };
     /**
+	 * Namespace for testing functionality. Tests are published by registering
+	 * {@link TestController} instances, then adding {@link TestItem TestItems}.
+	 * Controllers may also describe how to run tests by creating one or more
+	 * {@link TestRunProfile} instances.
+	 */ readonly tests: {
+        /**
 		 * Creates a new test controller.
 		 *
 		 * @param id Identifier for the controller, must be globally unique.
 		 * @param label A human-readable label for the controller.
 		 * @returns An instance of the {@link TestController}.
 		*/ readonly createTestController: TestController;
+    };
     /**
 	 * The kind of executions that {@link TestRunProfile TestRunProfiles} control.
 	 */ readonly TestRunProfileKind: {

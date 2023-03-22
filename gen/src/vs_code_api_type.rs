@@ -27,24 +27,29 @@ pub fn module_item(
                 id: (*crate::ident::VS_CODE_API_IDENT).clone(),
                 declare: false,
                 span: swc_common::Span::default(),
-                type_ann: Box::new(swc_ecma_ast::TsType::TsTypeLit(swc_ecma_ast::TsTypeLit {
-                    span: swc_common::Span::default(),
-                    members: result_vec
-                        .iter()
-                        .flat_map(|result| {
-                            result_decl_to_ts_property_signature(result, comments)
-                                .iter()
-                                .map(|sig| {
-                                    swc_ecma_ast::TsTypeElement::TsPropertySignature(sig.clone())
-                                })
-                                .collect::<Vec<_>>()
-                        })
-                        .collect(),
-                })),
+                type_ann: Box::new(result_decl_vec_to_ts_type(result_vec, comments)),
                 type_params: None,
             })),
         },
     ))
+}
+
+fn result_decl_vec_to_ts_type(
+    result_vec: &Vec<crate::pickup::ResultDeclWithComments>,
+    comments: &dyn swc_common::comments::Comments,
+) -> swc_ecma_ast::TsType {
+    swc_ecma_ast::TsType::TsTypeLit(swc_ecma_ast::TsTypeLit {
+        span: swc_common::Span::default(),
+        members: result_vec
+            .iter()
+            .flat_map(|result| {
+                result_decl_to_ts_property_signature(result, comments)
+                    .iter()
+                    .map(|sig| swc_ecma_ast::TsTypeElement::TsPropertySignature(sig.clone()))
+                    .collect::<Vec<_>>()
+            })
+            .collect(),
+    })
 }
 
 fn result_decl_to_ts_property_signature(
@@ -205,6 +210,35 @@ fn result_decl_to_ts_property_signature(
             })),
             type_params: None,
         }],
+        crate::pickup::ResultDecl::SubModule(sub_module) => {
+            vec![swc_ecma_ast::TsPropertySignature {
+                span: {
+                    let span = swc_common::Span::dummy_with_cmt();
+                    match &result.comments {
+                        Some(comment_vec) => swc_common::comments::Comments::add_leading_comments(
+                            &comments,
+                            span.lo,
+                            comment_vec.clone(),
+                        ),
+                        None => {}
+                    }
+                    span
+                },
+                computed: false,
+                optional: false,
+                readonly: true,
+                key: Box::new(swc_ecma_ast::Expr::Ident(
+                    sub_module.name.clone().ident().unwrap(),
+                )),
+                init: None,
+                params: vec![],
+                type_ann: Some(Box::new(swc_ecma_ast::TsTypeAnn {
+                    span: swc_common::Span::default(),
+                    type_ann: Box::new(result_decl_vec_to_ts_type(&sub_module.decl_vec, comments)),
+                })),
+                type_params: None,
+            }]
+        }
     }
 }
 
