@@ -132,15 +132,7 @@ fn result_decl_to_ts_property_signature(
                         .iter()
                         .map(|param| crate::fn_to_type::param_to_ts_fn_param(&param.pat))
                         .collect(),
-                    type_ann: Some(Box::new(swc_ecma_ast::TsTypeAnn {
-                        span: swc_common::Span::default(),
-                        type_ann: Box::new(swc_ecma_ast::TsType::TsKeywordType(
-                            swc_ecma_ast::TsKeywordType {
-                                span: swc_common::Span::default(),
-                                kind: swc_ecma_ast::TsKeywordTypeKind::TsStringKeyword,
-                            },
-                        )),
-                    })),
+                    type_ann: fn_decl.function.return_type.clone(),
                     type_params: fn_decl.function.type_params.clone(),
                 },
             )]

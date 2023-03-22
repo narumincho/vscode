@@ -3,7 +3,6 @@ mod ident;
 mod pickup;
 mod require_vs_code;
 mod vs_code_api_type;
-mod test;
 
 #[tokio::main]
 pub async fn main() -> anyhow::Result<()> {
