@@ -1,3 +1,5 @@
+declare const require: (path: "vscode") => VSCodeAPI;
+
 /** import VS Code API
 ```ts
 require("vscode")
@@ -5,11 +7,10 @@ require("vscode")
 
 Returns VSCodeApi only within the vscode extension.
 */ export function importVsCodeApi(): VSCodeAPI | undefined {
-  const requireFunc = ((globalThis as unknown) as {
-    require?: undefined | ((path: "vscode") => VSCodeAPI);
-  }).require;
-  return requireFunc === undefined ? undefined : requireFunc("vscode");
+  const requireFunc = require;
+  return requireFunc("vscode");
 }
+
 /**
  * Type Definition for Visual Studio Code 1.75 Extension API
  * See https://code.visualstudio.com/api for more information

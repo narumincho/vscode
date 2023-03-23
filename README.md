@@ -13,7 +13,7 @@ esbuild or something similar should be used. ( https://deno.land/x/esbuild )
 import {
   ExtensionContext,
   importVsCodeApi,
-} from "https://deno.land/x/vscode@0.0.3";
+} from "https://deno.land/x/vscode@0.0.4";
 
 export function activate(context: ExtensionContext) {
   const vscode = (() => {
@@ -40,3 +40,5 @@ export function activate(context: ExtensionContext) {
   context.subscriptions.push(disposable);
 }
 ```
+
+All examples can be found [here](example/)
