@@ -130,7 +130,7 @@ fn result_decl_to_ts_property_signature(
                         .function
                         .params
                         .iter()
-                        .map(|param| crate::fn_to_type::param_to_ts_fn_param(&param.pat))
+                        .map(|param| crate::fn_to_type::pat_to_ts_fn_param(&param.pat))
                         .collect(),
                     type_ann: fn_decl.function.return_type.clone(),
                     type_params: fn_decl.function.type_params.clone(),
@@ -337,7 +337,7 @@ fn class_member_to_ts_type_element(
                             .function
                             .params
                             .iter()
-                            .map(|p| crate::fn_to_type::param_to_ts_fn_param(&p.pat))
+                            .map(|p| crate::fn_to_type::pat_to_ts_fn_param(&p.pat))
                             .collect(),
                         type_ann: method.function.return_type.clone(),
                         type_params: method.function.type_params.clone(),
