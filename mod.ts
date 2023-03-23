@@ -1661,7 +1661,7 @@ Returns VSCodeApi only within the vscode extension.
      *  the `problemMatchers` extension point.
      */ new (
       taskDefinition: TaskDefinition,
-      scope: WorkspaceFolder | TaskScope,
+      scope: WorkspaceFolder | TaskScope.Global | TaskScope.Workspace,
       name: string,
       source: string,
       execution?: ProcessExecution | ShellExecution | CustomExecution,
@@ -5158,6 +5158,84 @@ type ValueOf<T> = T[keyof T];
   /**
    * The zero-based character value.
    */ readonly character: number;
+  /**
+   * Check if this position is before `other`.
+   *
+   * @param other A position.
+   * @return `true` if position is on a smaller line
+   * or on the same line on a smaller character.
+   */ isBefore(other: Position): boolean;
+  /**
+   * Check if this position is before or equal to `other`.
+   *
+   * @param other A position.
+   * @return `true` if position is on a smaller line
+   * or on the same line on a smaller or equal character.
+   */ isBeforeOrEqual(other: Position): boolean;
+  /**
+   * Check if this position is after `other`.
+   *
+   * @param other A position.
+   * @return `true` if position is on a greater line
+   * or on the same line on a greater character.
+   */ isAfter(other: Position): boolean;
+  /**
+   * Check if this position is after or equal to `other`.
+   *
+   * @param other A position.
+   * @return `true` if position is on a greater line
+   * or on the same line on a greater or equal character.
+   */ isAfterOrEqual(other: Position): boolean;
+  /**
+   * Check if this position is equal to `other`.
+   *
+   * @param other A position.
+   * @return `true` if the line and character of the given position are equal to
+   * the line and character of this position.
+   */ isEqual(other: Position): boolean;
+  /**
+   * Compare this to `other`.
+   *
+   * @param other A position.
+   * @return A number smaller than zero if this position is before the given position,
+   * a number greater than zero if this position is after the given position, or zero when
+   * this and the given position are equal.
+   */ compareTo(other: Position): number;
+  /**
+   * Create a new position relative to this position.
+   *
+   * @param lineDelta Delta value for the line value, default is `0`.
+   * @param characterDelta Delta value for the character value, default is `0`.
+   * @return A position which line and character is the sum of the current line and
+   * character and the corresponding deltas.
+   */ translate(lineDelta?: number, characterDelta?: number): Position;
+  /**
+   * Derived a new position relative to this position.
+   *
+   * @param change An object that describes a delta to this position.
+   * @return A position that reflects the given delta. Will return `this` position if the change
+   * is not changing anything.
+   */ translate(change: {
+    lineDelta?: number;
+    characterDelta?: number;
+  }): Position;
+  /**
+   * Create a new position derived from this position.
+   *
+   * @param line Value that should be used as line value, default is the {@link Position.line existing value}
+   * @param character Value that should be used as character value, default is the {@link Position.character existing value}
+   * @return A position where line and character are replaced by the given values.
+   */ with(line?: number, character?: number): Position;
+  /**
+   * Derived a new position from this position.
+   *
+   * @param change An object that describes a change to this position.
+   * @return A position that reflects the given change. Will return `this` position if the change
+   * is not changing anything.
+   */ with(change: {
+    line?: number;
+    character?: number;
+  }): Position;
 };
 /**
  * A range represents an ordered pair of two positions.
@@ -5179,6 +5257,52 @@ type ValueOf<T> = T[keyof T];
   /**
    * `true` if `start.line` and `end.line` are equal.
    */ isSingleLine: boolean;
+  /**
+   * Check if a position or a range is contained in this range.
+   *
+   * @param positionOrRange A position or a range.
+   * @return `true` if the position or range is inside or equal
+   * to this range.
+   */ contains(positionOrRange: Position | Range): boolean;
+  /**
+   * Check if `other` equals this range.
+   *
+   * @param other A range.
+   * @return `true` when start and end are {@link Position.isEqual equal} to
+   * start and end of this range.
+   */ isEqual(other: Range): boolean;
+  /**
+   * Intersect `range` with this range and returns a new range or `undefined`
+   * if the ranges have no overlap.
+   *
+   * @param range A range.
+   * @return A range of the greater start and smaller end positions. Will
+   * return undefined when there is no overlap.
+   */ intersection(range: Range): Range | undefined;
+  /**
+   * Compute the union of `other` with this range.
+   *
+   * @param other A range.
+   * @return A range of smaller start position and the greater end position.
+   */ union(other: Range): Range;
+  /**
+   * Derived a new range from this range.
+   *
+   * @param start A position that should be used as start. The default value is the {@link Range.start current start}.
+   * @param end A position that should be used as end. The default value is the {@link Range.end current end}.
+   * @return A range derived from this range with the given start and end position.
+   * If start and end are not different `this` range will be returned.
+   */ with(start?: Position, end?: Position): Range;
+  /**
+   * Derived a new range from this range.
+   *
+   * @param change An object that describes a change to this range.
+   * @return A range that reflects the given change. Will return `this` range if the change
+   * is not changing anything.
+   */ with(change: {
+    start?: Position;
+    end?: Position;
+  }): Range;
 };
 /**
  * Represents a text selection in an editor.
@@ -5738,6 +5862,48 @@ export interface DecorationInstanceRenderOptions
    * u.fsPath === '\\server\c$\folder\file.txt'
    * ```
    */ readonly fsPath: string;
+  /**
+   * Derive a new Uri from this Uri.
+   *
+   * ```ts
+   * let file = Uri.parse('before:some/file/path');
+   * let other = file.with({ scheme: 'after' });
+   * assert.ok(other.toString() === 'after:some/file/path');
+   * ```
+   *
+   * @param change An object that describes a change to this Uri. To unset components use `null` or
+   *  the empty string.
+   * @return A new Uri that reflects the given change. Will return `this` Uri if the change
+   *  is not changing anything.
+   */ with(change: {
+    scheme?: string;
+    authority?: string;
+    path?: string;
+    query?: string;
+    fragment?: string;
+  }): Uri;
+  /**
+   * Returns a string representation of this Uri. The representation and normalization
+   * of a URI depends on the scheme.
+   *
+   * * The resulting string can be safely used with {@link Uri.parse}.
+   * * The resulting string shall *not* be used for display purposes.
+   *
+   * *Note* that the implementation will encode _aggressive_ which often leads to unexpected,
+   * but not incorrect, results. For instance, colons are encoded to `%3A` which might be unexpected
+   * in file-uri. Also `&` and `=` will be encoded which might be unexpected for http-uris. For stability
+   * reasons this cannot be changed anymore. If you suffer from too aggressive encoding you should use
+   * the `skipEncoding`-argument: `uri.toString(true)`.
+   *
+   * @param skipEncoding Do not percentage-encode the result, defaults to `false`. Note that
+   * 	the `#` and `?` characters occurring in the path will always be encoded.
+   * @returns A string representation of this Uri.
+   */ toString(skipEncoding?: boolean): string;
+  /**
+   * Returns a JSON representation of this Uri.
+   *
+   * @return An object.
+   */ toJSON(): any;
 };
 /**
  * A cancellation token is passed to an asynchronous or long running
@@ -5760,6 +5926,12 @@ export interface DecorationInstanceRenderOptions
   /**
    * The cancellation token of this source.
    */ token: CancellationToken;
+  /**
+   * Signal cancellation on the token.
+   */ cancel(): void;
+  /**
+   * Dispose object and free resources.
+   */ dispose(): void;
 };
 /**
  * An error type that should be used to signal cancellation of an operation.
@@ -5771,7 +5943,11 @@ export interface DecorationInstanceRenderOptions
 /**
  * Represents a type which can release resources, such
  * as event listening or a timer.
- */ export type Disposable = {};
+ */ export type Disposable = {
+  /**
+   * Dispose this object.
+   */ dispose(): any;
+};
 /**
  * Represents a typed event.
  *
@@ -5806,6 +5982,15 @@ export interface DecorationInstanceRenderOptions
   /**
    * The event listeners can subscribe to.
    */ event: Event<T>;
+  /**
+   * Notify all subscribers of the {@link EventEmitter.event event}. Failure
+   * of one or more listener will not fail this function call.
+   *
+   * @param data The event object.
+   */ fire(data: T): void;
+  /**
+   * Dispose this object and free resources.
+   */ dispose(): void;
 };
 /**
  * A file system watcher notifies about changes to files and folders
@@ -6258,6 +6443,27 @@ export interface DecorationInstanceRenderOptions
   /**
    * String value of the kind, e.g. `"refactor.extract.function"`.
    */ readonly value: string;
+  /**
+   * Create a new kind by appending a more specific selector to the current kind.
+   *
+   * Does not modify the current kind.
+   */ append(parts: string): CodeActionKind;
+  /**
+   * Checks if this code action kind intersects `other`.
+   *
+   * The kind `"refactor.extract"` for example intersects `refactor`, `"refactor.extract"` and ``"refactor.extract.function"`,
+   * but not `"unicorn.refactor.extract"`, or `"refactor.extractAll"`.
+   *
+   * @param other Kind to check.
+   */ intersects(other: CodeActionKind): boolean;
+  /**
+   * Checks if `other` is a sub-kind of this `CodeActionKind`.
+   *
+   * The kind `"refactor.extract"` for example contains `"refactor.extract"` and ``"refactor.extract.function"`,
+   * but not `"unicorn.refactor.extract"`, or `"refactor.extractAll"` or `refactor`.
+   *
+   * @param other Kind to check.
+   */ contains(other: CodeActionKind): boolean;
 };
 /**
  * The reason why code actions were requested.
@@ -6624,6 +6830,19 @@ export interface DecorationInstanceRenderOptions
    * // Here 'link' in the rendered markdown resolves to '/path/to/file.js'
    * ```
    */ baseUri?: Uri;
+  /**
+   * Appends and escapes the given string to this markdown string.
+   * @param value Plain text.
+   */ appendText(value: string): MarkdownString;
+  /**
+   * Appends the given string 'as is' to this markdown string. When {@linkcode MarkdownString.supportThemeIcons supportThemeIcons} is `true`, {@link ThemeIcon ThemeIcons} in the `value` will be iconified.
+   * @param value Markdown string.
+   */ appendMarkdown(value: string): MarkdownString;
+  /**
+   * Appends the given string as codeblock using the provided language.
+   * @param value A code snippet.
+   * @param language An optional {@link languages.getLanguages language identifier}.
+   */ appendCodeblock(value: string, language?: string): MarkdownString;
 };
 /**
  * MarkedString can be used to render human-readable text. It is either a markdown string
@@ -7063,6 +7282,128 @@ export interface DecorationInstanceRenderOptions
   /**
    * The number of affected resources of textual or resource changes.
    */ readonly size: number;
+  /**
+   * Replace the given range with given text for the given resource.
+   *
+   * @param uri A resource identifier.
+   * @param range A range.
+   * @param newText A string.
+   * @param metadata Optional metadata for the entry.
+   */ replace(
+    uri: Uri,
+    range: Range,
+    newText: string,
+    metadata?: WorkspaceEditEntryMetadata,
+  ): void;
+  /**
+   * Insert the given text at the given position.
+   *
+   * @param uri A resource identifier.
+   * @param position A position.
+   * @param newText A string.
+   * @param metadata Optional metadata for the entry.
+   */ insert(
+    uri: Uri,
+    position: Position,
+    newText: string,
+    metadata?: WorkspaceEditEntryMetadata,
+  ): void;
+  /**
+   * Delete the text at the given range.
+   *
+   * @param uri A resource identifier.
+   * @param range A range.
+   * @param metadata Optional metadata for the entry.
+   */ delete(
+    uri: Uri,
+    range: Range,
+    metadata?: WorkspaceEditEntryMetadata,
+  ): void;
+  /**
+   * Check if a text edit for a resource exists.
+   *
+   * @param uri A resource identifier.
+   * @return `true` if the given resource will be touched by this edit.
+   */ has(uri: Uri): boolean;
+  /**
+   * Set (and replace) text edits or snippet edits for a resource.
+   *
+   * @param uri A resource identifier.
+   * @param edits An array of edits.
+   */ set(uri: Uri, edits: ReadonlyArray<TextEdit | SnippetTextEdit>): void;
+  /**
+   * Set (and replace) text edits or snippet edits with metadata for a resource.
+   *
+   * @param uri A resource identifier.
+   * @param edits An array of edits.
+   */ set(
+    uri: Uri,
+    edits: ReadonlyArray<
+      [TextEdit | SnippetTextEdit, WorkspaceEditEntryMetadata]
+    >,
+  ): void;
+  /**
+   * Set (and replace) notebook edits for a resource.
+   *
+   * @param uri A resource identifier.
+   * @param edits An array of edits.
+   */ set(uri: Uri, edits: readonly NotebookEdit[]): void;
+  /**
+   * Set (and replace) notebook edits with metadata for a resource.
+   *
+   * @param uri A resource identifier.
+   * @param edits An array of edits.
+   */ set(
+    uri: Uri,
+    edits: ReadonlyArray<[NotebookEdit, WorkspaceEditEntryMetadata]>,
+  ): void;
+  /**
+   * Get the text edits for a resource.
+   *
+   * @param uri A resource identifier.
+   * @return An array of text edits.
+   */ get(uri: Uri): TextEdit[];
+  /**
+   * Create a regular file.
+   *
+   * @param uri Uri of the new file.
+   * @param options Defines if an existing file should be overwritten or be
+   * ignored. When `overwrite` and `ignoreIfExists` are both set `overwrite` wins.
+   * When both are unset and when the file already exists then the edit cannot
+   * be applied successfully. The `content`-property allows to set the initial contents
+   * the file is being created with.
+   * @param metadata Optional metadata for the entry.
+   */ createFile(uri: Uri, options?: {
+    readonly overwrite?: boolean;
+    readonly ignoreIfExists?: boolean;
+    readonly contents?: Uint8Array;
+  }, metadata?: WorkspaceEditEntryMetadata): void;
+  /**
+   * Delete a file or folder.
+   *
+   * @param uri The uri of the file that is to be deleted.
+   * @param metadata Optional metadata for the entry.
+   */ deleteFile(uri: Uri, options?: {
+    readonly recursive?: boolean;
+    readonly ignoreIfNotExists?: boolean;
+  }, metadata?: WorkspaceEditEntryMetadata): void;
+  /**
+   * Rename a file or folder.
+   *
+   * @param oldUri The existing file.
+   * @param newUri The new location.
+   * @param options Defines if existing files should be overwritten or be
+   * ignored. When overwrite and ignoreIfExists are both set overwrite wins.
+   * @param metadata Optional metadata for the entry.
+   */ renameFile(oldUri: Uri, newUri: Uri, options?: {
+    readonly overwrite?: boolean;
+    readonly ignoreIfExists?: boolean;
+  }, metadata?: WorkspaceEditEntryMetadata): void;
+  /**
+   * Get all text edits grouped by resource.
+   *
+   * @return A shallow copy of `[Uri, TextEdit[]]`-tuples.
+   */ entries(): [Uri, TextEdit[]][];
 };
 /**
  * A snippet string is a template which allows to insert text
@@ -7077,6 +7418,55 @@ export interface DecorationInstanceRenderOptions
   /**
    * The snippet string.
    */ value: string;
+  /**
+   * Builder-function that appends the given string to
+   * the {@linkcode SnippetString.value value} of this snippet string.
+   *
+   * @param string A value to append 'as given'. The string will be escaped.
+   * @return This snippet string.
+   */ appendText(string: string): SnippetString;
+  /**
+   * Builder-function that appends a tabstop (`$1`, `$2` etc) to
+   * the {@linkcode SnippetString.value value} of this snippet string.
+   *
+   * @param number The number of this tabstop, defaults to an auto-increment
+   * value starting at 1.
+   * @return This snippet string.
+   */ appendTabstop(number?: number): SnippetString;
+  /**
+   * Builder-function that appends a placeholder (`${1:value}`) to
+   * the {@linkcode SnippetString.value value} of this snippet string.
+   *
+   * @param value The value of this placeholder - either a string or a function
+   * with which a nested snippet can be created.
+   * @param number The number of this tabstop, defaults to an auto-increment
+   * value starting at 1.
+   * @return This snippet string.
+   */ appendPlaceholder(
+    value: string | ((snippet: SnippetString) => any),
+    number?: number,
+  ): SnippetString;
+  /**
+   * Builder-function that appends a choice (`${1|a,b,c|}`) to
+   * the {@linkcode SnippetString.value value} of this snippet string.
+   *
+   * @param values The values for choices - the array of strings
+   * @param number The number of this tabstop, defaults to an auto-increment
+   * value starting at 1.
+   * @return This snippet string.
+   */ appendChoice(values: readonly string[], number?: number): SnippetString;
+  /**
+   * Builder-function that appends a variable (`${VAR}`) to
+   * the {@linkcode SnippetString.value value} of this snippet string.
+   *
+   * @param name The name of the variable - excluding the `$`.
+   * @param defaultValue The default value which is used when the variable name cannot
+   * be resolved - either a string or a function with which a nested snippet can be created.
+   * @return This snippet string.
+   */ appendVariable(
+    name: string,
+    defaultValue: string | ((snippet: SnippetString) => any),
+  ): SnippetString;
 };
 /**
  * The rename provider interface defines the contract between extensions and
@@ -7135,7 +7525,37 @@ export interface DecorationInstanceRenderOptions
 /**
  * A semantic tokens builder can help with creating a `SemanticTokens` instance
  * which contains delta encoded semantic tokens.
- */ export type SemanticTokensBuilder = {};
+ */ export type SemanticTokensBuilder = {
+  /**
+   * Add another token.
+   *
+   * @param line The token start line number (absolute value).
+   * @param char The token start character (absolute value).
+   * @param length The token length in characters.
+   * @param tokenType The encoded token type.
+   * @param tokenModifiers The encoded token modifiers.
+   */ push(
+    line: number,
+    char: number,
+    length: number,
+    tokenType: number,
+    tokenModifiers?: number,
+  ): void;
+  /**
+   * Add another token. Use only when providing a legend.
+   *
+   * @param range The range of the token. Must be single-line.
+   * @param tokenType The token type.
+   * @param tokenModifiers The token modifiers.
+   */ push(
+    range: Range,
+    tokenType: string,
+    tokenModifiers?: readonly string[],
+  ): void;
+  /**
+   * Finish and create a `SemanticTokens` instance.
+   */ build(resultId?: string): SemanticTokens;
+};
 /**
  * Represents semantic tokens, either in a range or in an entire document.
  * @see {@link DocumentSemanticTokensProvider.provideDocumentSemanticTokens provideDocumentSemanticTokens} for an explanation of the format.
@@ -9687,7 +10107,8 @@ export type ShellExecution = {
   /**
    * The task's scope.
    */ readonly scope:
-    | TaskScope
+    | TaskScope.Global
+    | TaskScope.Workspace
     | WorkspaceFolder
     | undefined;
   /**
@@ -10943,6 +11364,19 @@ export type FilePermission = ValueOf<VSCodeAPI["FilePermission"]>;
  * Encapsulates data transferred during drag and drop operations.
  */ export type DataTransferItem = {
   /**
+   * Get a string representation of this item.
+   *
+   * If {@linkcode DataTransferItem.value} is an object, this returns the result of json stringifying {@linkcode DataTransferItem.value} value.
+   */ asString(): Thenable<string>;
+  /**
+   * Try getting the {@link DataTransferFile file} associated with this data transfer item.
+   *
+   * Note that the file object is only valid for the scope of the drag and drop operation.
+   *
+   * @returns The file for the data transfer or `undefined` if the item is either not a file or the
+   * file data cannot be accessed.
+   */ asFile(): DataTransferFile | undefined;
+  /**
    * Custom data stored on this item.
    *
    * You can use `value` to share data across operations. The original object can be retrieved so long as the extension that
@@ -10955,7 +11389,40 @@ export type FilePermission = ValueOf<VSCodeAPI["FilePermission"]>;
  * Drag and drop controllers that implement {@link TreeDragAndDropController.handleDrag `handleDrag`} can add additional mime types to the
  * data transfer. These additional mime types will only be included in the `handleDrop` when the the drag was initiated from
  * an element in the same drag and drop controller.
- */ export type DataTransfer = {};
+ */ export type DataTransfer = {
+  /**
+   * Retrieves the data transfer item for a given mime type.
+   *
+   * @param mimeType The mime type to get the data transfer item for, such as `text/plain` or `image/png`.
+   *
+   * Special mime types:
+   * - `text/uri-list` — A string with `toString()`ed Uris separated by `\r\n`. To specify a cursor position in the file,
+   * set the Uri's fragment to `L3,5`, where 3 is the line number and 5 is the column number.
+   */ get(mimeType: string): DataTransferItem | undefined;
+  /**
+   * Sets a mime type to data transfer item mapping.
+   * @param mimeType The mime type to set the data for.
+   * @param value The data transfer item for the given mime type.
+   */ set(mimeType: string, value: DataTransferItem): void;
+  /**
+   * Allows iteration through the data transfer items.
+   *
+   * @param callbackfn Callback for iteration through the data transfer items.
+   * @param thisArg The `this` context used when invoking the handler function.
+   */ forEach(
+    callbackfn: (
+      item: DataTransferItem,
+      mimeType: string,
+      dataTransfer: DataTransfer,
+    ) => void,
+    thisArg?: any,
+  ): void;
+  /**
+   * Get a new iterator with the `[mime, item]` pairs for each element in this data transfer.
+   */ [Symbol.iterator](): IterableIterator<
+    [mimeType: string, item: DataTransferItem]
+  >;
+};
 /**
  * Provides support for drag and drop in `TreeView`.
  */ export interface TreeDragAndDropController<T> {
@@ -12304,6 +12771,16 @@ export type TextDocumentChangeReason = ValueOf<
   /**
    * `true` if `start` and `end` are equal.
    */ readonly isEmpty: boolean;
+  /**
+   * Derive a new range for this range.
+   *
+   * @param change An object that describes a change to this range.
+   * @return A range that reflects the given change. Will return `this` range if the change
+   * is not changing anything.
+   */ with(change: {
+    start?: number;
+    end?: number;
+  }): NotebookRange;
 };
 /**
  * One representation of a {@link NotebookCellOutput notebook output}, defined by MIME type and data.

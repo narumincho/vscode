@@ -247,7 +247,7 @@ fn class_member_to_ts_type_element(
                         span: method.span,
                         readonly: false,
                         key: Box::new(crate::fn_to_type::prop_name_to_expr(&method.key)),
-                        computed: false,
+                        computed: method.key.is_computed(),
                         optional: false,
                         params: method
                             .function

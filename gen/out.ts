@@ -10503,7 +10503,7 @@ export type FilePermission = ValueOf<VSCodeAPI["FilePermission"]>;
 		 */ forEach(callbackfn: (item: DataTransferItem, mimeType: string, dataTransfer: DataTransfer) => void, thisArg?: any): void;
     /**
 		 * Get a new iterator with the `[mime, item]` pairs for each element in this data transfer.
-		 */ Symbol.iterator(): IterableIterator<[mimeType: string, item: DataTransferItem]>;
+		 */ [Symbol.iterator](): IterableIterator<[mimeType: string, item: DataTransferItem]>;
 };
 /**
 	 * Provides support for drag and drop in `TreeView`.
