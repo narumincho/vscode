@@ -13,7 +13,7 @@ esbuild or something similar should be used. ( https://deno.land/x/esbuild )
 import {
   ExtensionContext,
   importVsCodeApi,
-} from "https://deno.land/x/vscode@0.0.4";
+} from "https://deno.land/x/vscode@0.0.4/mod.ts";
 
 export function activate(context: ExtensionContext) {
   const vscode = (() => {
