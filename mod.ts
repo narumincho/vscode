@@ -1661,7 +1661,7 @@ Returns VSCodeApi only within the vscode extension.
      *  the `problemMatchers` extension point.
      */ new (
       taskDefinition: TaskDefinition,
-      scope: WorkspaceFolder | TaskScope.Global | TaskScope.Workspace,
+      scope: WorkspaceFolder | TaskScope,
       name: string,
       source: string,
       execution?: ProcessExecution | ShellExecution | CustomExecution,
@@ -10107,8 +10107,7 @@ export type ShellExecution = {
   /**
    * The task's scope.
    */ readonly scope:
-    | TaskScope.Global
-    | TaskScope.Workspace
+    | TaskScope
     | WorkspaceFolder
     | undefined;
   /**
