@@ -13,7 +13,7 @@ esbuild or something similar should be used. ( https://deno.land/x/esbuild )
 import {
   ExtensionContext,
   importVsCodeApi,
-} from "https://deno.land/x/vscode@0.0.5/mod.ts";
+} from "https://deno.land/x/vscode@1.0.0/mod.ts";
 
 export function activate(context: ExtensionContext) {
   const vscode = (() => {
@@ -41,4 +41,5 @@ export function activate(context: ExtensionContext) {
 }
 ```
 
-All examples can be found [here](example/)
+All examples can be found
+[here](https://github.com/narumincho/vscode/tree/main/example)
