@@ -16,15 +16,12 @@ import {
 } from "https://deno.land/x/vscode@1.0.0/mod.ts";
 
 export function activate(context: ExtensionContext) {
-  const vscode = (() => {
-    const api = importVsCodeApi();
-    if (api === undefined) {
-      throw new Error(
-        "Could not import vscode api because it was not working within the extension",
-      );
-    }
-    return api;
-  })();
+  const vscode = importVsCodeApi();
+  if (vscode === undefined) {
+    throw new Error(
+      "Could not import vscode api because it was not working within the extension",
+    );
+  }
 
   console.log(
     'Congratulations, your extension "helloworld-sample" is now active!',
