@@ -165,7 +165,7 @@ Returns VSCodeApi only within the vscode extension.
      * The decoration's range will widen when edits occur at the start or end.
      */ readonly OpenOpen: 0;
     /**
-     * The decoration's range will not widen when edits occur at the start of end.
+     * The decoration's range will not widen when edits occur at the start or end.
      */ readonly ClosedClosed: 1;
     /**
      * The decoration's range will widen when edits occur at the start, but not at the end.
@@ -1662,7 +1662,7 @@ Returns VSCodeApi only within the vscode extension.
      *  the `problemMatchers` extension point.
      */ new (
       taskDefinition: TaskDefinition,
-      scope: WorkspaceFolder | TaskScope,
+      scope: WorkspaceFolder | TaskScope.Global | TaskScope.Workspace,
       name: string,
       source: string,
       execution?: ProcessExecution | ShellExecution | CustomExecution,
@@ -3419,6 +3419,21 @@ Returns VSCodeApi only within the vscode extension.
       NotebookDocumentChangeEvent
     >;
     /**
+     * An event that is emitted when a {@link NotebookDocument notebook document} will be saved to disk.
+     *
+     * *Note 1:* Subscribers can delay saving by registering asynchronous work. For the sake of data integrity the editor
+     * might save without firing this event. For instance when shutting down with dirty files.
+     *
+     * *Note 2:* Subscribers are called sequentially and they can {@link NotebookDocumentWillSaveEvent.waitUntil delay} saving
+     * by registering asynchronous work. Protection against misbehaving listeners is implemented as such:
+     *  * there is an overall time budget that all listeners share and if that is exhausted no further listener is called
+     *  * listeners that take a long time or produce errors frequently will not be called anymore
+     *
+     * The current thresholds are 1.5 seconds as overall time budget and a listener can misbehave 3 times before being ignored.
+     */ readonly onWillSaveNotebookDocument: Event<
+      NotebookDocumentWillSaveEvent
+    >;
+    /**
      * An event that is emitted when a {@link NotebookDocument notebook} is saved.
      */ readonly onDidSaveNotebookDocument: Event<NotebookDocument>;
     /**
@@ -4777,28 +4792,35 @@ Returns VSCodeApi only within the vscode extension.
      * Marks a string for localization. If a localized bundle is available for the language specified by
      * {@link env.language} and the bundle has a localized value for this message, then that localized
      * value will be returned (with injected {@link args} values for any templated values).
+     *
      * @param message - The message to localize. Supports index templating where strings like `{0}` and `{1}` are
      * replaced by the item at that index in the {@link args} array.
      * @param args - The arguments to be used in the localized string. The index of the argument is used to
      * match the template placeholder in the localized string.
      * @returns localized string with injected arguments.
-     * @example `l10n.t('Hello {0}!', 'World');`
+     *
+     * @example
+     * l10n.t('Hello {0}!', 'World');
      */ t(message: string, ...args: Array<string | number | boolean>): string;
     /**
      * Marks a string for localization. If a localized bundle is available for the language specified by
      * {@link env.language} and the bundle has a localized value for this message, then that localized
      * value will be returned (with injected {@link args} values for any templated values).
+     *
      * @param message The message to localize. Supports named templating where strings like `{foo}` and `{bar}` are
      * replaced by the value in the Record for that key (foo, bar, etc).
      * @param args The arguments to be used in the localized string. The name of the key in the record is used to
      * match the template placeholder in the localized string.
      * @returns localized string with injected arguments.
-     * @example `l10n.t('Hello {name}', { name: 'Erich' });`
+     *
+     * @example
+     * l10n.t('Hello {name}', { name: 'Erich' });
      */ t(message: string, args: Record<string, any>): string;
     /**
      * Marks a string for localization. If a localized bundle is available for the language specified by
      * {@link env.language} and the bundle has a localized value for this message, then that localized
      * value will be returned (with injected args values for any templated values).
+     *
      * @param options The options to use when localizing the message.
      * @returns localized string with injected arguments.
      */ t(options: {
@@ -7379,7 +7401,12 @@ export interface DecorationInstanceRenderOptions
    */ createFile(uri: Uri, options?: {
     readonly overwrite?: boolean;
     readonly ignoreIfExists?: boolean;
-    readonly contents?: Uint8Array;
+    /**
+     * The initial contents of the new file.
+     *
+     * If creating a file from a {@link DocumentDropEditProvider drop operation}, you can
+     * pass in a {@link DataTransferFile} to improve performance by avoiding extra data copying.
+     */ readonly contents?: Uint8Array | DataTransferFile;
   }, metadata?: WorkspaceEditEntryMetadata): void;
   /**
    * Delete a file or folder.
@@ -10110,7 +10137,8 @@ export type ShellExecution = {
   /**
    * The task's scope.
    */ readonly scope:
-    | TaskScope
+    | TaskScope.Global
+    | TaskScope.Workspace
     | WorkspaceFolder
     | undefined;
   /**
@@ -11349,6 +11377,8 @@ export type FilePermission = ValueOf<VSCodeAPI["FilePermission"]>;
 }
 /**
  * A file associated with a {@linkcode DataTransferItem}.
+ *
+ * Instances of this type can only be created by the editor and not by extensions.
  */ export interface DataTransferFile {
   /**
    * The name of the file.
@@ -11399,7 +11429,7 @@ export type FilePermission = ValueOf<VSCodeAPI["FilePermission"]>;
    * Mimes type look ups are case-insensitive.
    *
    * Special mime types:
-   * - `text/uri-list` — A string with `toString()`ed Uris separated by `\r\n`. To specify a cursor position in the file,
+   * - `text/uri-list` — A string with `toString()`ed Uris separated by `\r\n`. To specify a cursor position in the file,
    * set the Uri's fragment to `L3,5`, where 3 is the line number and 5 is the column number.
    */ get(mimeType: string): DataTransferItem | undefined;
   /**
@@ -12747,6 +12777,50 @@ export type TextDocumentChangeReason = ValueOf<
    */ readonly cellChanges: readonly NotebookDocumentCellChange[];
 }
 /**
+ * An event that is fired when a {@link NotebookDocument notebook document} will be saved.
+ *
+ * To make modifications to the document before it is being saved, call the
+ * {@linkcode NotebookDocumentWillSaveEvent.waitUntil waitUntil}-function with a thenable
+ * that resolves to a {@link WorkspaceEdit workspace edit}.
+ */ export interface NotebookDocumentWillSaveEvent {
+  /**
+   * A cancellation token.
+   */ readonly token: CancellationToken;
+  /**
+   * The {@link NotebookDocument notebook document} that will be saved.
+   */ readonly notebook: NotebookDocument;
+  /**
+   * The reason why save was triggered.
+   */ readonly reason: TextDocumentSaveReason;
+  /**
+   * Allows to pause the event loop and to apply {@link WorkspaceEdit workspace edit}.
+   * Edits of subsequent calls to this function will be applied in order. The
+   * edits will be *ignored* if concurrent modifications of the notebook document happened.
+   *
+   * *Note:* This function can only be called during event dispatch and not
+   * in an asynchronous manner:
+   *
+   * ```ts
+   * workspace.onWillSaveNotebookDocument(event => {
+   * 	// async, will *throw* an error
+   * 	setTimeout(() => event.waitUntil(promise));
+   *
+   * 	// sync, OK
+   * 	event.waitUntil(promise);
+   * })
+   * ```
+   *
+   * @param thenable A thenable that resolves to {@link WorkspaceEdit workspace edit}.
+   */ waitUntil(thenable: Thenable<WorkspaceEdit>): void;
+  /**
+   * Allows to pause the event loop until the provided thenable resolved.
+   *
+   * *Note:* This function can only be called during event dispatch.
+   *
+   * @param thenable A thenable that delays saving.
+   */ waitUntil(thenable: Thenable<any>): void;
+}
+/**
  * The summary of a notebook cell execution.
  */ export interface NotebookCellExecutionSummary {
   /**
@@ -13943,11 +14017,18 @@ export interface DebugAdapterTrackerFactory {
  * Options to be used when getting an {@link AuthenticationSession} from an {@link AuthenticationProvider}.
  */ export interface AuthenticationGetSessionOptions {
   /**
-   * Whether the existing user session preference should be cleared.
+   * Whether the existing session preference should be cleared.
    *
    * For authentication providers that support being signed into multiple accounts at once, the user will be
    * prompted to select an account to use when {@link authentication.getSession getSession} is called. This preference
    * is remembered until {@link authentication.getSession getSession} is called with this flag.
+   *
+   * Note:
+   * The preference is extension specific. So if one extension calls {@link authentication.getSession getSession}, it will not
+   * affect the session preference for another extension calling {@link authentication.getSession getSession}. Additionally,
+   * the preference is set for the current workspace and also globally. This means that new workspaces will use the "global"
+   * value at first and then when this flag is provided, a new value can be set for that workspace. This also means
+   * that pre-existing workspaces will not lose their preference if a new workspace sets this flag.
    *
    * Defaults to false.
    */ clearSessionPreference?: boolean;
