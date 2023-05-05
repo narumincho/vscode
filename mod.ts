@@ -10137,8 +10137,7 @@ export type ShellExecution = {
   /**
    * The task's scope.
    */ readonly scope:
-    | TaskScope.Global
-    | TaskScope.Workspace
+    | TaskScope
     | WorkspaceFolder
     | undefined;
   /**
