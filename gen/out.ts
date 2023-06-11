@@ -2356,18 +2356,19 @@ Returns VSCodeApi only within the vscode extension.
         /**
 		 * Creates a status bar {@link StatusBarItem item}.
 		 *
-		 * @param alignment The alignment of the item.
-		 * @param priority The priority of the item. Higher values mean the item should be shown more to the left.
-		 * @return A new status bar item.
-		 */ createStatusBarItem(alignment?: StatusBarAlignment, priority?: number): StatusBarItem;
-        /**
-		 * Creates a status bar {@link StatusBarItem item}.
-		 *
-		 * @param id The unique identifier of the item.
+		 * @param id The identifier of the item. Must be unique within the extension.
 		 * @param alignment The alignment of the item.
 		 * @param priority The priority of the item. Higher values mean the item should be shown more to the left.
 		 * @return A new status bar item.
 		 */ createStatusBarItem(id: string, alignment?: StatusBarAlignment, priority?: number): StatusBarItem;
+        /**
+		 * Creates a status bar {@link StatusBarItem item}.
+		 *
+		 * @see {@link createStatusBarItem} for creating a status bar item with an identifier.
+		 * @param alignment The alignment of the item.
+		 * @param priority The priority of the item. Higher values mean the item should be shown more to the left.
+		 * @return A new status bar item.
+		 */ createStatusBarItem(alignment?: StatusBarAlignment, priority?: number): StatusBarItem;
         /**
 		 * Creates a {@link Terminal} with a backing shell process. The cwd of the terminal will be the workspace
 		 * directory if it exists.
@@ -4191,9 +4192,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param options The {@link AuthenticationGetSessionOptions} to use
 		 * @returns A thenable that resolves to an authentication session
 		 */ getSession(providerId: string, scopes: readonly string[], options: AuthenticationGetSessionOptions & {
-            forceNewSession: true | {
-                detail: string;
-            };
+            forceNewSession: true | AuthenticationForceNewSessionOptions;
         }): Thenable<AuthenticationSession>;
         /**
 		 * Get an authentication session matching the desired scopes. Rejects if a provider with providerId is not
@@ -9107,6 +9106,9 @@ export interface SelectionRangeProvider {
     /**
 		 * Controls whether the terminal is cleared before executing the task.
 		 */ clear?: boolean;
+    /**
+		 * Controls whether the terminal is closed after executing the task.
+		 */ close?: boolean;
 }
 /**
 	 * A grouping for tasks. The editor by default supports the
@@ -10939,7 +10941,7 @@ export type TreeItem = {
 		 * **Example:** Exit the terminal when "y" is pressed, otherwise show a notification.
 		 * ```typescript
 		 * const writeEmitter = new vscode.EventEmitter<string>();
-		 * const closeEmitter = new vscode.EventEmitter<vscode.TerminalDimensions>();
+		 * const closeEmitter = new vscode.EventEmitter<void>();
 		 * const pty: vscode.Pseudoterminal = {
 		 *   onDidWrite: writeEmitter.event,
 		 *   onDidClose: closeEmitter.event,
@@ -10952,7 +10954,8 @@ export type TreeItem = {
 		 *     closeEmitter.fire();
 		 *   }
 		 * };
-		 * vscode.window.createTerminal({ name: 'Exit example', pty });
+		 * const terminal = vscode.window.createTerminal({ name: 'Exit example', pty });
+		 * terminal.show(true);
 		 * ```
 		 */ onDidClose?: Event<void | number>;
     /**
@@ -12977,6 +12980,14 @@ export interface DebugAdapterTrackerFactory {
 		 */ readonly label: string;
 }
 /**
+	 * Optional options to be used when calling {@link authentication.getSession} with the flag `forceNewSession`.
+	 */ export interface AuthenticationForceNewSessionOptions {
+    /**
+		 * An optional message that will be displayed to the user when we ask to re-authenticate. Providing additional context
+		 * as to why you are asking a user to re-authenticate can help increase the odds that they will accept.
+		 */ detail?: string;
+}
+/**
 	 * Options to be used when getting an {@link AuthenticationSession} from an {@link AuthenticationProvider}.
 	 */ export interface AuthenticationGetSessionOptions {
     /**
@@ -13019,9 +13030,7 @@ export interface DebugAdapterTrackerFactory {
 		 * {@link AuthenticationGetSessionOptions.createIfNone createIfNone}.
 		 *
 		 * This defaults to false.
-		 */ forceNewSession?: boolean | {
-        detail: string;
-    };
+		 */ forceNewSession?: boolean | AuthenticationForceNewSessionOptions;
     /**
 		 * Whether we should show the indication to sign in in the Accounts menu.
 		 *
@@ -13379,7 +13388,7 @@ export interface DebugAdapterTrackerFactory {
 		 * @param test Test item to associate the output with.
 		 */ appendOutput(output: string, location?: Location, test?: TestItem): void;
     /**
-		 * Signals that the end of the test run. Any tests included in the run whose
+		 * Signals the end of the test run. Any tests included in the run whose
 		 * states have not been updated will have their state reset.
 		 */ end(): void;
 }
@@ -13643,7 +13652,7 @@ export interface DebugAdapterTrackerFactory {
 		 */ readonly tabs: readonly Tab[];
 }
 /**
-	 * Represents the main editor area which consists of multple groups which contain tabs.
+	 * Represents the main editor area which consists of multiple groups which contain tabs.
 	 */ export interface TabGroups {
     /**
 		 * All the groups within the group container.
