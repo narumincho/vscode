@@ -1,3 +1,4 @@
+declare const require: undefined | ((path: "vscode") => VSCodeAPI);
 /** import VS Code API
 ```ts
 require("vscode")
@@ -5,9 +6,7 @@ require("vscode")
 
 Returns VSCodeApi only within the vscode extension.
 */ export function importVsCodeApi(): VSCodeAPI | undefined {
-    const requireFunc = ((globalThis as unknown) as {
-        require?: undefined | ((path: "vscode") => VSCodeAPI);
-    }).require;
+    const requireFunc = require;
     return requireFunc === undefined ? undefined : requireFunc("vscode");
 }
 /**
@@ -4220,7 +4219,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param id The unique identifier of the provider.
 		 * @param label The human-readable name of the provider.
 		 * @param provider The authentication provider provider.
-		 * @params options Additional options for the provider.
+		 * @param options Additional options for the provider.
 		 * @return A {@link Disposable} that unregisters this provider when being disposed.
 		 */ registerAuthenticationProvider(id: string, label: string, provider: AuthenticationProvider, options?: AuthenticationProviderOptions): Disposable;
     };

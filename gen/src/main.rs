@@ -38,7 +38,9 @@ pub async fn main() -> anyhow::Result<()> {
     let mut module_map = Vec::<swc_ecma_ast::ModuleItem>::new();
 
     let result = swc_common::GLOBALS.set(&swc_common::Globals::default(), || {
-        module_map.push(require_vs_code::module_item(&comments));
+        for module_item in require_vs_code::module_items(&comments) {
+            module_map.push(module_item);
+        }
 
         module_map.push(vs_code_api_type::module_item(&comments, &result));
 
