@@ -6,12 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tokio = { version = "1.28.2", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.29.1", features = ["macros", "rt-multi-thread"] }
 anyhow = "1.0.71"
 reqwest = "0.11.18"
-thiserror = "1.0.40"
-swc_atoms = "0.5.6"
-swc_common = "0.31.12"
+thiserror = "1.0.43"
+swc_atoms = "0.5.7"
+swc_common = "0.31.17"
 swc_ecma_parser = "0.133.14"
 swc_ecma_ast = "0.103.7"
 swc_ecma_codegen = "0.138.17"
