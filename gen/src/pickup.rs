@@ -49,6 +49,7 @@ fn module_item_to_result_decl_vec(
                         }))
                     },
                 }],
+                swc_ecma_ast::Decl::Using(_) => vec![],
             },
             swc_ecma_ast::ModuleDecl::ExportNamed(_) => vec![],
             swc_ecma_ast::ModuleDecl::ExportDefaultDecl(_) => vec![],
@@ -118,6 +119,7 @@ fn statement_to_result_decl_vec(
             swc_ecma_ast::Decl::TsModule(module_decl) => {
                 ts_module_decl_to_result_decl_vec(module_decl, comments)
             }
+            swc_ecma_ast::Decl::Using(_) => vec![],
         },
         swc_ecma_ast::Stmt::Expr(_) => todo!(),
     }
