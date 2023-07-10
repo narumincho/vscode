@@ -1,10 +1,7 @@
-import { fromFileUrl } from "https://deno.land/std@0.181.0/path/posix.ts";
-import { denoPlugin } from "https://deno.land/x/esbuild_deno_loader@0.6.0/mod.ts";
-import {
-  build as esBuild,
-  Plugin,
-} from "https://deno.land/x/esbuild@v0.17.12/mod.js";
-import { ensureFile } from "https://deno.land/std@0.181.0/fs/mod.ts";
+import { fromFileUrl } from "https://deno.land/std@0.193.0/path/posix.ts";
+import { denoPlugins } from "https://deno.land/x/esbuild_deno_loader@0.8.1/mod.ts";
+import { build as esBuild } from "https://deno.land/x/esbuild@v0.18.11/mod.js";
+import { ensureFile } from "https://deno.land/std@0.193.0/fs/mod.ts";
 
 /**
  * ```bash
@@ -35,7 +32,7 @@ const build = async (): Promise<string> => {
         new URL("./main.ts", import.meta.url),
       ),
     ],
-    plugins: [denoPlugin() as unknown as Plugin],
+    plugins: denoPlugins(),
     write: false,
     bundle: true,
     format: "cjs",

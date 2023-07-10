@@ -9,7 +9,6 @@ Returns VSCodeApi only within the vscode extension.
   const requireFunc = require;
   return requireFunc === undefined ? undefined : requireFunc("vscode");
 }
-
 /**
  * Type Definition for Visual Studio Code 1.75 Extension API
  * See https://code.visualstudio.com/api for more information
@@ -2874,6 +2873,16 @@ Returns VSCodeApi only within the vscode extension.
     /**
      * Determines an item is expanded
      */ readonly Expanded: 2;
+  };
+  /**
+   * Checkbox state of the tree item
+   */ readonly TreeItemCheckboxState: {
+    /**
+     * Determines an item is unchecked
+     */ readonly Unchecked: 0;
+    /**
+     * Determines an item is checked
+     */ readonly Checked: 1;
   };
   /**
    * Terminal exit reason kind.
@@ -11353,6 +11362,42 @@ export type FilePermission = ValueOf<VSCodeAPI["FilePermission"]>;
   /**
    * An optional interface to implement drag and drop in the tree view.
    */ dragAndDropController?: TreeDragAndDropController<T>;
+  /**
+   * By default, when the children of a tree item have already been fetched, child checkboxes are automatically managed based on the checked state of the parent tree item.
+   * If the tree item is collapsed by default (meaning that the children haven't yet been fetched) then child checkboxes will not be updated.
+   * To override this behavior and manage child and parent checkbox state in the extension, set this to `true`.
+   *
+   * Examples where {@link TreeViewOptions.manageCheckboxStateManually} is false, the default behavior:
+   *
+   * 1. A tree item is checked, then its children are fetched. The children will be checked.
+   *
+   * 2. A tree item's parent is checked. The tree item and all of it's siblings will be checked.
+   *   - [ ] Parent
+   *     - [ ] Child 1
+   *     - [ ] Child 2
+   *   When the user checks Parent, the tree will look like this:
+   *   - [x] Parent
+   *     - [x] Child 1
+   *     - [x] Child 2
+   *
+   * 3. A tree item and all of it's siblings are checked. The parent will be checked.
+   *   - [ ] Parent
+   *     - [ ] Child 1
+   *     - [ ] Child 2
+   *   When the user checks Child 1 and Child 2, the tree will look like this:
+   *   - [x] Parent
+   *     - [x] Child 1
+   *     - [x] Child 2
+   *
+   * 4. A tree item is unchecked. The parent will be unchecked.
+   *   - [x] Parent
+   *     - [x] Child 1
+   *     - [x] Child 2
+   *   When the user unchecks Child 1, the tree will look like this:
+   *   - [ ] Parent
+   *     - [ ] Child 1
+   *     - [x] Child 2
+   */ manageCheckboxStateManually?: boolean;
 }
 /**
  * The event that is fired when an element in the {@link TreeView} is expanded or collapsed
@@ -11528,6 +11573,13 @@ export type FilePermission = ValueOf<VSCodeAPI["FilePermission"]>;
    */ readonly value: number;
 }
 /**
+ * An event describing the change in a tree item's checkbox state.
+ */ export interface TreeCheckboxChangeEvent<T> {
+  /**
+   * The items that were checked or unchecked.
+   */ readonly items: ReadonlyArray<[T, TreeItemCheckboxState]>;
+}
+/**
  * Represents a Tree view
  */ export interface TreeView<T> extends Disposable {
   /**
@@ -11548,6 +11600,9 @@ export type FilePermission = ValueOf<VSCodeAPI["FilePermission"]>;
   /**
    * Event that is fired when {@link TreeView.visible visibility} has changed
    */ readonly onDidChangeVisibility: Event<TreeViewVisibilityChangeEvent>;
+  /**
+   * An event to signal that an element or root has either been checked or unchecked.
+   */ readonly onDidChangeCheckboxState: Event<TreeCheckboxChangeEvent<T>>;
   /**
    * An optional human-readable message that will be rendered in the view.
    * Setting the message to null, undefined, or empty string will remove the message from the view.
@@ -11699,6 +11754,14 @@ export type TreeItem = {
    * Generally, a TreeItem has no need to set the `role` of the accessibilityInformation;
    * however, there are cases where a TreeItem is not displayed in a tree-like way where setting the `role` may make sense.
    */ accessibilityInformation?: AccessibilityInformation;
+  /**
+   * {@link TreeItemCheckboxState TreeItemCheckboxState} of the tree item.
+   * {@link TreeDataProvider.onDidChangeTreeData onDidChangeTreeData} should be fired when {@link TreeItem.checkboxState checkboxState} changes.
+   */ checkboxState?: TreeItemCheckboxState | {
+    readonly state: TreeItemCheckboxState;
+    readonly tooltip?: string;
+    readonly accessibilityInformation?: AccessibilityInformation;
+  };
 };
 /**
  * Collapsible state of the tree item
@@ -11716,6 +11779,11 @@ export type TreeItem = {
    * first is the inclusive start index and the second the exclusive end index
    */ highlights?: [number, number][];
 }
+/**
+ * Checkbox state of the tree item
+ */ export type TreeItemCheckboxState = ValueOf<
+  VSCodeAPI["TreeItemCheckboxState"]
+>;
 /**
  * Value-object describing what options a terminal should use.
  */ export interface TerminalOptions {
@@ -12012,6 +12080,10 @@ export type TreeItem = {
    * collection will be invalidated when the extension is uninstalled or when the collection
    * is cleared. Defaults to true.
    */ persistent: boolean;
+  /**
+   * A description for the environment variable collection, this will be used to describe the
+   * changes in the UI.
+   */ description: string | MarkdownString | undefined;
   /**
    * Replace an environment variable with a value.
    *
