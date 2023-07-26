@@ -14,7 +14,7 @@ pub fn module_item(
                         kind: swc_common::comments::CommentKind::Block,
                         text: swc_atoms::Atom::from(
                             "*
- * Type Definition for Visual Studio Code 1.75 Extension API
+ * Type Definition for Visual Studio Code 1.80 Extension API
  * See https://code.visualstudio.com/api for more information
  ",
                         ),
@@ -66,44 +66,100 @@ fn result_decl_to_ts_property_signature(
                     class_member_to_ts_type_element(item, &class.ident, &class.class.type_params)
                 })
                 .collect::<Vec<_>>();
-            if members.is_empty() {
-                vec![]
-            } else {
-                vec![swc_ecma_ast::TsTypeElement::TsPropertySignature(
-                    swc_ecma_ast::TsPropertySignature {
-                        span: {
-                            let span = swc_common::Span::dummy_with_cmt();
-                            match &result.comments {
-                                Some(comment_vec) => {
-                                    swc_common::comments::Comments::add_leading_comments(
-                                        &comments,
-                                        span.lo,
-                                        comment_vec.clone(),
-                                    )
+            let members_with_default_constructor = if members.is_empty() {
+                vec![
+                    swc_ecma_ast::TsTypeElement::TsConstructSignatureDecl(
+                        swc_ecma_ast::TsConstructSignatureDecl {
+                            span: {
+                                let span = swc_common::Span::dummy_with_cmt();
+                                match &result.comments {
+                                    Some(comment_vec) => {
+                                        swc_common::comments::Comments::add_leading_comments(
+                                            &comments,
+                                            span.lo,
+                                            comment_vec.clone(),
+                                        )
+                                    }
+                                    None => {}
                                 }
-                                None => {}
-                            }
-                            span
+                                span
+                            },
+                            params: vec![],
+                            type_params: class.class.type_params.clone(),
+                            type_ann: Some(Box::new(swc_ecma_ast::TsTypeAnn {
+                                span: swc_common::Span::default(),
+                                type_ann: Box::new(swc_ecma_ast::TsType::TsTypeRef(
+                                    swc_ecma_ast::TsTypeRef {
+                                        span: swc_common::Span::default(),
+                                        type_name: swc_ecma_ast::TsEntityName::Ident(class.ident.clone()),
+                                        type_params: match &class.class.type_params {
+                                            Some(p) => {
+                                                Some(Box::new(swc_ecma_ast::TsTypeParamInstantiation {
+                                                    span: swc_common::Span::default(),
+                                                    params: p
+                                                        .params
+                                                        .iter()
+                                                        .map(|param| {
+                                                            Box::new(swc_ecma_ast::TsType::TsTypeRef(
+                                                                swc_ecma_ast::TsTypeRef {
+                                                                    span: swc_common::Span::default(),
+                                                                    type_name:
+                                                                        swc_ecma_ast::TsEntityName::Ident(
+                                                                            param.name.clone(),
+                                                                        ),
+                                                                    type_params: None,
+                                                                },
+                                                            ))
+                                                        })
+                                                        .collect(),
+                                                }))
+                                            }
+                                            None => None,
+                                        },
+                                    },
+                                )),
+                            })),
                         },
-                        readonly: true,
-                        key: Box::new(swc_ecma_ast::Expr::Ident(class.ident.clone())),
-                        computed: false,
-                        optional: false,
-                        init: None,
-                        params: vec![],
-                        type_ann: Some(Box::new(swc_ecma_ast::TsTypeAnn {
-                            span: swc_common::Span::default(),
-                            type_ann: Box::new(swc_ecma_ast::TsType::TsTypeLit(
-                                swc_ecma_ast::TsTypeLit {
-                                    span: swc_common::Span::default(),
-                                    members,
-                                },
-                            )),
-                        })),
-                        type_params: None,
+                    )
+                ]
+            } else {
+                members
+            };
+
+            vec![swc_ecma_ast::TsTypeElement::TsPropertySignature(
+                swc_ecma_ast::TsPropertySignature {
+                    span: {
+                        let span = swc_common::Span::dummy_with_cmt();
+                        match &result.comments {
+                            Some(comment_vec) => {
+                                swc_common::comments::Comments::add_leading_comments(
+                                    &comments,
+                                    span.lo,
+                                    comment_vec.clone(),
+                                )
+                            }
+                            None => {}
+                        }
+                        span
                     },
-                )]
-            }
+                    readonly: true,
+                    key: Box::new(swc_ecma_ast::Expr::Ident(class.ident.clone())),
+                    computed: false,
+                    optional: false,
+                    init: None,
+                    params: vec![],
+                    type_ann: Some(Box::new(swc_ecma_ast::TsTypeAnn {
+                        span: swc_common::Span::default(),
+                        type_ann: Box::new(swc_ecma_ast::TsType::TsTypeLit(
+                            swc_ecma_ast::TsTypeLit {
+                                span: swc_common::Span::default(),
+                                members: members_with_default_constructor,
+                            },
+                        )),
+                    })),
+                    type_params: None,
+                },
+            )]
         }
         crate::pickup::ResultDecl::Fn(fn_decl) => {
             vec![swc_ecma_ast::TsTypeElement::TsMethodSignature(
