@@ -18,7 +18,6 @@ export function activate(context: ExtensionContext) {
       vscode.window.showInformationMessage("Hello World!");
     },
   );
-  new vscode.EventEmmitter();
 
   context.subscriptions.push(disposable);
 }

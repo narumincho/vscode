@@ -10,7 +10,7 @@ Returns VSCodeApi only within the vscode extension.
     return requireFunc === undefined ? undefined : requireFunc("vscode");
 }
 /**
- * Type Definition for Visual Studio Code 1.75 Extension API
+ * Type Definition for Visual Studio Code 1.80 Extension API
  * See https://code.visualstudio.com/api for more information
  */ export type VSCodeAPI = {
     /**
@@ -279,6 +279,13 @@ Returns VSCodeApi only within the vscode extension.
 		 */ new(scheme: string, authority: string, path: string, query: string, fragment: string): Uri;
     };
     /**
+	 * A cancellation source creates and controls a {@link CancellationToken cancellation token}.
+	 */ readonly CancellationTokenSource: {
+        /**
+	 * A cancellation source creates and controls a {@link CancellationToken cancellation token}.
+	 */ new(): CancellationTokenSource;
+    };
+    /**
 	 * An error type that should be used to signal cancellation of an operation.
 	 *
 	 * This type can be used in response to a {@link CancellationToken cancellation token}
@@ -312,6 +319,23 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * @param callOnDispose Function that disposes something.
 		 */ new(callOnDispose: () => any): Disposable;
+    };
+    /**
+	 * An event emitter can be used to create and manage an {@link Event} for others
+	 * to subscribe to. One emitter always owns one event.
+	 *
+	 * Use this class if you want to provide event from within your extension, for instance
+	 * inside a {@link TextDocumentContentProvider} or when providing
+	 * API to other extensions.
+	 */ readonly EventEmitter: {
+        /**
+	 * An event emitter can be used to create and manage an {@link Event} for others
+	 * to subscribe to. One emitter always owns one event.
+	 *
+	 * Use this class if you want to provide event from within your extension, for instance
+	 * inside a {@link TextDocumentContentProvider} or when providing
+	 * API to other extensions.
+	 */ new <T>(): EventEmitter<T>;
     };
     /**
 	 * The kind of {@link QuickPickItem quick pick item}.
@@ -768,6 +792,19 @@ Returns VSCodeApi only within the vscode extension.
         new(range: NotebookRange, newCells: NotebookCellData[]): NotebookEdit;
     };
     /**
+	 * A workspace edit is a collection of textual and files changes for
+	 * multiple resources and documents.
+	 *
+	 * Use the {@link workspace.applyEdit applyEdit}-function to apply a workspace edit.
+	 */ readonly WorkspaceEdit: {
+        /**
+	 * A workspace edit is a collection of textual and files changes for
+	 * multiple resources and documents.
+	 *
+	 * Use the {@link workspace.applyEdit applyEdit}-function to apply a workspace edit.
+	 */ new(): WorkspaceEdit;
+    };
+    /**
 	 * A snippet string is a template which allows to insert text
 	 * and to control the editor cursor when insertion happens.
 	 *
@@ -832,6 +869,17 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param label A label string.
 		 * @param documentation A doc string.
 		 */ new(label: string, documentation?: string | MarkdownString): SignatureInformation;
+    };
+    /**
+	 * Signature help represents the signature of something
+	 * callable. There can be multiple signatures but only one
+	 * active and only one active parameter.
+	 */ readonly SignatureHelp: {
+        /**
+	 * Signature help represents the signature of something
+	 * callable. There can be multiple signatures but only one
+	 * active and only one active parameter.
+	 */ new(): SignatureHelp;
     };
     /**
 	 * How a {@linkcode SignatureHelpProvider} was triggered.
@@ -2533,6 +2581,21 @@ Returns VSCodeApi only within the vscode extension.
         /**
 		 * @param value Custom data stored on this item. Can be retrieved using {@linkcode DataTransferItem.value}.
 		 */ new(value: any): DataTransferItem;
+    };
+    /**
+	 * A map containing a mapping of the mime type of the corresponding transferred data.
+	 *
+	 * Drag and drop controllers that implement {@link TreeDragAndDropController.handleDrag `handleDrag`} can add additional mime types to the
+	 * data transfer. These additional mime types will only be included in the `handleDrop` when the the drag was initiated from
+	 * an element in the same drag and drop controller.
+	 */ readonly DataTransfer: {
+        /**
+	 * A map containing a mapping of the mime type of the corresponding transferred data.
+	 *
+	 * Drag and drop controllers that implement {@link TreeDragAndDropController.handleDrag `handleDrag`} can add additional mime types to the
+	 * data transfer. These additional mime types will only be included in the `handleDrop` when the the drag was initiated from
+	 * an element in the same drag and drop controller.
+	 */ new(): DataTransfer;
     };
     readonly TreeItem: {
         /**
