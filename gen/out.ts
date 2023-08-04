@@ -5567,6 +5567,12 @@ export interface DecorationInstanceRenderOptions extends ThemableDecorationInsta
 		 * the default is {@link QuickPickItemKind.Default}.
 		 */ kind?: QuickPickItemKind;
     /**
+		 * The icon path or {@link ThemeIcon} for the QuickPickItem.
+		 */ iconPath?: Uri | {
+        light: Uri;
+        dark: Uri;
+    } | ThemeIcon;
+    /**
 		 * A human-readable string which is rendered less prominent in the same line. Supports rendering of
 		 * {@link ThemeIcon theme icons} via the `$(<name>)`-syntax.
 		 *
@@ -13419,6 +13425,22 @@ export interface DebugAdapterTrackerFactory {
 		 * @param label Human-readable label of the test item.
 		 * @param uri URI this TestItem is associated with. May be a file or directory.
 		 */ createTestItem(id: string, label: string, uri?: Uri): TestItem;
+    /**
+		 * Marks an item's results as being outdated. This is commonly called when
+		 * code or configuration changes and previous results should no longer
+		 * be considered relevant. The same logic used to mark results as outdated
+		 * may be used to drive {@link TestRunRequest.continuous continuous test runs}.
+		 *
+		 * If an item is passed to this method, test results for the item and all of
+		 * its children will be marked as outdated. If no item is passed, then all
+		 * test owned by the TestController will be marked as outdated.
+		 *
+		 * Any test runs started before the moment this method is called, including
+		 * runs which may still be ongoing, will be marked as outdated and deprioritized
+		 * in the editor's UI.
+		 *
+		 * @param item Item to mark as outdated. If undefined, all the controller's items are marked outdated.
+		 */ invalidateTestResults(items?: TestItem | readonly TestItem[]): void;
     /**
 		 * Unregisters the test controller, disposing of its associated tests
 		 * and unpersisted results.
