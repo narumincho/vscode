@@ -7874,6 +7874,28 @@ export interface DecorationInstanceRenderOptions
     options: FormattingOptions,
     token: CancellationToken,
   ): ProviderResult<TextEdit[]>;
+  /**
+   * Provide formatting edits for multiple ranges in a document.
+   *
+   * This function is optional but allows a formatter to perform faster when formatting only modified ranges or when
+   * formatting a large number of selections.
+   *
+   * The given ranges are hints and providers can decide to format a smaller
+   * or larger range. Often this is done by adjusting the start and end
+   * of the range to full syntax nodes.
+   *
+   * @param document The document in which the command was invoked.
+   * @param ranges The ranges which should be formatted.
+   * @param options Options controlling formatting.
+   * @param token A cancellation token.
+   * @return A set of text edits or a thenable that resolves to such. The lack of a result can be
+   * signaled by returning `undefined`, `null`, or an empty array.
+   */ provideDocumentRangesFormattingEdits?(
+    document: TextDocument,
+    ranges: Range[],
+    options: FormattingOptions,
+    token: CancellationToken,
+  ): ProviderResult<TextEdit[]>;
 }
 /**
  * The document formatting provider interface defines the contract between extensions and
@@ -9866,9 +9888,10 @@ export interface SelectionRangeProvider {
    * notation for {@link TextDocument.uri ExtensionContext.extensionUri.fsPath} (independent of the uri scheme).
    */ readonly extensionPath: string;
   /**
-   * Gets the extension's environment variable collection for this workspace, enabling changes
-   * to be applied to terminal environment variables.
-   */ readonly environmentVariableCollection: EnvironmentVariableCollection;
+   * Gets the extension's global environment variable collection for this workspace, enabling changes to be
+   * applied to terminal environment variables.
+   */ readonly environmentVariableCollection:
+    GlobalEnvironmentVariableCollection;
   /**
    * Get the absolute path of a resource contained in the extension.
    *
@@ -12129,6 +12152,18 @@ export type TreeItem = {
   VSCodeAPI["EnvironmentVariableMutatorType"]
 >;
 /**
+ * Options applied to the mutator.
+ */ export interface EnvironmentVariableMutatorOptions {
+  /**
+   * Apply to the environment just before the process is created. Defaults to false.
+   */ applyAtProcessCreation?: boolean;
+  /**
+   * Apply to the environment in the shell integration script. Note that this _will not_ apply
+   * the mutator if shell integration is disabled or not working for some reason. Defaults to
+   * false.
+   */ applyAtShellIntegration?: boolean;
+}
+/**
  * A type of mutation and its value to be applied to an environment variable.
  */ export interface EnvironmentVariableMutator {
   /**
@@ -12137,6 +12172,9 @@ export type TreeItem = {
   /**
    * The value to use for the variable.
    */ readonly value: string;
+  /**
+   * Options applied to the mutator.
+   */ readonly options: EnvironmentVariableMutatorOptions;
 }
 /**
  * A collection of mutations that an extension can apply to a process environment.
@@ -12161,7 +12199,13 @@ export type TreeItem = {
    *
    * @param variable The variable to replace.
    * @param value The value to replace the variable with.
-   */ replace(variable: string, value: string): void;
+   * @param options Options applied to the mutator, when no options are provided this will
+   * default to `{ applyAtProcessCreation: true }`.
+   */ replace(
+    variable: string,
+    value: string,
+    options?: EnvironmentVariableMutatorOptions,
+  ): void;
   /**
    * Append a value to an environment variable.
    *
@@ -12170,7 +12214,13 @@ export type TreeItem = {
    *
    * @param variable The variable to append to.
    * @param value The value to append to the variable.
-   */ append(variable: string, value: string): void;
+   * @param options Options applied to the mutator, when no options are provided this will
+   * default to `{ applyAtProcessCreation: true }`.
+   */ append(
+    variable: string,
+    value: string,
+    options?: EnvironmentVariableMutatorOptions,
+  ): void;
   /**
    * Prepend a value to an environment variable.
    *
@@ -12179,7 +12229,13 @@ export type TreeItem = {
    *
    * @param variable The variable to prepend.
    * @param value The value to prepend to the variable.
-   */ prepend(variable: string, value: string): void;
+   * @param options Options applied to the mutator, when no options are provided this will
+   * default to `{ applyAtProcessCreation: true }`.
+   */ prepend(
+    variable: string,
+    value: string,
+    options?: EnvironmentVariableMutatorOptions,
+  ): void;
   /**
    * Gets the mutator that this collection applies to a variable, if any.
    *
@@ -12206,6 +12262,34 @@ export type TreeItem = {
   /**
    * Clears all mutators from this collection.
    */ clear(): void;
+}
+/**
+ * A collection of mutations that an extension can apply to a process environment. Applies to all scopes.
+ */ export interface GlobalEnvironmentVariableCollection
+  extends EnvironmentVariableCollection {
+  /**
+   * Gets scope-specific environment variable collection for the extension. This enables alterations to
+   * terminal environment variables solely within the designated scope, and is applied in addition to (and
+   * after) the global collection.
+   *
+   * Each object obtained through this method is isolated and does not impact objects for other scopes,
+   * including the global collection.
+   *
+   * @param scope The scope to which the environment variable collection applies to.
+   *
+   * If a scope parameter is omitted, collection applicable to all relevant scopes for that parameter is
+   * returned. For instance, if the 'workspaceFolder' parameter is not specified, the collection that applies
+   * across all workspace folders will be returned.
+   *
+   * @return Environment variable collection for the passed in scope.
+   */ getScoped(scope: EnvironmentVariableScope): EnvironmentVariableCollection;
+}
+/**
+ * The scope object to which the environment variable collection applies.
+ */ export interface EnvironmentVariableScope {
+  /**
+   * Any specific workspace folder to get collection for.
+   */ workspaceFolder?: WorkspaceFolder;
 }
 /**
  * A location in the editor at which progress information can be shown. It depends on the
