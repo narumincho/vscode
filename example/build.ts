@@ -1,10 +1,10 @@
-import { fromFileUrl } from "https://deno.land/std@0.201.0/path/posix.ts";
-import { denoPlugins } from "https://deno.land/x/esbuild_deno_loader@0.8.1/mod.ts";
+import { fromFileUrl } from "https://deno.land/std@0.203.0/path/posix.ts";
+import { denoPlugins } from "https://deno.land/x/esbuild_deno_loader@0.8.2/mod.ts";
 import {
   build as esBuild,
   Plugin,
-} from "https://deno.land/x/esbuild@v0.19.2/mod.js";
-import { ensureFile } from "https://deno.land/std@0.201.0/fs/mod.ts";
+} from "https://deno.land/x/esbuild@v0.19.4/mod.js";
+import { ensureFile } from "https://deno.land/std@0.203.0/fs/mod.ts";
 
 /**
  * ```bash
