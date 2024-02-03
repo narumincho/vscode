@@ -32,7 +32,7 @@ const build = async (): Promise<string> => {
     write: false,
     bundle: true,
     format: "cjs",
-    target: ["node18"],
+    target: ["node20"],
   });
 
   for (const esbuildResultFile of esbuildResult.outputFiles ?? []) {
