@@ -326,11 +326,11 @@ Returns VSCodeApi only within the vscode extension.
 		 * dispose-functions aren't awaited.
 		 * @returns Returns a new disposable which, upon dispose, will
 		 * dispose all provided disposables.
-		 */ from(...disposableLikes: Array<{
+		 */ from(...disposableLikes: {
             /**
 			 * Function to clean up resources.
 			 */ dispose: () => any;
-        }>): Disposable;
+        }[]): Disposable;
         /**
 		 * Creates a new disposable that calls the provided function
 		 * on dispose.
@@ -1764,7 +1764,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param command The command to execute.
 		 * @param args The command arguments.
 		 * @param options Optional options for the started the shell.
-		 */ new(command: string | ShellQuotedString, args: Array<string | ShellQuotedString>, options?: ShellExecutionOptions): ShellExecution;
+		 */ new(command: string | ShellQuotedString, args: (string | ShellQuotedString)[], options?: ShellExecutionOptions): ShellExecution;
     };
     /**
 	 * Class used to execute an extension callback as a task.
@@ -3113,14 +3113,14 @@ Returns VSCodeApi only within the vscode extension.
 		 * Each workspace is identified with a mandatory URI and an optional name.
 		 * @returns true if the operation was successfully started and false otherwise if arguments were used that would result
 		 * in invalid workspace folder state (e.g. 2 folders with the same URI).
-		 */ updateWorkspaceFolders(start: number, deleteCount: number | undefined | null, ...workspaceFoldersToAdd: Array<{
+		 */ updateWorkspaceFolders(start: number, deleteCount: number | undefined | null, ...workspaceFoldersToAdd: {
             /**
 			 * The uri of a workspace folder that's to be added.
 			 */ readonly uri: Uri;
             /**
 			 * The name of a workspace folder that's to be added.
 			 */ readonly name?: string;
-        }>): boolean;
+        }[]): boolean;
         /**
 		 * Creates a file system watcher that is notified on file events (create, change, delete)
 		 * depending on the parameters provided.
@@ -3259,6 +3259,25 @@ Returns VSCodeApi only within the vscode extension.
 		 * @returns A thenable that resolves to an array of resource identifiers. Will return no results if no
 		 * {@link workspace.workspaceFolders workspace folders} are opened.
 		 */ findFiles(include: GlobPattern, exclude?: GlobPattern | null, maxResults?: number, token?: CancellationToken): Thenable<Uri[]>;
+        /**
+		 * Saves the editor identified by the given resource and returns the resulting resource or `undefined`
+		 * if save was not successful or no editor with the given resource was found.
+		 *
+		 * **Note** that an editor with the provided resource must be opened in order to be saved.
+		 *
+		 * @param uri the associated uri for the opened editor to save.
+		 * @returns A thenable that resolves when the save operation has finished.
+		 */ save(uri: Uri): Thenable<Uri | undefined>;
+        /**
+		 * Saves the editor identified by the given resource to a new file name as provided by the user and
+		 * returns the resulting resource or `undefined` if save was not successful or cancelled or no editor
+		 * with the given resource was found.
+		 *
+		 * **Note** that an editor with the provided resource must be opened in order to be saved as.
+		 *
+		 * @param uri the associated uri for the opened editor to save as.
+		 * @returns A thenable that resolves when the save-as operation has finished.
+		 */ saveAs(uri: Uri): Thenable<Uri | undefined>;
         /**
 		 * Save all dirty files.
 		 *
@@ -3544,7 +3563,8 @@ Returns VSCodeApi only within the vscode extension.
 			 */ readonly isCaseSensitive?: boolean;
             /**
 			 * Whether the file system provider is readonly, no modifications like write, delete, create are possible.
-			 */ readonly isReadonly?: boolean;
+			 * If a {@link MarkdownString} is given, it will be shown as the reason why the file system is readonly.
+			 */ readonly isReadonly?: boolean | MarkdownString;
         }): Disposable;
         /**
 		 * When true, the user has explicitly trusted the contents of the workspace.
@@ -3655,7 +3675,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * Get all diagnostics.
 		 *
 		 * @returns An array of uri-diagnostics tuples or an empty array.
-		 */ getDiagnostics(): Array<[Uri, Diagnostic[]]>;
+		 */ getDiagnostics(): [Uri, Diagnostic[]][];
         /**
 		 * Create a diagnostics collection.
 		 *
@@ -4480,7 +4500,7 @@ Returns VSCodeApi only within the vscode extension.
 		 */ getExtension<T = any>(extensionId: string): Extension<T> | undefined;
         /**
 		 * All extensions currently known to the system.
-		 */ readonly all: ReadonlyArray<Extension<any>>;
+		 */ readonly all: readonly Extension<any>[];
         /**
 		 * An event which fires when `extensions.all` changes. This can happen when extensions are
 		 * installed, uninstalled, enabled or disabled.
@@ -6019,10 +6039,10 @@ type ValueOf<T> = T[keyof T];
 		 */ canSelectMany?: boolean;
     /**
 		 * A set of file filters that are used by the dialog. Each entry is a human-readable label,
-		 * like "TypeScript", and an array of extensions, e.g.
+		 * like "TypeScript", and an array of extensions, for example:
 		 * ```ts
 		 * {
-		 * 	'Images': ['png', 'jpg']
+		 * 	'Images': ['png', 'jpg'],
 		 * 	'TypeScript': ['ts', 'tsx']
 		 * }
 		 * ```
@@ -6047,10 +6067,10 @@ type ValueOf<T> = T[keyof T];
 		 */ saveLabel?: string;
     /**
 		 * A set of file filters that are used by the dialog. Each entry is a human-readable label,
-		 * like "TypeScript", and an array of extensions, e.g.
+		 * like "TypeScript", and an array of extensions, for example:
 		 * ```ts
 		 * {
-		 * 	'Images': ['png', 'jpg']
+		 * 	'Images': ['png', 'jpg'],
 		 * 	'TypeScript': ['ts', 'tsx']
 		 * }
 		 * ```
@@ -6410,7 +6430,7 @@ type ValueOf<T> = T[keyof T];
 		 *
 		 * We also support returning `Command` for legacy reasons, however all new extensions should return
 		 * `CodeAction` object instead.
-		 */ provideCodeActions(document: TextDocument, range: Range | Selection, context: CodeActionContext, token: CancellationToken): ProviderResult<Array<Command | T>>;
+		 */ provideCodeActions(document: TextDocument, range: Range | Selection, context: CodeActionContext, token: CancellationToken): ProviderResult<(Command | T)[]>;
     /**
 		 * Given a code action fill in its {@linkcode CodeAction.edit edit}-property. Changes to
 		 * all other properties, like title, are ignored. A code action that has an edit
@@ -7102,7 +7122,7 @@ type ValueOf<T> = T[keyof T];
 		 *
 		 * @param uri A resource identifier.
 		 * @param edits An array of edits.
-		 */ set(uri: Uri, edits: ReadonlyArray<[TextEdit | SnippetTextEdit, WorkspaceEditEntryMetadata]>): void;
+		 */ set(uri: Uri, edits: ReadonlyArray<[TextEdit | SnippetTextEdit, WorkspaceEditEntryMetadata | undefined]>): void;
     /**
 		 * Set (and replace) notebook edits for a resource.
 		 *
@@ -7114,7 +7134,7 @@ type ValueOf<T> = T[keyof T];
 		 *
 		 * @param uri A resource identifier.
 		 * @param edits An array of edits.
-		 */ set(uri: Uri, edits: ReadonlyArray<[NotebookEdit, WorkspaceEditEntryMetadata]>): void;
+		 */ set(uri: Uri, edits: ReadonlyArray<[NotebookEdit, WorkspaceEditEntryMetadata | undefined]>): void;
     /**
 		 * Get the text edits for a resource.
 		 *
@@ -7178,7 +7198,7 @@ type ValueOf<T> = T[keyof T];
 		 * Get all text edits grouped by resource.
 		 *
 		 * @returns A shallow copy of `[Uri, TextEdit[]]`-tuples.
-		 */ entries(): Array<[Uri, TextEdit[]]>;
+		 */ entries(): [Uri, TextEdit[]][];
 };
 /**
 	 * A snippet string is a template which allows to insert text
@@ -8342,7 +8362,7 @@ type ValueOf<T> = T[keyof T];
 		 */ kind: SymbolKind;
     /**
 		 * Tags for this item.
-		 */ tags?: readonly SymbolTag[];
+		 */ tags?: ReadonlyArray<SymbolTag>;
     /**
 		 * More detail for this item, e.g. the signature of a function.
 		 */ detail?: string;
@@ -8593,7 +8613,7 @@ type ValueOf<T> = T[keyof T];
 		 */ __characterPairSupport?: {
         /**
 			 * @deprecated
-			 */ autoClosingPairs: Array<{
+			 */ autoClosingPairs: {
             /**
 				 * @deprecated
 				 */ open: string;
@@ -8603,7 +8623,7 @@ type ValueOf<T> = T[keyof T];
             /**
 				 * @deprecated
 				 */ notIn?: string[];
-        }>;
+        }[];
     };
 }
 /**
@@ -9425,11 +9445,11 @@ type ValueOf<T> = T[keyof T];
 		 * extension is deactivated the disposables will be disposed.
 		 *
 		 * *Note* that asynchronous dispose-functions aren't awaited.
-		 */ readonly subscriptions: Array<{
+		 */ readonly subscriptions: {
         /**
 			 * Function to clean up resources.
 			 */ dispose(): any;
-    }>;
+    }[];
     /**
 		 * A memento object that stores state in the context
 		 * of the currently opened {@link workspace.workspaceFolders workspace}.
@@ -9787,7 +9807,7 @@ type ValueOf<T> = T[keyof T];
 		 */ command: string | ShellQuotedString;
     /**
 		 * The shell args. Is `undefined` if created with a full command line.
-		 */ args: Array<string | ShellQuotedString>;
+		 */ args: (string | ShellQuotedString)[];
     /**
 		 * The shell options used when the command line is executed in a shell.
 		 * Defaults to undefined.
@@ -10083,7 +10103,7 @@ type ValueOf<T> = T[keyof T];
 		 * @param uri The uri of the folder.
 		 * @returns An array of name/type-tuples or a thenable that resolves to such.
 		 * @throws {@linkcode FileSystemError.FileNotFound FileNotFound} when `uri` doesn't exist.
-		 */ readDirectory(uri: Uri): Array<[string, FileType]> | Thenable<Array<[string, FileType]>>;
+		 */ readDirectory(uri: Uri): [string, FileType][] | Thenable<[string, FileType][]>;
     /**
 		 * Create a new directory (Note, that new files are created via `write`-calls).
 		 *
@@ -10180,7 +10200,7 @@ type ValueOf<T> = T[keyof T];
 		 *
 		 * @param uri The uri of the folder.
 		 * @returns An array of name/type-tuples or a thenable that resolves to such.
-		 */ readDirectory(uri: Uri): Thenable<Array<[string, FileType]>>;
+		 */ readDirectory(uri: Uri): Thenable<[string, FileType][]>;
     /**
 		 * Create a new directory (Note, that new files are created via `write`-calls).
 		 *
@@ -10661,7 +10681,7 @@ type ValueOf<T> = T[keyof T];
 	 * Provider for creating `WebviewView` elements.
 	 */ export interface WebviewViewProvider {
     /**
-		 * Revolves a webview view.
+		 * Resolves a webview view.
 		 *
 		 * `resolveWebviewView` is called when a view first becomes visible. This may happen when the view is
 		 * first loaded or when the user hides and then shows a view again.
@@ -11422,7 +11442,7 @@ type ValueOf<T> = T[keyof T];
     /**
 		 * Ranges in the label to highlight. A range is defined as a tuple of two number where the
 		 * first is the inclusive start index and the second the exclusive end index
-		 */ highlights?: Array<[number, number]>;
+		 */ highlights?: [number, number][];
 }
 /**
 	* Checkbox state of the tree item
@@ -13903,7 +13923,14 @@ type ValueOf<T> = T[keyof T];
 		 * the generic "run all" button, then the default profile for
 		 * {@link TestRunProfileKind.Run} will be executed, although the
 		 * user can configure this.
+		 *
+		 * Changes the user makes in their default profiles will be reflected
+		 * in this property after a {@link onDidChangeDefault} event.
 		 */ isDefault: boolean;
+    /**
+		 * Fired when a user has changed whether this is a default profile. The
+		 * event contains the new value of {@link isDefault}
+		 */ onDidChangeDefault: Event<boolean>;
     /**
 		 * Whether this profile supports continuous running of requests. If so,
 		 * then {@link TestRunRequest.continuous} may be set to `true`. Defaults
