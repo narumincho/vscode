@@ -119,6 +119,9 @@ Returns VSCodeApi only within the vscode extension.
         /**
 		 * Render the line numbers with values relative to the primary cursor location.
 		 */ readonly Relative: 2;
+        /**
+		 * Render the line numbers on every 10th line number.
+		 */ readonly Interval: 3;
     };
     /**
 	 * Represents different {@link TextEditor.revealRange reveal} strategies in a text editor.
@@ -11480,7 +11483,7 @@ type ValueOf<T> = T[keyof T];
 		 * until `Terminal.show` is called. The typical usage for this is when you need to run
 		 * something that may need interactivity but only want to tell the user about it when
 		 * interaction is needed. Note that the terminals will still be exposed to all extensions
-		 * as normal.
+		 * as normal and they will remain hidden when the workspace is reloaded.
 		 */ hideFromUser?: boolean;
     /**
 		 * A message to write to the terminal on first launch, note that this is not sent to the
