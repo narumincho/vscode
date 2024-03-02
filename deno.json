@@ -1,0 +1,5 @@
+{
+  "name": "@narumincho/vscode",
+  "version": "1.87.0",
+  "exports": "./mod.ts"
+}
