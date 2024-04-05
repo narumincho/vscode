@@ -2,7 +2,8 @@
 
 ## Visual Studio Code Extension Development for Deno
 
-https://deno.land/x/vscode
+- https://deno.land/x/vscode
+- https://jsr.io/@narumincho/vscode
 
 modified for Deno from
 https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/vscode/index.d.ts
@@ -10,10 +11,7 @@ https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/vscode/inde
 esbuild or something similar should be used. ( https://deno.land/x/esbuild )
 
 ```ts
-import {
-  ExtensionContext,
-  importVsCodeApi,
-} from "https://deno.land/x/vscode@1.87.0/mod.ts";
+import { ExtensionContext, importVsCodeApi } from "jsr:@narumincho/vscode";
 
 export function activate(context: ExtensionContext) {
   const vscode = importVsCodeApi();

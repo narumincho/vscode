@@ -3466,17 +3466,12 @@ Returns VSCodeApi only within the vscode extension.
      * for file changes recursively.
      *
      * Additional paths can be added for file watching by providing a {@link RelativePattern} with
-     * a `base` path to watch. If the `pattern` is complex (e.g. contains `**` or path segments),
-     * the path will be watched recursively and otherwise will be watched non-recursively (i.e. only
-     * changes to the first level of the path will be reported).
+     * a `base` path to watch. If the path is a folder and the `pattern` is complex (e.g. contains
+     * `**` or path segments), it will be watched recursively and otherwise will be watched
+     * non-recursively (i.e. only changes to the first level of the path will be reported).
      *
-     * *Note* that requests for recursive file watchers for a `base` path that is inside the opened
-     * workspace are ignored given all opened {@link workspace.workspaceFolders workspace folders} are
-     * watched for file changes recursively by default. Non-recursive file watchers however are always
-     * supported, even inside the opened workspace because they allow to bypass the configured settings
-     * for excludes (`files.watcherExclude`). If you need to watch in a location that is typically
-     * excluded (for example `node_modules` or `.git` folder), then you can use a non-recursive watcher
-     * in the workspace for this purpose.
+     * *Note* that paths must exist in the file system to be watched. File watching may stop when
+     * the watched path is renamed or deleted.
      *
      * If possible, keep the use of recursive watchers to a minimum because recursive file watching
      * is quite resource intense.
@@ -5322,6 +5317,86 @@ Returns VSCodeApi only within the vscode extension.
      */ new (message: string | MarkdownString): TestMessage;
   };
   /**
+   * A class that contains information about a covered resource. A count can
+   * be give for lines, branches, and declarations in a file.
+   */ readonly TestCoverageCount: {
+    /**
+     * @param covered Value for {@link TestCoverageCount.covered}
+     * @param total Value for {@link TestCoverageCount.total}
+     */ new (covered: number, total: number): TestCoverageCount;
+  };
+  /**
+   * Contains coverage metadata for a file.
+   */ readonly FileCoverage: {
+    /**
+     * Creates a {@link FileCoverage} instance with counts filled in from
+     * the coverage details.
+     * @param uri Covered file URI
+     * @param detailed Detailed coverage information
+     */ fromDetails(
+      uri: Uri,
+      details: readonly FileCoverageDetail[],
+    ): FileCoverage;
+    /**
+     * @param uri Covered file URI
+     * @param statementCoverage Statement coverage information. If the reporter
+     * does not provide statement coverage information, this can instead be
+     * used to represent line coverage.
+     * @param branchCoverage Branch coverage information
+     * @param declarationCoverage Declaration coverage information
+     */ new (
+      uri: Uri,
+      statementCoverage: TestCoverageCount,
+      branchCoverage?: TestCoverageCount,
+      declarationCoverage?: TestCoverageCount,
+    ): FileCoverage;
+  };
+  /**
+   * Contains coverage information for a single statement or line.
+   */ readonly StatementCoverage: {
+    /**
+     * @param location The statement position.
+     * @param executed The number of times this statement was executed, or a
+     * boolean indicating  whether it was executed if the exact count is
+     * unknown. If zero or false, the statement will be marked as un-covered.
+     * @param branches Coverage from branches of this line.  If it's not a
+     * conditional, this should be omitted.
+     */ new (
+      executed: number | boolean,
+      location: Position | Range,
+      branches?: BranchCoverage[],
+    ): StatementCoverage;
+  };
+  /**
+   * Contains coverage information for a branch of a {@link StatementCoverage}.
+   */ readonly BranchCoverage: {
+    /**
+     * @param executed The number of times this branch was executed, or a
+     * boolean indicating  whether it was executed if the exact count is
+     * unknown. If zero or false, the branch will be marked as un-covered.
+     * @param location The branch position.
+     */ new (
+      executed: number | boolean,
+      location?: Position | Range,
+      label?: string,
+    ): BranchCoverage;
+  };
+  /**
+   * Contains coverage information for a declaration. Depending on the reporter
+   * and language, this may be types such as functions, methods, or namespaces.
+   */ readonly DeclarationCoverage: {
+    /**
+     * @param executed The number of times this declaration was executed, or a
+     * boolean indicating  whether it was executed if the exact count is
+     * unknown. If zero or false, the declaration will be marked as un-covered.
+     * @param location The declaration position.
+     */ new (
+      name: string,
+      executed: number | boolean,
+      location: Position | Range,
+    ): DeclarationCoverage;
+  };
+  /**
    * The tab represents a single text based resource.
    */ readonly TabInputText: {
     /**
@@ -6257,14 +6332,14 @@ type ValueOf<T> = T[keyof T];
  */ export interface TextEditorEdit {
   /**
    * Replace a certain text region with a new value.
-   * You can use \r\n or \n in `value` and they will be normalized to the current {@link TextDocument document}.
+   * You can use `\r\n` or `\n` in `value` and they will be normalized to the current {@link TextDocument document}.
    *
    * @param location The range this operation should remove.
    * @param value The new text this operation should insert after removing `location`.
    */ replace(location: Position | Range | Selection, value: string): void;
   /**
    * Insert text at a location.
-   * You can use \r\n or \n in `value` and they will be normalized to the current {@link TextDocument document}.
+   * You can use `\r\n` or `\n` in `value` and they will be normalized to the current {@link TextDocument document}.
    * Although the equivalent text edit can be made with {@link TextEditorEdit.replace replace}, `insert` will produce a different resulting selection (it will get moved).
    *
    * @param location The position where the new text should be inserted.
@@ -6318,7 +6393,7 @@ type ValueOf<T> = T[keyof T];
    * ```ts
    * const u = URI.parse('file://server/c$/folder/file.txt')
    * u.authority === 'server'
-   * u.path === '/shares/c$/file.txt'
+   * u.path === '/c$/folder/file.txt'
    * u.fsPath === '\\server\c$\folder\file.txt'
    * ```
    */ readonly fsPath: string;
@@ -10102,7 +10177,7 @@ type ValueOf<T> = T[keyof T];
    *
    * @param text The text to send.
    * @param shouldExecute Indicates that the text being sent should be executed rather than just inserted in the terminal.
-   * The character(s) added are \n or \r\n, depending on the platform. This defaults to `true`.
+   * The character(s) added are `\n` or `\r\n`, depending on the platform. This defaults to `true`.
    */ sendText(text: string, shouldExecute?: boolean): void;
   /**
    * Show the terminal panel and reveal this terminal in the UI.
@@ -12437,7 +12512,7 @@ type ValueOf<T> = T[keyof T];
    * until `Terminal.show` is called. The typical usage for this is when you need to run
    * something that may need interactivity but only want to tell the user about it when
    * interaction is needed. Note that the terminals will still be exposed to all extensions
-   * as normal and they will remain hidden when the workspace is reloaded.
+   * as normal. The hidden terminals will not be restored when the workspace is next opened.
    */ hideFromUser?: boolean;
   /**
    * A message to write to the terminal on first launch, note that this is not sent to the
@@ -15042,6 +15117,19 @@ type ValueOf<T> = T[keyof T];
     token: CancellationToken,
   ) => Thenable<void> | void;
   /**
+   * An extension-provided function that provides detailed statement and
+   * function-level coverage for a file. The editor will call this when more
+   * detail is needed for a file, such as when it's opened in an editor or
+   * expanded in the **Test Coverage** view.
+   *
+   * The {@link FileCoverage} object passed to this function is the same instance
+   * emitted on {@link TestRun.addCoverage} calls associated with this profile.
+   */ loadDetailedCoverage?: (
+    testRun: TestRun,
+    fileCoverage: FileCoverage,
+    token: CancellationToken,
+  ) => Thenable<FileCoverageDetail[]>;
+  /**
    * Deletes the run profile.
    */ dispose(): void;
 }
@@ -15284,9 +15372,16 @@ type ValueOf<T> = T[keyof T];
    * @param test Test item to associate the output with.
    */ appendOutput(output: string, location?: Location, test?: TestItem): void;
   /**
+   * Adds coverage for a file in the run.
+   */ addCoverage(fileCoverage: FileCoverage): void;
+  /**
    * Signals the end of the test run. Any tests included in the run whose
    * states have not been updated will have their state reset.
    */ end(): void;
+  /**
+   * An event fired when the editor is no longer interested in data
+   * associated with the test run.
+   */ onDidDispose: Event<void>;
 }
 /**
  * Collection of test items, found in {@link TestItem.children} and
@@ -15436,6 +15531,86 @@ type ValueOf<T> = T[keyof T];
    * - `message`: the {@link TestMessage} instance.
    */ contextValue?: string;
 };
+/**
+ * A class that contains information about a covered resource. A count can
+ * be give for lines, branches, and declarations in a file.
+ */ export type TestCoverageCount = {
+  /**
+   * Number of items covered in the file.
+   */ covered: number;
+  /**
+   * Total number of covered items in the file.
+   */ total: number;
+};
+/**
+ * Contains coverage metadata for a file.
+ */ export type FileCoverage = {
+  /**
+   * File URI.
+   */ readonly uri: Uri;
+  /**
+   * Statement coverage information. If the reporter does not provide statement
+   * coverage information, this can instead be used to represent line coverage.
+   */ statementCoverage: TestCoverageCount;
+  /**
+   * Branch coverage information.
+   */ branchCoverage?: TestCoverageCount;
+  /**
+   * Declaration coverage information. Depending on the reporter and
+   * language, this may be types such as functions, methods, or namespaces.
+   */ declarationCoverage?: TestCoverageCount;
+};
+/**
+ * Contains coverage information for a single statement or line.
+ */ export type StatementCoverage = {
+  /**
+   * The number of times this statement was executed, or a boolean indicating
+   * whether it was executed if the exact count is unknown. If zero or false,
+   * the statement will be marked as un-covered.
+   */ executed: number | boolean;
+  /**
+   * Statement location.
+   */ location: Position | Range;
+  /**
+   * Coverage from branches of this line or statement. If it's not a
+   * conditional, this will be empty.
+   */ branches: BranchCoverage[];
+};
+/**
+ * Contains coverage information for a branch of a {@link StatementCoverage}.
+ */ export type BranchCoverage = {
+  /**
+   * The number of times this branch was executed, or a boolean indicating
+   * whether it was executed if the exact count is unknown. If zero or false,
+   * the branch will be marked as un-covered.
+   */ executed: number | boolean;
+  /**
+   * Branch location.
+   */ location?: Position | Range;
+  /**
+   * Label for the branch, used in the context of "the ${label} branch was
+   * not taken," for example.
+   */ label?: string;
+};
+/**
+ * Contains coverage information for a declaration. Depending on the reporter
+ * and language, this may be types such as functions, methods, or namespaces.
+ */ export type DeclarationCoverage = {
+  /**
+   * Name of the declaration.
+   */ name: string;
+  /**
+   * The number of times this declaration was executed, or a boolean
+   * indicating whether it was executed if the exact count is unknown. If
+   * zero or false, the declaration will be marked as un-covered.
+   */ executed: number | boolean;
+  /**
+   * Declaration location.
+   */ location: Position | Range;
+};
+/**
+ * Coverage details returned from {@link TestRunProfile.loadDetailedCoverage}.
+ */ export type FileCoverageDetail = StatementCoverage | DeclarationCoverage;
 /**
  * The tab represents a single text based resource.
  */ export type TabInputText = {
