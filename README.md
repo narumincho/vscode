@@ -11,7 +11,7 @@ https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/vscode/inde
 esbuild or something similar should be used. ( https://deno.land/x/esbuild )
 
 ```ts
-import { ExtensionContext, importVsCodeApi } from "jsr:@narumincho/vscode";
+import { type ExtensionContext, importVsCodeApi } from "jsr:@narumincho/vscode";
 
 export function activate(context: ExtensionContext) {
   const vscode = importVsCodeApi();

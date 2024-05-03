@@ -7,9 +7,9 @@ edition = "2021"
 
 [dependencies]
 tokio = { version = "1.37.0", features = ["macros", "rt-multi-thread"] }
-anyhow = "1.0.81"
+anyhow = "1.0.82"
 reqwest = "0.11.27"
-thiserror = "1.0.58"
+thiserror = "1.0.59"
 swc_atoms = "0.5.9"
 swc_common = "0.31.22"
 swc_ecma_parser = "0.137.16"

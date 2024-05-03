@@ -2490,7 +2490,7 @@ Returns VSCodeApi only within the vscode extension.
      * Represents the current window's state.
      */ readonly state: WindowState;
     /**
-     * An {@link Event} which fires when the focus state of the current window
+     * An {@link Event} which fires when the focus or activity state of the current window
      * changes. The value of the event represents whether the window is focused.
      */ readonly onDidChangeWindowState: Event<WindowState>;
     /**
@@ -7009,7 +7009,7 @@ type ValueOf<T> = T[keyof T];
   /**
    * Checks if this code action kind intersects `other`.
    *
-   * The kind `"refactor.extract"` for example intersects `refactor`, `"refactor.extract"` and ``"refactor.extract.function"`,
+   * The kind `"refactor.extract"` for example intersects `refactor`, `"refactor.extract"` and `"refactor.extract.function"`,
    * but not `"unicorn.refactor.extract"`, or `"refactor.extractAll"`.
    *
    * @param other Kind to check.
@@ -12010,6 +12010,10 @@ type ValueOf<T> = T[keyof T];
   /**
    * Whether the current window is focused.
    */ readonly focused: boolean;
+  /**
+   * Whether the window has been interacted with recently. This will change
+   * immediately on activity, or after a short time of user inactivity.
+   */ readonly active: boolean;
 }
 /**
  * A uri handler is responsible for handling system-wide {@link Uri uris}.

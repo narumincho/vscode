@@ -1,4 +1,4 @@
-import { ExtensionContext, importVsCodeApi } from "../mod.ts";
+import { type ExtensionContext, importVsCodeApi } from "../mod.ts";
 
 export function activate(context: ExtensionContext) {
   const vscode = importVsCodeApi();
