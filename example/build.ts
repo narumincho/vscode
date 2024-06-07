@@ -1,10 +1,10 @@
-import { denoPlugins } from "https://deno.land/x/esbuild_deno_loader@0.8.2/mod.ts";
+import { denoPlugins } from "https://deno.land/x/esbuild_deno_loader@0.9.0/mod.ts";
 import {
   build as esBuild,
-  Plugin,
-} from "https://deno.land/x/esbuild@v0.19.7/mod.js";
-import { ensureFile } from "https://deno.land/std@0.208.0/fs/mod.ts";
-import { resolve } from "https://deno.land/std@0.208.0/path/mod.ts";
+  type Plugin,
+} from "https://deno.land/x/esbuild@v0.21.4/mod.js";
+import { ensureFile } from "jsr:@std/fs";
+import { resolve } from "jsr:@std/path";
 
 /**
  * ```bash
@@ -25,7 +25,7 @@ export const writeTextFileWithLog = async (
 
 const distributionPath = "./vscodeExtensionDistribution/";
 
-const build = async (): Promise<string> => {
+const buildMainJs = async (): Promise<string> => {
   const esbuildResult = await esBuild({
     entryPoints: ["./example/main.ts"],
     plugins: denoPlugins() as Plugin[],
@@ -53,37 +53,38 @@ const scriptRelativePath = "./main.js";
 await Promise.all([
   writeTextFileWithLog(
     resolve(distributionPath, scriptRelativePath),
-    await build(),
+    await buildMainJs(),
   ),
 
   writeTextFileWithLog(
     resolve(distributionPath, "./package.json"),
     JSON.stringify({
-      "name": "example",
-      "version": "0.0.1",
-      "description": "example VSCode extension",
-      "repository": {
-        "url": "git+https://github.com/narumincho/vscode.git",
-        "type": "git",
+      name: "example",
+      version: "0.0.1",
+      description: "example VSCode extension",
+      repository: {
+        url: "git+https://github.com/narumincho/vscode.git",
+        type: "git",
       },
-      "license": "MIT",
-      "homepage": "https://github.com/narumincho/vscode",
-      "author": "narumincho",
-      "engines": {
-        "vscode": "^1.76.0",
+      license: "MIT",
+      homepage: "https://github.com/narumincho/vscode",
+      author: "narumincho",
+      engines: {
+        vscode: "^1.76.0",
       },
-      "dependencies": {},
-      "activationEvents": [],
-      "contributes": {
-        "commands": [
+      dependencies: {},
+      activationEvents: [],
+      contributes: {
+        commands: [
           {
-            "command": "extension.helloWorld",
-            "title": "Hello World",
+            command: "extension.helloWorld",
+            title: "Hello World",
           },
         ],
       },
-      "browser": scriptRelativePath,
-      "publisher": "narumincho",
+      type: "module",
+      browser: scriptRelativePath,
+      publisher: "narumincho",
     }),
   ),
 

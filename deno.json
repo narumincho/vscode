@@ -1,5 +1,8 @@
 {
   "name": "@narumincho/vscode",
   "version": "1.89.0",
-  "exports": "./mod.ts"
+  "exports": "./mod.ts",
+  "tasks": {
+    "build-example": "deno run --allow-read --allow-env --allow-write=./vscodeExtensionDistribution ./example/build.ts"
+  }
 }
