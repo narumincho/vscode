@@ -1,5 +1,8 @@
 {
   "name": "@narumincho/vscode",
-  "version": "1.89.0",
-  "exports": "./mod.ts"
+  "version": "1.90.0",
+  "exports": "./mod.ts",
+  "tasks": {
+    "build-example": "deno run -A ./example/build.ts"
+  }
 }
