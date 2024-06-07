@@ -3,6 +3,6 @@
   "version": "1.90.0",
   "exports": "./mod.ts",
   "tasks": {
-    "build-example": "deno run --allow-read --allow-env --allow-write=./vscodeExtensionDistribution ./example/build.ts"
+    "build-example": "deno run -A ./example/build.ts"
   }
 }
