@@ -56,6 +56,7 @@ await Promise.all([
     await buildMainJs(),
   ),
 
+  // https://code.visualstudio.com/api/references/extension-manifest
   writeTextFileWithLog(
     resolve(distributionPath, "./package.json"),
     JSON.stringify({
