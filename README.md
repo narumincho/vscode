@@ -8,8 +8,6 @@
 modified for Deno from
 https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/vscode/index.d.ts
 
-or emit or something similar should be used. ( https://deno.land/x/esbuild )
-
 Must be bundled with
 
 - [esbuild](https://github.com/esbuild/deno-esbuild) with

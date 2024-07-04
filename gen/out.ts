@@ -74,7 +74,7 @@ Returns VSCodeApi only within the vscode extension.
     };
     /**
 	 * Represents sources that can cause {@link window.onDidChangeTextEditorSelection selection change events}.
-	*/ readonly TextEditorSelectionChangeKind: {
+	 */ readonly TextEditorSelectionChangeKind: {
         /**
 		 * Selection changed due to typing in the editor.
 		 */ readonly Keyboard: 1;
@@ -1179,7 +1179,7 @@ Returns VSCodeApi only within the vscode extension.
 	 */ readonly InlineCompletionList: {
         /**
 		 * Creates a new list of inline completion items.
-		*/ new(items: InlineCompletionItem[]): InlineCompletionList;
+		 */ new(items: InlineCompletionItem[]): InlineCompletionList;
     };
     /**
 	 * Describes how an {@link InlineCompletionItemProvider inline completion provider} was triggered.
@@ -1423,7 +1423,7 @@ Returns VSCodeApi only within the vscode extension.
 	 */ readonly ConfigurationTarget: {
         /**
 		 * Global configuration
-		*/ readonly Global: 1;
+		 */ readonly Global: 1;
         /**
 		 * Workspace configuration
 		 */ readonly Workspace: 2;
@@ -2877,8 +2877,8 @@ Returns VSCodeApi only within the vscode extension.
 		 */ readonly Expanded: 2;
     };
     /**
-	* Checkbox state of the tree item
-	*/ readonly TreeItemCheckboxState: {
+	 * Checkbox state of the tree item
+	 */ readonly TreeItemCheckboxState: {
         /**
 		 * Determines an item is unchecked
 		 */ readonly Unchecked: 0;
@@ -4257,7 +4257,7 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * @param rendererId The renderer ID to communicate with
 		 * @returns A new notebook renderer messaging object.
-		*/ createRendererMessaging(rendererId: string): NotebookRendererMessaging;
+		 */ createRendererMessaging(rendererId: string): NotebookRendererMessaging;
     };
     /**
 	 * Namespace for source control mangement.
@@ -4464,7 +4464,7 @@ Returns VSCodeApi only within the vscode extension.
         /**
 		 * Add breakpoints.
 		 * @param breakpoints The breakpoints to add.
-		*/ addBreakpoints(breakpoints: readonly Breakpoint[]): void;
+		 */ addBreakpoints(breakpoints: readonly Breakpoint[]): void;
         /**
 		 * Remove breakpoints.
 		 * @param breakpoints The breakpoints to remove.
@@ -4713,7 +4713,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param id Identifier for the controller, must be globally unique.
 		 * @param label A human-readable label for the controller.
 		 * @returns An instance of the {@link TestController}.
-		*/ createTestController(id: string, label: string): TestController;
+		 */ createTestController(id: string, label: string): TestController;
     };
     /**
 	 * The kind of executions that {@link TestRunProfile TestRunProfiles} control.
@@ -5442,7 +5442,7 @@ type ValueOf<T> = T[keyof T];
 };
 /**
 	 * Represents sources that can cause {@link window.onDidChangeTextEditorSelection selection change events}.
-	*/ export type TextEditorSelectionChangeKind = ValueOf<VSCodeAPI["TextEditorSelectionChangeKind"]>;
+	 */ export type TextEditorSelectionChangeKind = ValueOf<VSCodeAPI["TextEditorSelectionChangeKind"]>;
 /**
 	 * Represents an event describing the change in a {@link TextEditor.selections text editor's selections}.
 	 */ export interface TextEditorSelectionChangeEvent {
@@ -11301,8 +11301,8 @@ type ValueOf<T> = T[keyof T];
 		 * array containing all selected tree items.
 		 */ canSelectMany?: boolean;
     /**
-		* An optional interface to implement drag and drop in the tree view.
-		*/ dragAndDropController?: TreeDragAndDropController<T>;
+		 * An optional interface to implement drag and drop in the tree view.
+		 */ dragAndDropController?: TreeDragAndDropController<T>;
     /**
 		 * By default, when the children of a tree item have already been fetched, child checkboxes are automatically managed based on the checked state of the parent tree item.
 		 * If the tree item is collapsed by default (meaning that the children haven't yet been fetched) then child checkboxes will not be updated.
@@ -11500,8 +11500,8 @@ type ValueOf<T> = T[keyof T];
 	 * An event describing the change in a tree item's checkbox state.
 	 */ export interface TreeCheckboxChangeEvent<T> {
     /**
-		* The items that were checked or unchecked.
-		*/ readonly items: ReadonlyArray<[T, TreeItemCheckboxState]>;
+		 * The items that were checked or unchecked.
+		 */ readonly items: ReadonlyArray<[T, TreeItemCheckboxState]>;
 }
 /**
 	 * Represents a Tree view
@@ -11525,8 +11525,8 @@ type ValueOf<T> = T[keyof T];
 		 * Event that is fired when {@link TreeView.visible visibility} has changed
 		 */ readonly onDidChangeVisibility: Event<TreeViewVisibilityChangeEvent>;
     /**
-		* An event to signal that an element or root has either been checked or unchecked.
-		*/ readonly onDidChangeCheckboxState: Event<TreeCheckboxChangeEvent<T>>;
+		 * An event to signal that an element or root has either been checked or unchecked.
+		 */ readonly onDidChangeCheckboxState: Event<TreeCheckboxChangeEvent<T>>;
     /**
 		 * An optional human-readable message that will be rendered in the view.
 		 * Setting the message to null, undefined, or empty string will remove the message from the view.
@@ -11716,8 +11716,8 @@ type ValueOf<T> = T[keyof T];
 		 */ highlights?: [number, number][];
 }
 /**
-	* Checkbox state of the tree item
-	*/ export type TreeItemCheckboxState = ValueOf<VSCodeAPI["TreeItemCheckboxState"]>;
+	 * Checkbox state of the tree item
+	 */ export type TreeItemCheckboxState = ValueOf<VSCodeAPI["TreeItemCheckboxState"]>;
 /**
 	 * Value-object describing what options a terminal should use.
 	 */ export interface TerminalOptions {
@@ -11774,8 +11774,8 @@ type ValueOf<T> = T[keyof T];
 		 * recommended for the best contrast and consistency across themes.
 		 */ color?: ThemeColor;
     /**
-		* The {@link TerminalLocation} or {@link TerminalEditorLocationOptions} or {@link TerminalSplitLocationOptions} for the terminal.
-		*/ location?: TerminalLocation | TerminalEditorLocationOptions | TerminalSplitLocationOptions;
+		 * The {@link TerminalLocation} or {@link TerminalEditorLocationOptions} or {@link TerminalSplitLocationOptions} for the terminal.
+		 */ location?: TerminalLocation | TerminalEditorLocationOptions | TerminalSplitLocationOptions;
     /**
 		 * Opt-out of the default terminal persistence on restart and reload.
 		 * This will only take effect when `terminal.integrated.enablePersistentSessions` is enabled.
@@ -12376,7 +12376,7 @@ type ValueOf<T> = T[keyof T];
     /**
 		 * The reason why the document was changed.
 		 * Is `undefined` if the reason is not known.
-		*/ readonly reason: TextDocumentChangeReason | undefined;
+		 */ readonly reason: TextDocumentChangeReason | undefined;
 }
 /**
 	 * Represents reasons why a text document is saved.
@@ -13796,6 +13796,11 @@ type ValueOf<T> = T[keyof T];
     /**
 		 * When true, the debug viewlet will not be automatically revealed for this session.
 		 */ suppressDebugView?: boolean;
+    /**
+		 * Signals to the editor that the debug session was started from a test run
+		 * request. This is used to link the lifecycle of the debug session and
+		 * test run in UI actions.
+		 */ testRun?: TestRun;
 }
 /**
 	 * A DebugConfigurationProviderTriggerKind specifies when the `provideDebugConfigurations` method of a `DebugConfigurationProvider` is triggered.
@@ -14130,14 +14135,14 @@ type ValueOf<T> = T[keyof T];
     /**
 		 * Whether it is possible to be signed into multiple accounts at once with this provider.
 		 * If not specified, will default to false.
-		*/ readonly supportsMultipleAccounts?: boolean;
+		 */ readonly supportsMultipleAccounts?: boolean;
 }
 /**
-	* An {@link Event} which fires when an {@link AuthenticationSession} is added, removed, or changed.
-	*/ export interface AuthenticationProviderAuthenticationSessionsChangeEvent {
+	 * An {@link Event} which fires when an {@link AuthenticationSession} is added, removed, or changed.
+	 */ export interface AuthenticationProviderAuthenticationSessionsChangeEvent {
     /**
 		 * The {@link AuthenticationSession AuthenticationSessions} of the {@link AuthenticationProvider} that have been added.
-		*/ readonly added: readonly AuthenticationSession[] | undefined;
+		 */ readonly added: readonly AuthenticationSession[] | undefined;
     /**
 		 * The {@link AuthenticationSession AuthenticationSessions} of the {@link AuthenticationProvider} that have been removed.
 		 */ readonly removed: readonly AuthenticationSession[] | undefined;
@@ -15346,7 +15351,7 @@ type ValueOf<T> = T[keyof T];
 	 * Represents a language model response.
 	 *
 	 * @see {@link LanguageModelAccess.chatRequest}
-	*/ export interface LanguageModelChatResponse {
+	 */ export interface LanguageModelChatResponse {
     /**
 		 * An async iterable that is a stream of text chunks forming the overall response.
 		 *
