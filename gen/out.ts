@@ -12232,7 +12232,7 @@ type ValueOf<T> = T[keyof T];
 		 * Buttons for actions in the UI.
 		 */ buttons: readonly QuickInputButton[];
     /**
-		 * An event signaling when a button in the title bar was triggered.
+		 * An event signaling when a top level button (buttons stored in {@link buttons}) was triggered.
 		 * This event does not fire for buttons on a {@link QuickPickItem}.
 		 */ readonly onDidTriggerButton: Event<QuickInputButton>;
     /**

@@ -1,8 +1,5 @@
-import { denoPlugins } from "https://deno.land/x/esbuild_deno_loader@0.9.0/mod.ts";
-import {
-  build as esBuild,
-  type Plugin,
-} from "https://deno.land/x/esbuild@v0.21.4/mod.js";
+import { denoPlugins } from "jsr:@luca/esbuild-deno-loader";
+import { build, type Plugin, stop } from "npm:esbuild";
 import { ensureFile } from "jsr:@std/fs";
 import { resolve } from "jsr:@std/path";
 
@@ -26,7 +23,7 @@ export const writeTextFileWithLog = async (
 const distributionPath = "./vscodeExtensionDistribution/";
 
 const buildMainJs = async (): Promise<string> => {
-  const esbuildResult = await esBuild({
+  const esbuildResult = await build({
     entryPoints: ["./example/main.ts"],
     plugins: denoPlugins() as Plugin[],
     write: false,
@@ -96,4 +93,4 @@ await Promise.all([
   ),
 ]);
 
-Deno.exit();
+await stop();
