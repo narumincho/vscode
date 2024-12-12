@@ -1791,7 +1791,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * @param command The command to execute.
 		 * @param args The command arguments.
 		 * @param options Optional options for the started the shell.
-		 */ new(command: string | ShellQuotedString, args: (string | ShellQuotedString)[], options?: ShellExecutionOptions): ShellExecution;
+		 */ new(command: string | ShellQuotedString, args: Array<string | ShellQuotedString>, options?: ShellExecutionOptions): ShellExecution;
     };
     /**
 	 * Class used to execute an extension callback as a task.
@@ -4842,7 +4842,8 @@ Returns VSCodeApi only within the vscode extension.
 		 * used to represent line coverage.
 		 * @param branchCoverage Branch coverage information
 		 * @param declarationCoverage Declaration coverage information
-		 */ new(uri: Uri, statementCoverage: TestCoverageCount, branchCoverage?: TestCoverageCount, declarationCoverage?: TestCoverageCount): FileCoverage;
+		 * @param includesTests Test cases included in this coverage report, see {@link includesTests}
+		 */ new(uri: Uri, statementCoverage: TestCoverageCount, branchCoverage?: TestCoverageCount, declarationCoverage?: TestCoverageCount, includesTests?: TestItem[]): FileCoverage;
     };
     /**
 	 * Contains coverage information for a single statement or line.
@@ -5014,14 +5015,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * Create a new ChatResponseReferencePart.
 		 * @param value A uri or location
 		 * @param iconPath Icon for the reference shown in UI
-		 */ new(value: Uri | Location, iconPath?: Uri | ThemeIcon | {
-            /**
-			 * The icon path for the light theme.
-			 */ light: Uri;
-            /**
-			 * The icon path for the dark theme.
-			 */ dark: Uri;
-        }): ChatResponseReferencePart;
+		 */ new(value: Uri | Location, iconPath?: IconPath): ChatResponseReferencePart;
     };
     /**
 	 * Represents a part of a chat response that is a button that executes a command.
@@ -5062,20 +5056,20 @@ Returns VSCodeApi only within the vscode extension.
 		 *
 		 * @param content The content of the message.
 		 * @param name The optional name of a user for the message.
-		 */ User(content: string | (LanguageModelTextPart | LanguageModelToolResultPart)[], name?: string): LanguageModelChatMessage;
+		 */ User(content: string | Array<LanguageModelTextPart | LanguageModelToolResultPart>, name?: string): LanguageModelChatMessage;
         /**
 		 * Utility to create a new assistant message.
 		 *
 		 * @param content The content of the message.
 		 * @param name The optional name of a user for the message.
-		 */ Assistant(content: string | (LanguageModelTextPart | LanguageModelToolCallPart)[], name?: string): LanguageModelChatMessage;
+		 */ Assistant(content: string | Array<LanguageModelTextPart | LanguageModelToolCallPart>, name?: string): LanguageModelChatMessage;
         /**
 		 * Create a new user message.
 		 *
 		 * @param role The role of the message.
 		 * @param content The content of the message.
 		 * @param name The optional name of a user for the message.
-		 */ new(role: LanguageModelChatMessageRole, content: string | (LanguageModelTextPart | LanguageModelToolResultPart | LanguageModelToolCallPart)[], name?: string): LanguageModelChatMessage;
+		 */ new(role: LanguageModelChatMessageRole, content: string | Array<LanguageModelTextPart | LanguageModelToolResultPart | LanguageModelToolCallPart>, name?: string): LanguageModelChatMessage;
     };
     /**
 	 * An error type for language model specific errors.
@@ -5194,7 +5188,7 @@ Returns VSCodeApi only within the vscode extension.
         /**
 		 * @param callId The ID of the tool call.
 		 * @param content The content of the tool result.
-		 */ new(callId: string, content: (LanguageModelTextPart | LanguageModelPromptTsxPart | unknown)[]): LanguageModelToolResultPart;
+		 */ new(callId: string, content: Array<LanguageModelTextPart | LanguageModelPromptTsxPart | unknown>): LanguageModelToolResultPart;
     };
     /**
 	 * A language model response part containing a piece of text, returned from a {@link LanguageModelChatResponse}.
@@ -5219,7 +5213,7 @@ Returns VSCodeApi only within the vscode extension.
         /**
 		 * Create a LanguageModelToolResult
 		 * @param content A list of tool result content parts
-		 */ new(content: (LanguageModelTextPart | LanguageModelPromptTsxPart)[]): LanguageModelToolResult;
+		 */ new(content: Array<LanguageModelTextPart | LanguageModelPromptTsxPart>): LanguageModelToolResult;
     };
 };
 type ValueOf<T> = T[keyof T];
@@ -5779,6 +5773,17 @@ type ValueOf<T> = T[keyof T];
 		 */ readonly color?: ThemeColor | undefined;
 };
 /**
+	 * Represents an icon in the UI. This is either an uri, separate uris for the light- and dark-themes,
+	 * or a {@link ThemeIcon theme icon}.
+	 */ export type IconPath = Uri | {
+    /**
+		 * The icon path for the light theme.
+		 */ light: Uri;
+    /**
+		 * The icon path for the dark theme.
+		 */ dark: Uri;
+} | ThemeIcon;
+/**
 	 * Represents theme specific rendering styles for a {@link TextEditorDecorationType text editor decoration}.
 	 */ export interface ThemableDecorationRenderOptions {
     /**
@@ -6336,14 +6341,7 @@ type ValueOf<T> = T[keyof T];
 		 */ kind?: QuickPickItemKind;
     /**
 		 * The icon path or {@link ThemeIcon} for the QuickPickItem.
-		 */ iconPath?: Uri | {
-        /**
-			 * The icon path for the light theme.
-			 */ light: Uri;
-        /**
-			 * The icon path for the dark theme.
-			 */ dark: Uri;
-    } | ThemeIcon;
+		 */ iconPath?: IconPath;
     /**
 		 * A human-readable string which is rendered less prominent in the same line. Supports rendering of
 		 * {@link ThemeIcon theme icons} via the `$(<name>)`-syntax.
@@ -6834,7 +6832,7 @@ type ValueOf<T> = T[keyof T];
 		 *
 		 * We also support returning `Command` for legacy reasons, however all new extensions should return
 		 * `CodeAction` object instead.
-		 */ provideCodeActions(document: TextDocument, range: Range | Selection, context: CodeActionContext, token: CancellationToken): ProviderResult<(Command | T)[]>;
+		 */ provideCodeActions(document: TextDocument, range: Range | Selection, context: CodeActionContext, token: CancellationToken): ProviderResult<Array<Command | T>>;
     /**
 		 * Given a code action fill in its {@linkcode CodeAction.edit edit}-property. Changes to
 		 * all other properties, like title, are ignored. A code action that has an edit
@@ -7462,14 +7460,7 @@ type ValueOf<T> = T[keyof T];
 		 */ description?: string;
     /**
 		 * The icon path or {@link ThemeIcon} for the edit.
-		 */ iconPath?: Uri | {
-        /**
-			 * The icon path for the light theme.
-			 */ light: Uri;
-        /**
-			 * The icon path for the dark theme.
-			 */ dark: Uri;
-    } | ThemeIcon;
+		 */ iconPath?: IconPath;
 }
 /**
 	 * Additional data about a workspace edit.
@@ -9764,8 +9755,13 @@ type ValueOf<T> = T[keyof T];
 		 * verify whether it was successful.
 		 *
 		 * @param executable A command to run.
-		 * @param args Arguments to launch the executable with which will be automatically escaped
-		 * based on the executable type.
+		 * @param args Arguments to launch the executable with. The arguments will be escaped such
+		 * that they are interpreted as single arguments when the argument both contains whitespace
+		 * and does not include any single quote, double quote or backtick characters.
+		 *
+		 * Note that this escaping is not intended to be a security measure, be careful when passing
+		 * untrusted data to this API as strings like `$(...)` can often be used in shells to
+		 * execute code within a string.
 		 *
 		 * @example
 		 * // Execute a command in a terminal immediately after being created
@@ -10125,8 +10121,8 @@ type ValueOf<T> = T[keyof T];
 			 */ setKeysForSync(keys: readonly string[]): void;
     };
     /**
-		 * A storage utility for secrets. Secrets are persisted across reloads and are independent of the
-		 * current opened {@link workspace.workspaceFolders workspace}.
+		 * A secret storage object that stores state independent
+		 * of the current opened {@link workspace.workspaceFolders workspace}.
 		 */ readonly secrets: SecretStorage;
     /**
 		 * The uri of the directory containing the extension.
@@ -10258,8 +10254,10 @@ type ValueOf<T> = T[keyof T];
 		 */ readonly key: string;
 }
 /**
-	 * Represents a storage utility for secrets, information that is
-	 * sensitive.
+	 * Represents a storage utility for secrets (or any information that is sensitive)
+	 * that will be stored encrypted. The implementation of the secret storage will
+	 * be different on each platform and the secrets will not be synced across
+	 * machines.
 	 */ export interface SecretStorage {
     /**
 		 * Retrieve a secret that was stored with key. Returns undefined if there
@@ -10464,7 +10462,7 @@ type ValueOf<T> = T[keyof T];
 		 */ command: string | ShellQuotedString;
     /**
 		 * The shell args. Is `undefined` if created with a full command line.
-		 */ args: (string | ShellQuotedString)[];
+		 */ args: Array<string | ShellQuotedString>;
     /**
 		 * The shell options used when the command line is executed in a shell.
 		 * Defaults to undefined.
@@ -12022,14 +12020,7 @@ type ValueOf<T> = T[keyof T];
 		 * The icon path or {@link ThemeIcon} for the tree item.
 		 * When `falsy`, {@link ThemeIcon.Folder Folder Theme Icon} is assigned, if item is collapsible otherwise {@link ThemeIcon.File File Theme Icon}.
 		 * When a file or folder {@link ThemeIcon} is specified, icon is derived from the current file icon theme for the specified theme icon using {@link TreeItem.resourceUri resourceUri} (if provided).
-		 */ iconPath?: string | Uri | {
-        /**
-			 * The icon path for the light theme.
-			 */ light: string | Uri;
-        /**
-			 * The icon path for the dark theme.
-			 */ dark: string | Uri;
-    } | ThemeIcon;
+		 */ iconPath?: string | IconPath;
     /**
 		 * A human-readable string which is rendered less prominent.
 		 * When `true`, it is derived from {@link TreeItem.resourceUri resourceUri} and when `falsy`, it is not shown.
@@ -12150,14 +12141,7 @@ type ValueOf<T> = T[keyof T];
 		 */ message?: string;
     /**
 		 * The icon path or {@link ThemeIcon} for the terminal.
-		 */ iconPath?: Uri | {
-        /**
-			 * The icon path for the light theme.
-			 */ light: Uri;
-        /**
-			 * The icon path for the dark theme.
-			 */ dark: Uri;
-    } | ThemeIcon;
+		 */ iconPath?: IconPath;
     /**
 		 * The icon {@link ThemeColor} for the terminal.
 		 * The `terminal.ansi*` theme keys are
@@ -12183,14 +12167,7 @@ type ValueOf<T> = T[keyof T];
 		 */ pty: Pseudoterminal;
     /**
 		 * The icon path or {@link ThemeIcon} for the terminal.
-		 */ iconPath?: Uri | {
-        /**
-			 * The icon path for the light theme.
-			 */ light: Uri;
-        /**
-			 * The icon path for the dark theme.
-			 */ dark: Uri;
-    } | ThemeIcon;
+		 */ iconPath?: IconPath;
     /**
 		 * The icon {@link ThemeColor} for the terminal.
 		 * The standard `terminal.ansi*` theme keys are
@@ -12708,14 +12685,7 @@ type ValueOf<T> = T[keyof T];
 	 */ export interface QuickInputButton {
     /**
 		 * Icon for the button.
-		 */ readonly iconPath: Uri | {
-        /**
-			 * The icon path for the light theme.
-			 */ light: Uri;
-        /**
-			 * The icon path for the dark theme.
-			 */ dark: Uri;
-    } | ThemeIcon;
+		 */ readonly iconPath: IconPath;
     /**
 		 * An optional tooltip.
 		 */ readonly tooltip?: string | undefined;
@@ -14676,6 +14646,27 @@ type ValueOf<T> = T[keyof T];
 		 * emitted on {@link TestRun.addCoverage} calls associated with this profile.
 		 */ loadDetailedCoverage?: (testRun: TestRun, fileCoverage: FileCoverage, token: CancellationToken) => Thenable<FileCoverageDetail[]>;
     /**
+		 * An extension-provided function that provides detailed statement and
+		 * function-level coverage for a single test in a file. This is the per-test
+		 * sibling of {@link TestRunProfile.loadDetailedCoverage}, called only if
+		 * a test item is provided in {@link FileCoverage.includesTests} and only
+		 * for files where such data is reported.
+		 *
+		 * Often {@link TestRunProfile.loadDetailedCoverage} will be called first
+		 * when a user opens a file, and then this method will be called if they
+		 * drill down into specific per-test coverage information. This method
+		 * should then return coverage data only for statements and declarations
+		 * executed by the specific test during the run.
+		 *
+		 * The {@link FileCoverage} object passed to this function is the same
+		 * instance emitted on {@link TestRun.addCoverage} calls associated with this profile.
+		 *
+		 * @param testRun The test run that generated the coverage data.
+		 * @param fileCoverage The file coverage object to load detailed coverage for.
+		 * @param fromTestItem The test item to request coverage information for.
+		 * @param token A cancellation token that indicates the operation should be cancelled.
+		 */ loadDetailedCoverageForTest?: (testRun: TestRun, fileCoverage: FileCoverage, fromTestItem: TestItem, token: CancellationToken) => Thenable<FileCoverageDetail[]>;
+    /**
 		 * Deletes the run profile.
 		 */ dispose(): void;
 }
@@ -15100,6 +15091,11 @@ type ValueOf<T> = T[keyof T];
 		 * Declaration coverage information. Depending on the reporter and
 		 * language, this may be types such as functions, methods, or namespaces.
 		 */ declarationCoverage?: TestCoverageCount;
+    /**
+		 * A list of {@link TestItem test cases} that generated coverage in this
+		 * file. If set, then {@link TestRunProfile.loadDetailedCoverageForTest}
+		 * should also be defined in order to retrieve detailed coverage information.
+		 */ includesTests?: TestItem[];
 };
 /**
 	 * Contains coverage information for a single statement or line.
@@ -15557,14 +15553,7 @@ type ValueOf<T> = T[keyof T];
 		 */ readonly id: string;
     /**
 		 * An icon for the participant shown in UI.
-		 */ iconPath?: Uri | {
-        /**
-			 * The icon path for the light theme.
-			 */ light: Uri;
-        /**
-			 * The icon path for the dark theme.
-			 */ dark: Uri;
-    } | ThemeIcon;
+		 */ iconPath?: IconPath;
     /**
 		 * The handler for requests to this participant.
 		 */ requestHandler: ChatRequestHandler;
@@ -15688,14 +15677,7 @@ type ValueOf<T> = T[keyof T];
 		 *
 		 * @param value A uri or location
 		 * @param iconPath Icon for the reference shown in UI
-		 */ reference(value: Uri | Location, iconPath?: Uri | ThemeIcon | {
-        /**
-			 * The icon path for the light theme.
-			 */ light: Uri;
-        /**
-			 * The icon path for the dark theme.
-			 */ dark: Uri;
-    }): void;
+		 */ reference(value: Uri | Location, iconPath?: IconPath): void;
     /**
 		 * Pushes a part to this stream.
 		 *
@@ -15754,14 +15736,7 @@ type ValueOf<T> = T[keyof T];
 		 */ value: Uri | Location;
     /**
 		 * The icon for the reference.
-		 */ iconPath?: Uri | ThemeIcon | {
-        /**
-			 * The icon path for the light theme.
-			 */ light: Uri;
-        /**
-			 * The icon path for the dark theme.
-			 */ dark: Uri;
-    };
+		 */ iconPath?: IconPath;
 };
 /**
 	 * Represents a part of a chat response that is a button that executes a command.
@@ -15785,7 +15760,7 @@ type ValueOf<T> = T[keyof T];
     /**
 		 * A string or heterogeneous array of things that a message can contain as content. Some parts may be message-type
 		 * specific for some models.
-		 */ content: (LanguageModelTextPart | LanguageModelToolResultPart | LanguageModelToolCallPart)[];
+		 */ content: Array<LanguageModelTextPart | LanguageModelToolResultPart | LanguageModelToolCallPart>;
     /**
 		 * The optional name of a user for this message.
 		 */ name: string | undefined;
@@ -16016,7 +15991,7 @@ type ValueOf<T> = T[keyof T];
 		 */ callId: string;
     /**
 		 * The value of the tool result.
-		 */ content: (LanguageModelTextPart | LanguageModelPromptTsxPart | unknown)[];
+		 */ content: Array<LanguageModelTextPart | LanguageModelPromptTsxPart | unknown>;
 };
 /**
 	 * A language model response part containing a piece of text, returned from a {@link LanguageModelChatResponse}.
@@ -16040,7 +16015,7 @@ type ValueOf<T> = T[keyof T];
 		 * A list of tool result content parts. Includes `unknown` becauses this list may be extended with new content types in
 		 * the future.
 		 * @see {@link lm.invokeTool}.
-		 */ content: (LanguageModelTextPart | LanguageModelPromptTsxPart | unknown)[];
+		 */ content: Array<LanguageModelTextPart | LanguageModelPromptTsxPart | unknown>;
 };
 /**
 	 * A token that can be passed to {@link lm.invokeTool} when invoking a tool inside the context of handling a chat request.
@@ -16139,7 +16114,7 @@ type ValueOf<T> = T[keyof T];
 	 */ export interface PreparedToolInvocation {
     /**
 		 * A customized progress message to show while the tool runs.
-		 */ invocationMessage?: string;
+		 */ invocationMessage?: string | MarkdownString;
     /**
 		 * The presence of this property indicates that the user should be asked to confirm before running the tool. The user
 		 * should be asked for confirmation for any tool that has a side-effect or may potentially be dangerous.
