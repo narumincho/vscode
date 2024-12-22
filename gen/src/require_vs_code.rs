@@ -90,12 +90,33 @@ fn func_body() -> swc_ecma_ast::BlockStmt {
                         id: require_func_ident(),
                         type_ann: None,
                     }),
-                    init: Some(Box::new(swc_ecma_ast::Expr::Ident(
-                        swc_ecma_ast::Ident::new(
+                    init: Some(Box::new(swc_ecma_ast::Expr::Cond(swc_ecma_ast::CondExpr {
+                        span: swc_common::Span::default(),
+                        test: Box::new(swc_ecma_ast::Expr::Bin(swc_ecma_ast::BinExpr {
+                            span: swc_common::Span::default(),
+                            op: swc_ecma_ast::BinaryOp::EqEqEq,
+                            left: Box::new(swc_ecma_ast::Expr::Unary(swc_ecma_ast::UnaryExpr {
+                                span: swc_common::Span::default(),
+                                op: swc_ecma_ast::UnaryOp::TypeOf,
+                                arg: Box::new(swc_ecma_ast::Expr::Ident(swc_ecma_ast::Ident::new(
+                                    string_cache::Atom::from("require"),
+                                    swc_common::Span::default(),
+                                ))),
+                            })),
+                            right: Box::new(swc_ecma_ast::Expr::Lit(swc_ecma_ast::Lit::Str(
+                                swc_ecma_ast::Str {
+                                    span: swc_common::Span::default(),
+                                    value: string_cache::Atom::from("function"),
+                                    raw: None,
+                                },
+                            ))),
+                        })),
+                        cons: Box::new(swc_ecma_ast::Expr::Ident(swc_ecma_ast::Ident::new(
                             string_cache::Atom::from("require"),
                             swc_common::Span::default(),
-                        ),
-                    ))),
+                        ))),
+                        alt: Box::new(undefined_expr()),
+                    }))),
                 }],
             }))),
             swc_ecma_ast::Stmt::Return(swc_ecma_ast::ReturnStmt {

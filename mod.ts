@@ -6,7 +6,7 @@ require("vscode")
 
 Returns VSCodeApi only within the vscode extension.
 */ export function importVsCodeApi(): VSCodeAPI | undefined {
-  const requireFunc = require;
+  const requireFunc = typeof require === "function" ? require : undefined;
   return requireFunc === undefined ? undefined : requireFunc("vscode");
 }
 /**
@@ -17138,12 +17138,12 @@ type ValueOf<T> = T[keyof T];
     token?: CancellationToken,
   ): Thenable<LanguageModelChatResponse>;
   /**
-		 * Count the number of tokens in a message using the model specific tokenizer-logic.
+     * Count the number of tokens in a message using the model specific tokenizer-logic.
 
-		 * @param text A string or a message instance.
-		 * @param token Optional cancellation token.  See {@link CancellationTokenSource} for how to create one.
-		 * @returns A thenable that resolves to the number of tokens.
-		 */ countTokens(
+     * @param text A string or a message instance.
+     * @param token Optional cancellation token.  See {@link CancellationTokenSource} for how to create one.
+     * @returns A thenable that resolves to the number of tokens.
+     */ countTokens(
     text: string | LanguageModelChatMessage,
     token?: CancellationToken,
   ): Thenable<number>;

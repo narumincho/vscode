@@ -6,7 +6,7 @@ require("vscode")
 
 Returns VSCodeApi only within the vscode extension.
 */ export function importVsCodeApi(): VSCodeAPI | undefined {
-    const requireFunc = require;
+    const requireFunc = typeof require === "function" ? require : undefined;
     return requireFunc === undefined ? undefined : requireFunc("vscode");
 }
 /**
