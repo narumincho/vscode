@@ -1341,7 +1341,7 @@ Returns VSCodeApi only within the vscode extension.
    * used.
    */ readonly InlayHintKind: {
     /**
-     * An inlay hint that for a type annotation.
+     * An inlay hint that is for a type annotation.
      */ readonly Type: 1;
     /**
      * An inlay hint that is for a parameter.
@@ -1483,11 +1483,65 @@ Returns VSCodeApi only within the vscode extension.
      */ new (ranges: Range[], wordPattern?: RegExp): LinkedEditingRanges;
   };
   /**
+   * Identifies a {@linkcode DocumentDropEdit} or {@linkcode DocumentPasteEdit}
+   */ readonly DocumentDropOrPasteEditKind: {
+    readonly Empty: DocumentDropOrPasteEditKind;
+    /**
+     * The root kind for basic text edits.
+     *
+     * This kind should be used for edits that insert basic text into the document. A good example of this is
+     * an edit that pastes the clipboard text while also updating imports in the file based on the pasted text.
+     * For this we could use a kind such as `text.updateImports.someLanguageId`.
+     *
+     * Even though most drop/paste edits ultimately insert text, you should not use {@linkcode Text} as the base kind
+     * for every edit as this is redundant. Instead a more specific kind that describes the type of content being
+     * inserted should be used instead. For example, if the edit adds a Markdown link, use `markdown.link` since even
+     * though the content being inserted is text, it's more important to know that the edit inserts Markdown syntax.
+     */ readonly Text: DocumentDropOrPasteEditKind;
+    /**
+     * Root kind for edits that update imports in a document in addition to inserting text.
+     */ readonly TextUpdateImports: DocumentDropOrPasteEditKind;
+    /**
+     * Use {@linkcode DocumentDropOrPasteEditKind.Empty} instead.
+     */ new (value: string): DocumentDropOrPasteEditKind;
+  };
+  /**
    * An edit operation applied {@link DocumentDropEditProvider on drop}.
    */ readonly DocumentDropEdit: {
     /**
      * @param insertText The text or snippet to insert at the drop location.
-     */ new (insertText: string | SnippetString): DocumentDropEdit;
+     * @param title Human readable label that describes the edit.
+     * @param kind {@link DocumentDropOrPasteEditKind Kind} of the edit.
+     */ new (
+      insertText: string | SnippetString,
+      title?: string,
+      kind?: DocumentDropOrPasteEditKind,
+    ): DocumentDropEdit;
+  };
+  /**
+   * The reason why paste edits were requested.
+   */ readonly DocumentPasteTriggerKind: {
+    /**
+     * Pasting was requested as part of a normal paste operation.
+     */ readonly Automatic: 0;
+    /**
+     * Pasting was requested by the user with the `paste as` command.
+     */ readonly PasteAs: 1;
+  };
+  /**
+   * An edit the applies a paste operation.
+   */ readonly DocumentPasteEdit: {
+    /**
+     * Create a new paste edit.
+     *
+     * @param insertText The text or snippet to insert at the pasted locations.
+     * @param title Human readable label that describes the edit.
+     * @param kind {@link DocumentDropOrPasteEditKind Kind} of the edit.
+     */ new (
+      insertText: string | SnippetString,
+      title: string,
+      kind: DocumentDropOrPasteEditKind,
+    ): DocumentPasteEdit;
   };
   /**
    * Describes what to do with the indentation when pressing Enter.
@@ -4552,13 +4606,47 @@ Returns VSCodeApi only within the vscode extension.
     /**
      * Registers a new {@link DocumentDropEditProvider}.
      *
+     * Multiple drop providers can be registered for a language. When dropping content into an editor, all
+     * registered providers for the editor's language will be invoked based on the mimetypes they handle
+     * as specified by their {@linkcode DocumentDropEditProviderMetadata}.
+     *
+     * Each provider can return one or more {@linkcode DocumentDropEdit DocumentDropEdits}. The edits are sorted
+     * using the {@linkcode DocumentDropEdit.yieldTo} property. By default the first edit will be applied. If there
+     * are any additional edits, these will be shown to the user as selectable drop options in the drop widget.
+     *
      * @param selector A selector that defines the documents this provider applies to.
      * @param provider A drop provider.
+     * @param metadata Additional metadata about the provider.
      *
-     * @returns A {@link Disposable} that unregisters this provider when disposed of.
+     * @returns A {@linkcode Disposable} that unregisters this provider when disposed of.
      */ registerDocumentDropEditProvider(
       selector: DocumentSelector,
       provider: DocumentDropEditProvider,
+      metadata?: DocumentDropEditProviderMetadata,
+    ): Disposable;
+    /**
+     * Registers a new {@linkcode DocumentPasteEditProvider}.
+     *
+     * Multiple providers can be registered for a language. All registered providers for a language will be invoked
+     * for copy and paste operations based on their handled mimetypes as specified by the {@linkcode DocumentPasteProviderMetadata}.
+     *
+     * For {@link DocumentPasteEditProvider.prepareDocumentPaste copy operations}, changes to the {@linkcode DataTransfer}
+     * made by each provider will be merged into a single {@linkcode DataTransfer} that is used to populate the clipboard.
+     *
+     * For {@link DocumentPasteEditProvider.providerDocumentPasteEdits paste operations}, each provider will be invoked
+     * and can return one or more {@linkcode DocumentPasteEdit DocumentPasteEdits}. The edits are sorted using
+     * the {@linkcode DocumentPasteEdit.yieldTo} property. By default the first edit will be applied
+     * and the rest of the edits will be shown to the user as selectable paste options in the paste widget.
+     *
+     * @param selector A selector that defines the documents this provider applies to.
+     * @param provider A paste editor provider.
+     * @param metadata Additional metadata about the provider.
+     *
+     * @returns A {@linkcode Disposable} that unregisters this provider when disposed of.
+     */ registerDocumentPasteEditProvider(
+      selector: DocumentSelector,
+      provider: DocumentPasteEditProvider,
+      metadata: DocumentPasteProviderMetadata,
     ): Disposable;
     /**
      * Set a {@link LanguageConfiguration language configuration} for a language.
@@ -9786,8 +9874,45 @@ type ValueOf<T> = T[keyof T];
   ): ProviderResult<LinkedEditingRanges>;
 }
 /**
+ * Identifies a {@linkcode DocumentDropEdit} or {@linkcode DocumentPasteEdit}
+ */ export type DocumentDropOrPasteEditKind = {
+  /**
+   * The raw string value of the kind.
+   */ readonly value: string;
+  /**
+   * Create a new kind by appending additional scopes to the current kind.
+   *
+   * Does not modify the current kind.
+   */ append(...parts: string[]): DocumentDropOrPasteEditKind;
+  /**
+   * Checks if this kind intersects `other`.
+   *
+   * The kind `"text.plain"` for example intersects `text`, `"text.plain"` and `"text.plain.list"`,
+   * but not `"unicorn"`, or `"textUnicorn.plain"`.
+   *
+   * @param other Kind to check.
+   */ intersects(other: DocumentDropOrPasteEditKind): boolean;
+  /**
+   * Checks if `other` is a sub-kind of this `DocumentDropOrPasteEditKind`.
+   *
+   * The kind `"text.plain"` for example contains `"text.plain"` and `"text.plain.list"`,
+   * but not `"text"` or `"unicorn.text.plain"`.
+   *
+   * @param other Kind to check.
+   */ contains(other: DocumentDropOrPasteEditKind): boolean;
+};
+/**
  * An edit operation applied {@link DocumentDropEditProvider on drop}.
  */ export type DocumentDropEdit = {
+  /**
+   * Human readable label that describes the edit.
+   */ title?: string;
+  /**
+   * {@link DocumentDropOrPasteEditKind Kind} of the edit.
+   */ kind?: DocumentDropOrPasteEditKind;
+  /**
+   * Controls the ordering or multiple edits. If this provider yield to edits, it will be shown lower in the list.
+   */ yieldTo?: readonly DocumentDropOrPasteEditKind[];
   /**
    * The text or snippet to insert at the drop location.
    */ insertText: string | SnippetString;
@@ -9801,7 +9926,9 @@ type ValueOf<T> = T[keyof T];
  * This allows users to drag and drop resources (including resources from external apps) into the editor. While dragging
  * and dropping files, users can hold down `shift` to drop the file into the editor instead of opening it.
  * Requires `editor.dropIntoEditor.enabled` to be on.
- */ export interface DocumentDropEditProvider {
+ */ export interface DocumentDropEditProvider<
+  T extends DocumentDropEdit = DocumentDropEdit,
+> {
   /**
    * Provide edits which inserts the content being dragged and dropped into the document.
    *
@@ -9817,7 +9944,171 @@ type ValueOf<T> = T[keyof T];
     position: Position,
     dataTransfer: DataTransfer,
     token: CancellationToken,
-  ): ProviderResult<DocumentDropEdit>;
+  ): ProviderResult<T | T[]>;
+  /**
+   * Optional method which fills in the {@linkcode DocumentDropEdit.additionalEdit} before the edit is applied.
+   *
+   * This is called once per edit and should be used if generating the complete edit may take a long time.
+   * Resolve can only be used to change {@link DocumentDropEdit.additionalEdit}.
+   *
+   * @param edit The {@linkcode DocumentDropEdit} to resolve.
+   * @param token A cancellation token.
+   *
+   * @returns The resolved edit or a thenable that resolves to such. It is OK to return the given
+   * `edit`. If no result is returned, the given `edit` is used.
+   */ resolveDocumentDropEdit?(
+    edit: T,
+    token: CancellationToken,
+  ): ProviderResult<T>;
+}
+/**
+ * Provides additional metadata about how a {@linkcode DocumentDropEditProvider} works.
+ */ export interface DocumentDropEditProviderMetadata {
+  /**
+   * List of {@link DocumentDropOrPasteEditKind kinds} that the provider may return in {@linkcode DocumentDropEditProvider.provideDocumentDropEdits provideDocumentDropEdits}.
+   *
+   * This is used to filter out providers when a specific {@link DocumentDropOrPasteEditKind kind} of edit is requested.
+   */ readonly providedDropEditKinds?: readonly DocumentDropOrPasteEditKind[];
+  /**
+   * List of {@link DataTransfer} mime types that the provider can handle.
+   *
+   * This can either be an exact mime type such as `image/png`, or a wildcard pattern such as `image/*`.
+   *
+   * Use `text/uri-list` for resources dropped from the explorer or other tree views in the workbench.
+   *
+   * Use `files` to indicate that the provider should be invoked if any {@link DataTransferFile files} are present in the {@link DataTransfer}.
+   * Note that {@link DataTransferFile} entries are only created when dropping content from outside the editor, such as
+   * from the operating system.
+   */ readonly dropMimeTypes: readonly string[];
+}
+/**
+ * The reason why paste edits were requested.
+ */ export type DocumentPasteTriggerKind = ValueOf<
+  VSCodeAPI["DocumentPasteTriggerKind"]
+>;
+/**
+ * Additional information about the paste operation.
+ */ export interface DocumentPasteEditContext {
+  /**
+   * Requested kind of paste edits to return.
+   *
+   * When a explicit kind if requested by {@linkcode DocumentPasteTriggerKind.PasteAs PasteAs}, providers are
+   * encourage to be more flexible when generating an edit of the requested kind.
+   */ readonly only: DocumentDropOrPasteEditKind | undefined;
+  /**
+   * The reason why paste edits were requested.
+   */ readonly triggerKind: DocumentPasteTriggerKind;
+}
+/**
+ * Provider invoked when the user copies or pastes in a {@linkcode TextDocument}.
+ */ export interface DocumentPasteEditProvider<
+  T extends DocumentPasteEdit = DocumentPasteEdit,
+> {
+  /**
+   * Optional method invoked after the user copies from a {@link TextEditor text editor}.
+   *
+   * This allows the provider to attach metadata about the copied text to the {@link DataTransfer}. This data
+   * transfer is then passed back to providers in {@linkcode provideDocumentPasteEdits}.
+   *
+   * Note that currently any changes to the {@linkcode DataTransfer} are isolated to the current editor window.
+   * This means that any added metadata cannot be seen by other editor windows or by other applications.
+   *
+   * @param document Text document where the copy took place.
+   * @param ranges Ranges being copied in {@linkcode document}.
+   * @param dataTransfer The data transfer associated with the copy. You can store additional values on this for
+   * later use in {@linkcode provideDocumentPasteEdits}. This object is only valid for the duration of this method.
+   * @param token A cancellation token.
+   *
+   * @return Optional thenable that resolves when all changes to the `dataTransfer` are complete.
+   */ prepareDocumentPaste?(
+    document: TextDocument,
+    ranges: readonly Range[],
+    dataTransfer: DataTransfer,
+    token: CancellationToken,
+  ): void | Thenable<void>;
+  /**
+   * Invoked before the user pastes into a {@link TextEditor text editor}.
+   *
+   * Returned edits can replace the standard pasting behavior.
+   *
+   * @param document Document being pasted into
+   * @param ranges Range in the {@linkcode document} to paste into.
+   * @param dataTransfer The {@link DataTransfer data transfer} associated with the paste. This object is only
+   * valid for the duration of the paste operation.
+   * @param context Additional context for the paste.
+   * @param token A cancellation token.
+   *
+   * @return Set of potential {@link DocumentPasteEdit edits} that can apply the paste. Only a single returned
+   * {@linkcode DocumentPasteEdit} is applied at a time. If multiple edits are returned from all providers, then
+   * the first is automatically applied and a widget is shown that lets the user switch to the other edits.
+   */ provideDocumentPasteEdits?(
+    document: TextDocument,
+    ranges: readonly Range[],
+    dataTransfer: DataTransfer,
+    context: DocumentPasteEditContext,
+    token: CancellationToken,
+  ): ProviderResult<T[]>;
+  /**
+   * Optional method which fills in the {@linkcode DocumentPasteEdit.additionalEdit} before the edit is applied.
+   *
+   * This is called once per edit and should be used if generating the complete edit may take a long time.
+   * Resolve can only be used to change {@linkcode DocumentPasteEdit.additionalEdit}.
+   *
+   * @param pasteEdit The {@linkcode DocumentPasteEdit} to resolve.
+   * @param token A cancellation token.
+   *
+   * @returns The resolved paste edit or a thenable that resolves to such. It is OK to return the given
+   * `pasteEdit`. If no result is returned, the given `pasteEdit` is used.
+   */ resolveDocumentPasteEdit?(
+    pasteEdit: T,
+    token: CancellationToken,
+  ): ProviderResult<T>;
+}
+/**
+ * An edit the applies a paste operation.
+ */ export type DocumentPasteEdit = {
+  /**
+   * Human readable label that describes the edit.
+   */ title: string;
+  /**
+   * {@link DocumentDropOrPasteEditKind Kind} of the edit.
+   */ kind: DocumentDropOrPasteEditKind;
+  /**
+   * The text or snippet to insert at the pasted locations.
+   *
+   * If your edit requires more advanced insertion logic, set this to an empty string and provide an {@link DocumentPasteEdit.additionalEdit additional edit} instead.
+   */ insertText: string | SnippetString;
+  /**
+   * An optional additional edit to apply on paste.
+   */ additionalEdit?: WorkspaceEdit;
+  /**
+   * Controls ordering when multiple paste edits can potentially be applied.
+   *
+   * If this edit yields to another, it will be shown lower in the list of possible paste edits shown to the user.
+   */ yieldTo?: readonly DocumentDropOrPasteEditKind[];
+};
+/**
+ * Provides additional metadata about how a {@linkcode DocumentPasteEditProvider} works.
+ */ export interface DocumentPasteProviderMetadata {
+  /**
+   * List of {@link DocumentDropOrPasteEditKind kinds} that the provider may return in {@linkcode DocumentPasteEditProvider.provideDocumentPasteEdits provideDocumentPasteEdits}.
+   *
+   * This is used to filter out providers when a specific {@link DocumentDropOrPasteEditKind kind} of edit is requested.
+   */ readonly providedPasteEditKinds: readonly DocumentDropOrPasteEditKind[];
+  /**
+   * Mime types that {@linkcode DocumentPasteEditProvider.prepareDocumentPaste prepareDocumentPaste} may add on copy.
+   */ readonly copyMimeTypes?: readonly string[];
+  /**
+   * Mime types that {@linkcode DocumentPasteEditProvider.provideDocumentPasteEdits provideDocumentPasteEdits} should be invoked for.
+   *
+   * This can either be an exact mime type such as `image/png`, or a wildcard pattern such as `image/*`.
+   *
+   * Use `text/uri-list` for resources dropped from the explorer or other tree views in the workbench.
+   *
+   * Use `files` to indicate that the provider should be invoked if any {@link DataTransferFile files} are present in the {@linkcode DataTransfer}.
+   * Note that {@linkcode DataTransferFile} entries are only created when pasting content from outside the editor, such as
+   * from the operating system.
+   */ readonly pasteMimeTypes?: readonly string[];
 }
 /**
  * A tuple of two characters, like a pair of
@@ -10889,10 +11180,17 @@ type ValueOf<T> = T[keyof T];
   /**
    * The exit code reported by the shell.
    *
-   * Note that `undefined` means the shell either did not report an exit  code (ie. the shell
-   * integration script is misbehaving) or the shell reported a command started before the command
-   * finished (eg. a sub-shell was opened). Generally this should not happen, depending on the use
-   * case, it may be best to treat this as a failure.
+   * When this is `undefined` it can mean several things:
+   *
+   * - The shell either did not report an exit  code (ie. the shell integration script is
+   *   misbehaving)
+   * - The shell reported a command started before the command finished (eg. a sub-shell was
+   *   opened).
+   * - The user canceled the command via ctrl+c.
+   * - The user pressed enter when there was no input.
+   *
+   * Generally this should not happen. Depending on the use case, it may be best to treat this
+   * as a failure.
    *
    * @example
    * const execution = shellIntegration.executeCommand({
@@ -11447,10 +11745,10 @@ type ValueOf<T> = T[keyof T];
    */ commandLine: string | undefined;
   /**
    * The shell command. Is `undefined` if created with a full command line.
-   */ command: string | ShellQuotedString;
+   */ command: string | ShellQuotedString | undefined;
   /**
    * The shell args. Is `undefined` if created with a full command line.
-   */ args: Array<string | ShellQuotedString>;
+   */ args: Array<string | ShellQuotedString> | undefined;
   /**
    * The shell options used when the command line is executed in a shell.
    * Defaults to undefined.
@@ -11560,11 +11858,7 @@ type ValueOf<T> = T[keyof T];
  * An event signaling the start of a task execution.
  *
  * This interface is not intended to be implemented.
- */ export /**
- * An event signaling the start of a task execution.
- *
- * This interface is not intended to be implemented.
- */ interface TaskStartEvent {
+ */ export interface TaskStartEvent {
   /**
    * The task item representing the task that got started.
    */ readonly execution: TaskExecution;
@@ -11573,11 +11867,7 @@ type ValueOf<T> = T[keyof T];
  * An event signaling the end of an executed task.
  *
  * This interface is not intended to be implemented.
- */ export /**
- * An event signaling the end of an executed task.
- *
- * This interface is not intended to be implemented.
- */ interface TaskEndEvent {
+ */ export interface TaskEndEvent {
   /**
    * The task item representing the task that finished.
    */ readonly execution: TaskExecution;
@@ -12086,9 +12376,7 @@ type ValueOf<T> = T[keyof T];
 }
 /**
  * A panel that contains a webview.
- */ export /**
- * A panel that contains a webview.
- */ interface WebviewPanel {
+ */ export interface WebviewPanel {
   /**
    * Identifies the type of the webview panel, such as `'markdown.preview'`.
    */ readonly viewType: string;
@@ -12190,39 +12478,7 @@ type ValueOf<T> = T[keyof T];
  * The extension can then restore the old `WebviewPanel` from this state.
  *
  * @param T Type of the webview's state.
- */ export /**
- * Restore webview panels that have been persisted when vscode shuts down.
- *
- * There are two types of webview persistence:
- *
- * - Persistence within a session.
- * - Persistence across sessions (across restarts of the editor).
- *
- * A `WebviewPanelSerializer` is only required for the second case: persisting a webview across sessions.
- *
- * Persistence within a session allows a webview to save its state when it becomes hidden
- * and restore its content from this state when it becomes visible again. It is powered entirely
- * by the webview content itself. To save off a persisted state, call `acquireVsCodeApi().setState()` with
- * any json serializable object. To restore the state again, call `getState()`
- *
- * ```js
- * // Within the webview
- * const vscode = acquireVsCodeApi();
- *
- * // Get existing state
- * const oldState = vscode.getState() || { value: 0 };
- *
- * // Update state
- * setState({ value: oldState.value + 1 })
- * ```
- *
- * A `WebviewPanelSerializer` extends this persistence across restarts of the editor. When the editor is shutdown,
- * it will save off the state from `setState` of all webviews that have a serializer. When the
- * webview first becomes visible after the restart, this state is passed to `deserializeWebviewPanel`.
- * The extension can then restore the old `WebviewPanel` from this state.
- *
- * @param T Type of the webview's state.
- */ interface WebviewPanelSerializer<T = unknown> {
+ */ export interface WebviewPanelSerializer<T = unknown> {
   /**
    * Restore a webview panel from its serialized `state`.
    *
@@ -12294,11 +12550,7 @@ type ValueOf<T> = T[keyof T];
  * Additional information the webview view being resolved.
  *
  * @param T Type of the webview's state.
- */ export /**
- * Additional information the webview view being resolved.
- *
- * @param T Type of the webview's state.
- */ interface WebviewViewResolveContext<T = unknown> {
+ */ export interface WebviewViewResolveContext<T = unknown> {
   /**
    * Persisted state from the webview content.
    *
@@ -12385,12 +12637,7 @@ type ValueOf<T> = T[keyof T];
  *
  * Custom documents are only used within a given `CustomEditorProvider`. The lifecycle of a `CustomDocument` is
  * managed by the editor. When no more references remain to a `CustomDocument`, it is disposed of.
- */ export /**
- * Represents a custom document used by a {@linkcode CustomEditorProvider}.
- *
- * Custom documents are only used within a given `CustomEditorProvider`. The lifecycle of a `CustomDocument` is
- * managed by the editor. When no more references remain to a `CustomDocument`, it is disposed of.
- */ interface CustomDocument {
+ */ export interface CustomDocument {
   /**
    * The associated uri for this document.
    */ readonly uri: Uri;
@@ -12405,11 +12652,7 @@ type ValueOf<T> = T[keyof T];
  * Event triggered by extensions to signal to the editor that an edit has occurred on an {@linkcode CustomDocument}.
  *
  * @see {@linkcode CustomEditorProvider.onDidChangeCustomDocument}.
- */ export /**
- * Event triggered by extensions to signal to the editor that an edit has occurred on an {@linkcode CustomDocument}.
- *
- * @see {@linkcode CustomEditorProvider.onDidChangeCustomDocument}.
- */ interface CustomDocumentEditEvent<
+ */ export interface CustomDocumentEditEvent<
   T extends CustomDocument = CustomDocument,
 > {
   /**
@@ -12440,12 +12683,7 @@ type ValueOf<T> = T[keyof T];
  * has changed.
  *
  * @see {@linkcode CustomEditorProvider.onDidChangeCustomDocument}.
- */ export /**
- * Event triggered by extensions to signal to the editor that the content of a {@linkcode CustomDocument}
- * has changed.
- *
- * @see {@linkcode CustomEditorProvider.onDidChangeCustomDocument}.
- */ interface CustomDocumentContentChangeEvent<
+ */ export interface CustomDocumentContentChangeEvent<
   T extends CustomDocument = CustomDocument,
 > {
   /**
@@ -12454,9 +12692,7 @@ type ValueOf<T> = T[keyof T];
 }
 /**
  * A backup for an {@linkcode CustomDocument}.
- */ export /**
- * A backup for an {@linkcode CustomDocument}.
- */ interface CustomDocumentBackup {
+ */ export interface CustomDocumentBackup {
   /**
    * Unique identifier for the backup.
    *
@@ -12471,9 +12707,7 @@ type ValueOf<T> = T[keyof T];
 }
 /**
  * Additional information used to implement {@linkcode CustomDocumentBackup}.
- */ export /**
- * Additional information used to implement {@linkcode CustomDocumentBackup}.
- */ interface CustomDocumentBackupContext {
+ */ export interface CustomDocumentBackupContext {
   /**
    * Suggested file location to write the new backup.
    *
@@ -12486,9 +12720,7 @@ type ValueOf<T> = T[keyof T];
 }
 /**
  * Additional information about the opening custom document.
- */ export /**
- * Additional information about the opening custom document.
- */ interface CustomDocumentOpenContext {
+ */ export interface CustomDocumentOpenContext {
   /**
    * The id of the backup to restore the document from or `undefined` if there is no backup.
    *
@@ -13250,9 +13482,7 @@ type ValueOf<T> = T[keyof T];
 }
 /**
  * Defines the interface of a terminal pty, enabling extensions to control a terminal.
- */ export /**
- * Defines the interface of a terminal pty, enabling extensions to control a terminal.
- */ interface Pseudoterminal {
+ */ export interface Pseudoterminal {
   /**
    * An event that when fired will write data to the terminal. Unlike
    * {@link Terminal.sendText} which sends text to the underlying child
@@ -14056,10 +14286,13 @@ type ValueOf<T> = T[keyof T];
    */ readonly index: number;
 }
 /**
- * The configuration scope which can be a
- * a 'resource' or a languageId or both or
- * a '{@link TextDocument}' or
- * a '{@link WorkspaceFolder}'
+ * The configuration scope which can be:
+ * - a {@link Uri} representing a resource
+ * - a {@link TextDocument} representing an open text document
+ * - a {@link WorkspaceFolder} representing a workspace folder
+ * - an object containing:
+ *   - `uri`: an optional {@link Uri} of a text document
+ *   - `languageId`: the language identifier of a text document
  */ export type ConfigurationScope = Uri | TextDocument | WorkspaceFolder | {
   /**
    * The uri of a {@link TextDocument text document}
@@ -15373,8 +15606,9 @@ type ValueOf<T> = T[keyof T];
    */ readonly uri: Uri;
   /**
    * The range the comment thread is located within the document. The thread icon will be shown
-   * at the last line of the range.
-   */ range: Range;
+   * at the last line of the range. When set to undefined, the comment will be associated with the
+   * file, and not a specific range.
+   */ range: Range | undefined;
   /**
    * The ordered comments of the thread.
    */ comments: readonly Comment[];
@@ -15495,6 +15729,16 @@ type ValueOf<T> = T[keyof T];
    */ text: string;
 }
 /**
+ * The ranges a CommentingRangeProvider enables commenting on.
+ */ export interface CommentingRanges {
+  /**
+   * Enables comments to be added to a file without a specific range.
+   */ enableFileComments: boolean;
+  /**
+   * The ranges which allow new comment threads creation.
+   */ ranges?: Range[];
+}
+/**
  * Commenting range provider for a {@link CommentController comment controller}.
  */ export interface CommentingRangeProvider {
   /**
@@ -15502,7 +15746,7 @@ type ValueOf<T> = T[keyof T];
    */ provideCommentingRanges(
     document: TextDocument,
     token: CancellationToken,
-  ): ProviderResult<Range[]>;
+  ): ProviderResult<Range[] | CommentingRanges>;
 }
 /**
  * Represents a {@link CommentController comment controller}'s {@link CommentController.options options}.
@@ -17138,12 +17382,12 @@ type ValueOf<T> = T[keyof T];
     token?: CancellationToken,
   ): Thenable<LanguageModelChatResponse>;
   /**
-     * Count the number of tokens in a message using the model specific tokenizer-logic.
+		 * Count the number of tokens in a message using the model specific tokenizer-logic.
 
-     * @param text A string or a message instance.
-     * @param token Optional cancellation token.  See {@link CancellationTokenSource} for how to create one.
-     * @returns A thenable that resolves to the number of tokens.
-     */ countTokens(
+		 * @param text A string or a message instance.
+		 * @param token Optional cancellation token.  See {@link CancellationTokenSource} for how to create one.
+		 * @returns A thenable that resolves to the number of tokens.
+		 */ countTokens(
     text: string | LanguageModelChatMessage,
     token?: CancellationToken,
   ): Thenable<number>;
