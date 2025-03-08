@@ -3256,14 +3256,14 @@ Returns VSCodeApi only within the vscode extension.
    * A map containing a mapping of the mime type of the corresponding transferred data.
    *
    * Drag and drop controllers that implement {@link TreeDragAndDropController.handleDrag `handleDrag`} can add additional mime types to the
-   * data transfer. These additional mime types will only be included in the `handleDrop` when the the drag was initiated from
+   * data transfer. These additional mime types will only be included in the `handleDrop` when the drag was initiated from
    * an element in the same drag and drop controller.
    */ readonly DataTransfer: {
     /**
      * A map containing a mapping of the mime type of the corresponding transferred data.
      *
      * Drag and drop controllers that implement {@link TreeDragAndDropController.handleDrag `handleDrag`} can add additional mime types to the
-     * data transfer. These additional mime types will only be included in the `handleDrop` when the the drag was initiated from
+     * data transfer. These additional mime types will only be included in the `handleDrop` when the drag was initiated from
      * an element in the same drag and drop controller.
      */ new (): DataTransfer;
   };
@@ -5251,7 +5251,7 @@ Returns VSCodeApi only within the vscode extension.
       providerId: string,
       scopes: readonly string[],
       options: AuthenticationGetSessionOptions & {
-        createIfNone: true;
+        createIfNone: true | AuthenticationGetSessionPresentationOptions;
       },
     ): Thenable<AuthenticationSession>;
     /**
@@ -5270,7 +5270,10 @@ Returns VSCodeApi only within the vscode extension.
       providerId: string,
       scopes: readonly string[],
       options: AuthenticationGetSessionOptions & {
-        forceNewSession: true | AuthenticationForceNewSessionOptions;
+        forceNewSession:
+          | true
+          | AuthenticationGetSessionPresentationOptions
+          | AuthenticationForceNewSessionOptions;
       },
     ): Thenable<AuthenticationSession>;
     /**
@@ -6329,14 +6332,14 @@ type ValueOf<T> = T[keyof T];
   /**
    * The position at which the selection starts.
    * This position might be before or after {@link Selection.active active}.
-   */ anchor: Position;
+   */ readonly anchor: Position;
   /**
    * The position of the cursor.
    * This position might be before or after {@link Selection.anchor anchor}.
-   */ active: Position;
+   */ readonly active: Position;
   /**
    * A selection is reversed if its {@link Selection.anchor anchor} is the {@link Selection.end end} position.
-   */ isReversed: boolean;
+   */ readonly isReversed: boolean;
 };
 /**
  * Represents sources that can cause {@link window.onDidChangeTextEditorSelection selection change events}.
@@ -6806,6 +6809,9 @@ type ValueOf<T> = T[keyof T];
       /**
        * Add undo stop after making the edits.
        */ readonly undoStopAfter: boolean;
+      /**
+       * Keep whitespace of the {@link SnippetString.value} as is.
+       */ readonly keepWhitespace?: boolean;
     },
   ): Thenable<boolean>;
   /**
@@ -8303,6 +8309,9 @@ type ValueOf<T> = T[keyof T];
   /**
    * The {@link SnippetString snippet} this edit will perform.
    */ snippet: SnippetString;
+  /**
+   * Whether the snippet edit should be applied with existing whitespace preserved.
+   */ keepWhitespace?: boolean;
 };
 /**
  * A notebook edit represents edits that should be applied to the contents of a notebook.
@@ -10052,7 +10061,7 @@ type ValueOf<T> = T[keyof T];
    * Optional method which fills in the {@linkcode DocumentPasteEdit.additionalEdit} before the edit is applied.
    *
    * This is called once per edit and should be used if generating the complete edit may take a long time.
-   * Resolve can only be used to change {@linkcode DocumentPasteEdit.additionalEdit}.
+   * Resolve can only be used to change {@linkcode DocumentPasteEdit.insertText} or {@linkcode DocumentPasteEdit.additionalEdit}.
    *
    * @param pasteEdit The {@linkcode DocumentPasteEdit} to resolve.
    * @param token A cancellation token.
@@ -11440,7 +11449,7 @@ type ValueOf<T> = T[keyof T];
    * {@linkcode ExtensionContext.globalState globalState} to store key value data.
    *
    * @see {@linkcode FileSystem workspace.fs} for how to read and write files and folders from
-   *  an uri.
+   *  a uri.
    */ readonly storageUri: Uri | undefined;
   /**
    * An absolute file path of a workspace specific directory in which the extension
@@ -13061,7 +13070,7 @@ type ValueOf<T> = T[keyof T];
  * A map containing a mapping of the mime type of the corresponding transferred data.
  *
  * Drag and drop controllers that implement {@link TreeDragAndDropController.handleDrag `handleDrag`} can add additional mime types to the
- * data transfer. These additional mime types will only be included in the `handleDrop` when the the drag was initiated from
+ * data transfer. These additional mime types will only be included in the `handleDrop` when the drag was initiated from
  * an element in the same drag and drop controller.
  */ export type DataTransfer = {
   /**
@@ -13071,7 +13080,7 @@ type ValueOf<T> = T[keyof T];
    * Mimes type look ups are case-insensitive.
    *
    * Special mime types:
-   * - `text/uri-list` — A string with `toString()`ed Uris separated by `\r\n`. To specify a cursor position in the file,
+   * - `text/uri-list` — A string with `toString()`ed Uris separated by `\r\n`. To specify a cursor position in the file,
    * set the Uri's fragment to `L3,5`, where 3 is the line number and 5 is the column number.
    */ get(mimeType: string): DataTransferItem | undefined;
   /**
@@ -15127,6 +15136,24 @@ type ValueOf<T> = T[keyof T];
    * no {@link SourceControlResourceState source control resource states}.
    */ hideWhenEmpty?: boolean;
   /**
+   * Context value of the resource group. This can be used to contribute resource group specific actions.
+   * For example, if a resource group is given a context value of `exportable`, when contributing actions to `scm/resourceGroup/context`
+   * using `menus` extension point, you can specify context value for key `scmResourceGroupState` in `when` expressions, like `scmResourceGroupState == exportable`.
+   * ```json
+   * "contributes": {
+   *   "menus": {
+   *     "scm/resourceGroup/context": [
+   *       {
+   *         "command": "extension.export",
+   *         "when": "scmResourceGroupState == exportable"
+   *       }
+   *     ]
+   *   }
+   * }
+   * ```
+   * This will show action `extension.export` only for resource groups with `contextValue` equal to `exportable`.
+   */ contextValue?: string;
+  /**
    * This group's collection of
    * {@link SourceControlResourceState source control resource states}.
    */ resourceStates: SourceControlResourceState[];
@@ -15829,13 +15856,18 @@ type ValueOf<T> = T[keyof T];
    */ readonly label: string;
 }
 /**
- * Optional options to be used when calling {@link authentication.getSession} with the flag `forceNewSession`.
- */ export interface AuthenticationForceNewSessionOptions {
+ * Optional options to be used when calling {@link authentication.getSession} with interactive options `forceNewSession` & `createIfNone`.
+ */ export interface AuthenticationGetSessionPresentationOptions {
   /**
    * An optional message that will be displayed to the user when we ask to re-authenticate. Providing additional context
    * as to why you are asking a user to re-authenticate can help increase the odds that they will accept.
    */ detail?: string;
 }
+/**
+ * Optional options to be used when calling {@link authentication.getSession} with the flag `forceNewSession`.
+ * @deprecated Use {@link AuthenticationGetSessionPresentationOptions} instead.
+ */ export type AuthenticationForceNewSessionOptions =
+  AuthenticationGetSessionPresentationOptions;
 /**
  * Options to be used when getting an {@link AuthenticationSession} from an {@link AuthenticationProvider}.
  */ export interface AuthenticationGetSessionOptions {
@@ -15862,24 +15894,31 @@ type ValueOf<T> = T[keyof T];
    * on the accounts activity bar icon. An entry for the extension will be added under the menu to sign in. This
    * allows quietly prompting the user to sign in.
    *
+   * If you provide options, you will also see the dialog but with the additional context provided.
+   *
    * If there is a matching session but the extension has not been granted access to it, setting this to true
    * will also result in an immediate modal dialog, and false will add a numbered badge to the accounts icon.
    *
    * Defaults to false.
    *
    * Note: you cannot use this option with {@link AuthenticationGetSessionOptions.silent silent}.
-   */ createIfNone?: boolean;
+   */ createIfNone?: boolean | AuthenticationGetSessionPresentationOptions;
   /**
    * Whether we should attempt to reauthenticate even if there is already a session available.
    *
    * If true, a modal dialog will be shown asking the user to sign in again. This is mostly used for scenarios
    * where the token needs to be re minted because it has lost some authorization.
    *
+   * If you provide options, you will also see the dialog but with the additional context provided.
+   *
    * If there are no existing sessions and forceNewSession is true, it will behave identically to
    * {@link AuthenticationGetSessionOptions.createIfNone createIfNone}.
    *
    * This defaults to false.
-   */ forceNewSession?: boolean | AuthenticationForceNewSessionOptions;
+   */ forceNewSession?:
+    | boolean
+    | AuthenticationGetSessionPresentationOptions
+    | AuthenticationForceNewSessionOptions;
   /**
    * Whether we should show the indication to sign in in the Accounts menu.
    *
@@ -17487,7 +17526,7 @@ type ValueOf<T> = T[keyof T];
    */ description: string;
   /**
    * A JSON schema for the input this tool accepts.
-   */ inputSchema?: object;
+   */ inputSchema?: object | undefined;
 }
 /**
  * A tool-calling mode for the language model to use.
