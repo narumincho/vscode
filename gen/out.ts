@@ -4917,7 +4917,7 @@ Returns VSCodeApi only within the vscode extension.
 		 * used to represent line coverage.
 		 * @param branchCoverage Branch coverage information
 		 * @param declarationCoverage Declaration coverage information
-		 * @param includesTests Test cases included in this coverage report, see {@link includesTests}
+		 * @param includesTests Test cases included in this coverage report, see {@link FileCoverage.includesTests}
 		 */ new(uri: Uri, statementCoverage: TestCoverageCount, branchCoverage?: TestCoverageCount, declarationCoverage?: TestCoverageCount, includesTests?: TestItem[]): FileCoverage;
     };
     /**
@@ -5415,12 +5415,12 @@ type ValueOf<T> = T[keyof T];
 		 * The position will be {@link TextDocument.validatePosition adjusted}.
 		 *
 		 * @param position A position.
-		 * @returns A valid zero-based offset.
+		 * @returns A valid zero-based offset in UTF-16 [code units](https://developer.mozilla.org/en-US/docs/Glossary/Code_unit).
 		 */ offsetAt(position: Position): number;
     /**
 		 * Converts a zero-based offset to a position.
 		 *
-		 * @param offset A zero-based offset.
+		 * @param offset A zero-based offset into the document. This offset is in UTF-16 [code units](https://developer.mozilla.org/en-US/docs/Glossary/Code_unit).
 		 * @returns A valid {@link Position}.
 		 */ positionAt(offset: number): Position;
     /**
@@ -5474,6 +5474,8 @@ type ValueOf<T> = T[keyof T];
 		 */ readonly line: number;
     /**
 		 * The zero-based character value.
+		 *
+		 * Character offsets are expressed using UTF-16 [code units](https://developer.mozilla.org/en-US/docs/Glossary/Code_unit).
 		 */ readonly character: number;
     /**
 		 * Check if this position is before `other`.
@@ -6412,6 +6414,9 @@ type ValueOf<T> = T[keyof T];
     /**
 		 * A human-readable string which is rendered prominent. Supports rendering of {@link ThemeIcon theme icons} via
 		 * the `$(<name>)`-syntax.
+		 *
+		 * Note: When {@link QuickPickItem.kind kind} is set to {@link QuickPickItemKind.Default} (so a regular item
+		 * instead of a separator), it supports rendering of {@link ThemeIcon theme icons} via the `$(<name>)`-syntax.
 		 */ label: string;
     /**
 		 * The kind of QuickPickItem that will determine how this item is rendered in the quick pick. When not specified,
@@ -9955,6 +9960,16 @@ type ValueOf<T> = T[keyof T];
 		 * For more information on events that can send data see "DEC Private Mode Set (DECSET)" on
 		 * https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
 		 */ readonly isInteractedWith: boolean;
+    /**
+		 * The detected shell type of the {@link Terminal}. This will be `undefined` when there is
+		 * not a clear signal as to what the shell is, or the shell is not supported yet. This
+		 * value should change to the shell type of a sub-shell when launched (for example, running
+		 * `bash` inside `zsh`).
+		 *
+		 * Note that the possible values are currently defined as any of the following:
+		 * 'bash', 'cmd', 'csh', 'fish', 'gitbash', 'julia', 'ksh', 'node', 'nu', 'pwsh', 'python',
+		 * 'sh', 'wsl', 'zsh'.
+		 */ readonly shell: string | undefined;
 }
 /**
 	 * [Shell integration](https://code.visualstudio.com/docs/terminal/shell-integration)-powered capabilities owned by a terminal.
@@ -12005,7 +12020,7 @@ type ValueOf<T> = T[keyof T];
 		 * Mimes type look ups are case-insensitive.
 		 *
 		 * Special mime types:
-		 * - `text/uri-list` — A string with `toString()`ed Uris separated by `\r\n`. To specify a cursor position in the file,
+		 * - `text/uri-list` — A string with `toString()`ed Uris separated by `\r\n`. To specify a cursor position in the file,
 		 * set the Uri's fragment to `L3,5`, where 3 is the line number and 5 is the column number.
 		 */ get(mimeType: string): DataTransferItem | undefined;
     /**
@@ -15866,7 +15881,7 @@ type ValueOf<T> = T[keyof T];
 		 * This associates the tool invocation to a chat session.
 		 */ readonly toolInvocationToken: ChatParticipantToolToken;
     /**
-		 * This is the model that is currently selected in the UI. Extensions can use this or use {@link chat.selectChatModels} to
+		 * This is the model that is currently selected in the UI. Extensions can use this or use {@link lm.selectChatModels} to
 		 * pick another model. Don't hold onto this past the lifetime of the request.
 		 */ readonly model: LanguageModelChat;
 }
@@ -16008,7 +16023,7 @@ type ValueOf<T> = T[keyof T];
 /**
 	 * Represents a language model response.
 	 *
-	 * @see {@link LanguageModelAccess.chatRequest}
+	 * @see {@link ChatRequest}
 	 */ export interface LanguageModelChatResponse {
     /**
 		 * An async iterable that is a stream of text and tool-call parts forming the overall response. A
